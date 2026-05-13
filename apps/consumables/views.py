@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 
+from apps.accounts.decorators import admin_required
 from apps.activity.utils import log_activity
 from apps.consumables.forms import ConsumableForm, ConsumableUsageLogForm, RestockForm
 from apps.consumables.models import Consumable, ConsumableUsageLog
@@ -101,6 +102,7 @@ def consumable_edit_view(request, pk):
 
 
 @login_required
+@admin_required
 def consumable_delete_view(request, pk):
     """Admin only: soft-delete (deactivate) a consumable."""
     consumable = get_object_or_404(Consumable, pk=pk)

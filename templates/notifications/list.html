@@ -13,17 +13,29 @@
       <h2 class="text-xl font-bold text-slate-800">Your Notifications</h2>
       <p class="text-sm text-slate-500 mt-0.5">Stay up to date with lab activity</p>
     </div>
-    <form method="post" action="{% url 'notifications:mark_all_read' %}">
-      {% csrf_token %}
-      <button type="submit"
-              class="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+    <div class="flex items-center gap-2">
+      {% if user.is_admin %}
+      <a href="{% url 'notifications:clear_all' %}"
+         class="inline-flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 text-sm font-medium rounded-lg transition-colors border border-red-200">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
         </svg>
-        Mark All Read
-      </button>
-    </form>
+        Clear All
+      </a>
+      {% endif %}
+      <form method="post" action="{% url 'notifications:mark_all_read' %}">
+        {% csrf_token %}
+        <button type="submit"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Mark All Read
+        </button>
+      </form>
+    </div>
   </div>
 
   <!-- Notification List -->
@@ -79,8 +91,8 @@
                 </div>
 
                 <!-- Unread dot + dismiss button -->
-                {% if not notification.is_read %}
                 <div class="flex items-center gap-2 flex-shrink-0">
+                  {% if not notification.is_read %}
                   <span class="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0"></span>
                   <form method="post" action="{% url 'notifications:mark_read' notification.pk %}">
                     {% csrf_token %}
@@ -93,8 +105,16 @@
                       </svg>
                     </button>
                   </form>
+                  {% endif %}
+                  <a href="{% url 'notifications:delete' notification.pk %}"
+                     title="Delete notification"
+                     class="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </a>
                 </div>
-                {% endif %}
               </div>
 
               <!-- Footer: time + optional link -->

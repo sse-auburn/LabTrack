@@ -185,6 +185,12 @@
     </form>
     {% endif %}
 
+    {% if user.is_admin or reservation.requester == user %}
+    <a href="{% url 'reservations:delete' reservation.pk %}"
+       class="inline-flex items-center px-4 py-2 bg-red-50 border border-red-300 text-red-700 rounded-lg text-sm hover:bg-red-100 transition">
+      Delete Reservation
+    </a>
+    {% endif %}
     <a href="{% url 'reservations:list' %}"
        class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50 transition">
       Back to List

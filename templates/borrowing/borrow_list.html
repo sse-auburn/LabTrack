@@ -162,6 +162,10 @@
                     <a href="{% url 'borrowing:return' borrow.pk %}"
                        class="text-xs text-teal-600 hover:text-teal-700 font-medium transition-colors">Return</a>
                     {% endif %}
+                    {% if user.is_admin or borrow.borrower == user %}
+                    <a href="{% url 'borrowing:delete' borrow.pk %}"
+                       class="text-xs text-red-600 hover:text-red-700 font-medium transition-colors">Delete</a>
+                    {% endif %}
                   </div>
                 </td>
               </tr>

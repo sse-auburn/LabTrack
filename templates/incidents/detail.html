@@ -29,6 +29,9 @@
           <a href="{% url 'incidents:resolve' incident.pk %}" class="px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">Mark Resolved</a>
         {% endif %}
       {% endif %}
+      {% if user.is_admin or incident.reported_by == user %}
+        <a href="{% url 'incidents:delete' incident.pk %}" class="px-3 py-1.5 bg-red-50 border border-red-300 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100">Delete</a>
+      {% endif %}
     </div>
   </div>
 

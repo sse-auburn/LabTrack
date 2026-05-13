@@ -60,7 +60,12 @@
             </td>
             <td class="px-6 py-4 text-sm text-gray-500">{{ incident.created_at|date:"M d, Y" }}</td>
             <td class="px-6 py-4 text-right">
-              <a href="{% url 'incidents:detail' incident.pk %}" class="text-xs text-indigo-600 hover:underline">View</a>
+              <div class="flex items-center justify-end gap-2">
+                <a href="{% url 'incidents:detail' incident.pk %}" class="text-xs text-indigo-600 hover:underline">View</a>
+                {% if user.is_admin or incident.reported_by == user %}
+                <a href="{% url 'incidents:delete' incident.pk %}" class="text-xs text-red-600 hover:underline">Delete</a>
+                {% endif %}
+              </div>
             </td>
           </tr>
           {% endfor %}

@@ -143,6 +143,67 @@ def profile_edit_view(request):
 
 @login_required
 @admin_required
+def user_create_view(request):
+    """Create a new user by an admin."""
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.first_name = form.cleaned_data.get('first_name', '')
+            user.last_name = form.cleaned_data.get('last_name', '')
+            user.save()
+            UserProfile.objects.get_or_create(user=user)
+
+            log_activity(
+                actor=request.user,
+                action='USER_CREATED',
+                description=f'Admin created user: {user.email}',
+                content_type_label='customuser',
+                object_id=user.pk,
+                object_repr=str(user),
+                request=request,
+            )
+            messages.success(request, f'User {user.full_name} has been created.')
+            return redirect('accounts:user_list')
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, 'accounts/user_form.html', {
+        'form': form,
+        'action': 'Create',
+    })
+
+
+@login_required
+@admin_required
+def user_edit_view(request, pk):
+    """Edit any user as an admin."""
+    target_user = get_object_or_404(CustomUser, pk=pk)
+    profile, _ = UserProfile.objects.get_or_create(user=target_user)
+
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=target_user)
+        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, f'{target_user.full_name} has been updated.')
+            return redirect('accounts:user_detail', pk=pk)
+    else:
+        user_form = UserUpdateForm(instance=target_user)
+        profile_form = ProfileUpdateForm(instance=profile)
+
+    return render(request, 'accounts/user_form.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'target_user': target_user,
+        'action': 'Edit',
+    })
+
+
+@login_required
+@admin_required
 def user_list_view(request):
     """List all registered users with pagination (admin only)."""
     queryset = CustomUser.objects.select_related('profile').order_by('username')
@@ -254,3 +315,33 @@ def toggle_active_view(request, pk):
         messages.success(request, f"{target_user.full_name} has been {status}.")
 
     return redirect('accounts:user_list')
+
+
+@login_required
+@admin_required
+def user_delete_view(request, pk):
+    """Delete a user account (admin only)."""
+    target_user = get_object_or_404(CustomUser, pk=pk)
+
+    if target_user == request.user:
+        messages.error(request, 'You cannot delete your own account.')
+        return redirect('accounts:user_list')
+
+    if request.method == 'POST':
+        name = target_user.full_name or target_user.username
+        target_user.delete()
+        log_activity(
+            actor=request.user,
+            action='USER_DELETED',
+            description=f'Admin deleted user: {name}.',
+            content_type_label='customuser',
+            object_id=pk,
+            object_repr=name,
+            request=request,
+        )
+        messages.success(request, f'User "{name}" has been deleted.')
+        return redirect('accounts:user_list')
+
+    return render(request, 'accounts/user_confirm_delete.html', {
+        'target_user': target_user,
+    })

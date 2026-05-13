@@ -98,6 +98,9 @@
         <button class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">Confirm Return</button>
       </form>
     {% endif %}
+    {% if user.is_admin or borrow.borrower == user %}
+    <a href="{% url 'borrowing:delete' borrow.pk %}" class="px-4 py-2 bg-red-50 border border-red-300 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100">Delete Request</a>
+    {% endif %}
     <a href="{% url 'borrowing:list' %}" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50">Back to List</a>
   </div>
 

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Activity Log – SSELabTrack{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+  <div class="max-w-md w-full">
+    <div class="bg-white rounded-xl shadow-sm border border-red-200 overflow-hidden">
+      <div class="bg-red-50 px-6 py-5 border-b border-red-100">
+        <div class="flex items-center gap-3">
+          <div class="shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold text-gray-900">Delete Activity Log</h1>
+            <p class="text-sm text-red-600">This action cannot be undone</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 py-6">
+        <p class="text-gray-700 text-sm mb-4">
+          Are you sure you want to delete this activity log entry?
+        </p>
+
+        <div class="bg-gray-50 rounded-lg p-4 mb-5 text-sm space-y-1.5">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Action</span>
+            <span class="font-medium text-gray-700">{{ log.action }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Actor</span>
+            <span class="font-medium text-gray-700">{{ log.actor.full_name|default:log.actor.username }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Timestamp</span>
+            <span class="font-medium text-gray-700">{{ log.timestamp }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Description</span>
+            <span class="font-medium text-gray-700">{{ log.description|truncatechars:40 }}</span>
+          </div>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="flex gap-3">
+            <a href="{% url 'activity:feed' %}"
+               class="flex-1 text-center px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
+              Cancel
+            </a>
+            <button type="submit"
+                    class="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+              Yes, Delete Log
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

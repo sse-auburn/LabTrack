@@ -168,3 +168,39 @@ def admin_dashboard_view(request):
         'category_usage': category_usage,
         'monthly_borrows': monthly_borrows,
     })
+
+
+@admin_required
+def admin_panel_view(request):
+    """Functional admin panel — central hub for managing the entire system."""
+    from django.apps import apps
+    from apps.accounts.models import CustomUser
+    from apps.equipment.models import Category, Location
+    from apps.kits.models import Kit
+    from apps.projects.models import Project
+    from apps.incidents.models import MaintenanceLog, CalibrationLog
+
+    today = date.today()
+
+    counts = {
+        'users': CustomUser.objects.count(),
+        'members': CustomUser.objects.filter(role='MEMBER').count(),
+        'admins': CustomUser.objects.filter(role='ADMIN').count(),
+        'equipment': Equipment.objects.filter(is_active=True).count(),
+        'categories': Category.objects.count(),
+        'locations': Location.objects.count(),
+        'kits': Kit.objects.count(),
+        'projects': Project.objects.count(),
+        'consumables': Consumable.objects.filter(is_active=True).count(),
+        'borrow_requests': BorrowRequest.objects.count(),
+        'pending_borrows': BorrowRequest.objects.filter(status='PENDING').count(),
+        'overdue': BorrowRequest.objects.filter(due_date__lt=today, status__in=['APPROVED', 'ACTIVE']).count(),
+        'reservations': Reservation.objects.count(),
+        'incidents_open': IncidentReport.objects.filter(status__in=['OPEN', 'INVESTIGATING']).count(),
+        'maintenance': MaintenanceLog.objects.count(),
+        'calibration': CalibrationLog.objects.count(),
+        'activity': ActivityLog.objects.count(),
+        'notifications': Notification.objects.filter(is_read=False).count(),
+    }
+
+    return render(request, 'admin_panel.html', {'counts': counts})

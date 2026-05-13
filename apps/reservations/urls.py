@@ -15,6 +15,7 @@ urlpatterns = [
     path('<int:pk>/confirm/', views.reservation_confirm_view, name='confirm'),
     path('<int:pk>/return/', views.reservation_return_view, name='return'),
     path('<int:pk>/return/confirm/', views.reservation_return_confirm_view, name='return_confirm'),
+    path('<int:pk>/delete/', views.reservation_delete_view, name='delete'),
     path('waitlist/', views.waitlist_list_view, name='waitlist_list'),
     path('waitlist/create/', views.waitlist_create_view, name='waitlist_create'),
     path('waitlist/<int:pk>/leave/', views.waitlist_leave_view, name='waitlist_leave'),

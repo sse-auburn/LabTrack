@@ -215,7 +215,7 @@
                 {% endif %}
               </div>
 
-              <!-- Timestamp -->
+              <!-- Timestamp + delete -->
               <div class="flex-shrink-0 text-right">
                 <span class="text-xs text-slate-400 whitespace-nowrap">
                   {{ log.timestamp|timesince }} ago
@@ -223,6 +223,10 @@
                 <p class="text-xs text-slate-300 mt-0.5 whitespace-nowrap hidden sm:block">
                   {{ log.timestamp|date:"H:i" }}
                 </p>
+                {% if user.is_admin %}
+                <a href="{% url 'activity:delete' log.pk %}"
+                   class="text-xs text-red-500 hover:text-red-700 mt-1 inline-block">Delete</a>
+                {% endif %}
               </div>
             </div>
           </div>

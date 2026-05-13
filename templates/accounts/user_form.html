@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} User{% endblock %}
+{% block page_title %}{{ action }} User{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <form method="post" {% if profile_form %}enctype="multipart/form-data"{% endif %} class="space-y-6">
+    {% csrf_token %}
+
+    <!-- User Account Info -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+      <h3 class="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
+        <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        Account Information
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {% for field in form %}
+        <div class="{% if field.name == 'email' or field.name == 'password1' or field.name == 'password2' %}sm:col-span-2{% endif %}">
+          <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+            {{ field.label }}
+          </label>
+          {{ field }}
+          {% if field.help_text %}
+          <p class="mt-1 text-xs text-slate-500">{{ field.help_text }}</p>
+          {% endif %}
+          {% if field.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ field.errors.0 }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if profile_form %}
+    <!-- Profile Info -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+      <h3 class="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
+        <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3 3 0 00-3 3m3-3a3 3 0 013 3m-3 3v2m3-2v2m9-2v2"/>
+        </svg>
+        Profile Information
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {% for field in profile_form %}
+        <div class="{% if field.name == 'bio' %}sm:col-span-2{% endif %}">
+          <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+            {{ field.label }}
+          </label>
+          {{ field }}
+          {% if field.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ field.errors.0 }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end gap-3">
+      <a href="{% url 'accounts:user_list' %}"
+         class="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors">
+        Cancel
+      </a>
+      <button type="submit"
+              class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors">
+        {{ action }} User
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

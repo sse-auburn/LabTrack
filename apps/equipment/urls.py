@@ -21,8 +21,12 @@ urlpatterns = [
     # Categories
     path('categories/', views.category_list_view, name='category_list'),
     path('categories/create/', views.category_create_view, name='category_create'),
+    path('categories/<int:pk>/edit/', views.category_edit_view, name='category_edit'),
+    path('categories/<int:pk>/delete/', views.category_delete_view, name='category_delete'),
 
     # Locations
     path('locations/', views.location_list_view, name='location_list'),
     path('locations/create/', views.location_create_view, name='location_create'),
+    path('locations/<int:pk>/edit/', views.location_edit_view, name='location_edit'),
+    path('locations/<int:pk>/delete/', views.location_delete_view, name='location_delete'),
 ]

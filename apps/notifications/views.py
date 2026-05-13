@@ -1,5 +1,6 @@
 """Views for the notifications app."""
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import JsonResponse
@@ -7,6 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from apps.accounts.decorators import admin_required
 from apps.notifications.models import Notification
 
 
@@ -70,3 +72,34 @@ def unread_count_view(request):
     ).count()
 
     return JsonResponse({'unread_count': count})
+
+
+@login_required
+def notification_delete_view(request, pk):
+    """Delete a notification (owner or admin only)."""
+    notification = get_object_or_404(Notification, pk=pk)
+
+    if request.user.role != 'ADMIN' and notification.recipient != request.user:
+        messages.error(request, 'You do not have permission to delete this notification.')
+        return redirect('notifications:list')
+
+    if request.method == 'POST':
+        notification.delete()
+        messages.success(request, 'Notification has been deleted.')
+        return redirect('notifications:list')
+
+    return render(request, 'notifications/notification_confirm_delete.html', {
+        'notification': notification,
+    })
+
+
+@login_required
+@admin_required
+def notification_clear_all_view(request):
+    """Admin only: delete all notifications."""
+    if request.method == 'POST':
+        deleted, _ = Notification.objects.all().delete()
+        messages.success(request, f'{deleted} notification(s) have been cleared.')
+        return redirect('notifications:list')
+
+    return render(request, 'notifications/notification_confirm_clear_all.html')

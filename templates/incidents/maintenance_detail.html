@@ -10,6 +10,9 @@
     {% if user.is_admin and log.status != 'COMPLETED' and log.status != 'CANCELLED' %}
       <a href="{% url 'incidents:maintenance_complete' log.pk %}" class="px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">Mark Complete</a>
     {% endif %}
+    {% if user.is_admin or log.performed_by == user %}
+      <a href="{% url 'incidents:maintenance_delete' log.pk %}" class="px-3 py-1.5 bg-red-50 border border-red-300 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100">Delete</a>
+    {% endif %}
   </div>
   <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
     <dl class="grid grid-cols-2 gap-4 text-sm">

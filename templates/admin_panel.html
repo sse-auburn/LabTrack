@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Administration{% endblock %}
+
+{% block page_title %}Administration{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- Welcome Banner -->
+  <div class="bg-gradient-to-r from-brand-600 to-brand-800 rounded-2xl px-6 py-5 text-white shadow-md">
+    <p class="text-brand-200 text-sm font-medium">System Administration</p>
+    <h2 class="text-2xl font-bold mt-0.5">Lab Management Panel</h2>
+    <p class="text-brand-200 text-sm mt-1">Manage users, inventory, operations, and system settings.</p>
+  </div>
+
+  <!-- ── Quick Stats ── -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex items-center gap-3">
+      <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-brand-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-xl font-bold text-slate-800">{{ counts.equipment }}</p>
+        <p class="text-xs text-slate-500 font-medium">Equipment</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex items-center gap-3">
+      <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-xl font-bold text-slate-800">{{ counts.users }}</p>
+        <p class="text-xs text-slate-500 font-medium">Users</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex items-center gap-3">
+      <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-xl font-bold text-slate-800">{{ counts.borrow_requests }}</p>
+        <p class="text-xs text-slate-500 font-medium">Borrows</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex items-center gap-3">
+      <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-xl font-bold text-slate-800">{{ counts.reservations }}</p>
+        <p class="text-xs text-slate-500 font-medium">Reservations</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex items-center gap-3">
+      <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-xl font-bold text-slate-800">{{ counts.incidents_open }}</p>
+        <p class="text-xs text-slate-500 font-medium">Open Incidents</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex items-center gap-3">
+      <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-xl font-bold text-slate-800">{{ counts.consumables }}</p>
+        <p class="text-xs text-slate-500 font-medium">Consumables</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Management Hub ── -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- People & Access -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          People & Access
+        </h3>
+      </div>
+      <div class="divide-y divide-slate-100">
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Users</p>
+            <p class="text-xs text-slate-500">{{ counts.users }} total ({{ counts.admins }} admin, {{ counts.members }} member)</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="{% url 'accounts:user_list' %}" class="text-xs font-medium text-brand-600 hover:underline">List</a>
+            <a href="{% url 'accounts:user_create' %}" class="text-xs font-medium text-green-600 hover:underline">+ Add</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab Inventory -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+          </svg>
+          Lab Inventory
+        </h3>
+      </div>
+      <div class="divide-y divide-slate-100">
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Equipment</p>
+            <p class="text-xs text-slate-500">{{ counts.equipment }} items</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="{% url 'equipment:list' %}" class="text-xs font-medium text-brand-600 hover:underline">List</a>
+            <a href="{% url 'equipment:create' %}" class="text-xs font-medium text-green-600 hover:underline">+ Add</a>
+          </div>
+        </div>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Categories</p>
+            <p class="text-xs text-slate-500">{{ counts.categories }} categories</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="{% url 'equipment:category_list' %}" class="text-xs font-medium text-brand-600 hover:underline">List</a>
+            <a href="{% url 'equipment:category_create' %}" class="text-xs font-medium text-green-600 hover:underline">+ Add</a>
+          </div>
+        </div>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Locations</p>
+            <p class="text-xs text-slate-500">{{ counts.locations }} locations</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="{% url 'equipment:location_list' %}" class="text-xs font-medium text-brand-600 hover:underline">List</a>
+            <a href="{% url 'equipment:location_create' %}" class="text-xs font-medium text-green-600 hover:underline">+ Add</a>
+          </div>
+        </div>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Kits</p>
+            <p class="text-xs text-slate-500">{{ counts.kits }} kits</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="{% url 'kits:list' %}" class="text-xs font-medium text-brand-600 hover:underline">List</a>
+            <a href="{% url 'kits:create' %}" class="text-xs font-medium text-green-600 hover:underline">+ Add</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supplies -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          </svg>
+          Supplies
+        </h3>
+      </div>
+      <div class="divide-y divide-slate-100">
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Consumables</p>
+            <p class="text-xs text-slate-500">{{ counts.consumables }} items</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="{% url 'consumables:list' %}" class="text-xs font-medium text-brand-600 hover:underline">List</a>
+            <a href="{% url 'consumables:create' %}" class="text-xs font-medium text-green-600 hover:underline">+ Add</a>
+          </div>
+        </div>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Low Stock</p>
+            <p class="text-xs text-slate-500">Items below threshold</p>
+          </div>
+          <a href="{% url 'consumables:low_stock' %}" class="text-xs font-medium text-yellow-600 hover:underline">View Alerts</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Operations -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+          </svg>
+          Operations
+        </h3>
+      </div>
+      <div class="divide-y divide-slate-100">
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Borrow Requests</p>
+            <p class="text-xs text-slate-500">{{ counts.borrow_requests }} total, {{ counts.pending_borrows }} pending</p>
+          </div>
+          <a href="{% url 'borrowing:list' %}" class="text-xs font-medium text-brand-600 hover:underline">Manage</a>
+        </div>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Overdue Items</p>
+            <p class="text-xs text-slate-500">{{ counts.overdue }} overdue borrows</p>
+          </div>
+          <a href="{% url 'borrowing:overdue' %}" class="text-xs font-medium text-red-600 hover:underline">View</a>
+        </div>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Return Queue</p>
+            <p class="text-xs text-slate-500">Pending confirmations</p>
+          </div>
+          <a href="{% url 'borrowing:return_queue' %}" class="text-xs font-medium text-brand-600 hover:underline">Process</a>
+        </div>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Reservations</p>
+            <p class="text-xs text-slate-500">{{ counts.reservations }} total</p>
+          </div>
+          <a href="{% url 'reservations:list' %}" class="text-xs font-medium text-brand-600 hover:underline">Manage</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Research & Projects -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+          </svg>
+          Research & Projects
+        </h3>
+      </div>
+      <div class="divide-y divide-slate-100">
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Projects</p>
+            <p class="text-xs text-slate-500">{{ counts.projects }} projects</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="{% url 'projects:list' %}" class="text-xs font-medium text-brand-600 hover:underline">List</a>
+            <a href="{% url 'projects:create' %}" class="text-xs font-medium text-green-600 hover:underline">+ Add</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Maintenance -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Maintenance
+        </h3>
+      </div>
+      <div class="divide-y divide-slate-100">
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Incidents</p>
+            <p class="text-xs text-slate-500">{{ counts.incidents_open }} open</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="{% url 'incidents:list' %}" class="text-xs font-medium text-brand-600 hover:underline">List</a>
+            <a href="{% url 'incidents:create' %}" class="text-xs font-medium text-green-600 hover:underline">+ Add</a>
+          </div>
+        </div>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Maintenance Logs</p>
+            <p class="text-xs text-slate-500">{{ counts.maintenance }} records</p>
+          </div>
+          <a href="{% url 'incidents:maintenance_list' %}" class="text-xs font-medium text-brand-600 hover:underline">View</a>
+        </div>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Calibration Logs</p>
+            <p class="text-xs text-slate-500">{{ counts.calibration }} records</p>
+          </div>
+          <a href="{% url 'incidents:calibration_list' %}" class="text-xs font-medium text-brand-600 hover:underline">View</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- System -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          System
+        </h3>
+      </div>
+      <div class="divide-y divide-slate-100">
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Activity Log</p>
+            <p class="text-xs text-slate-500">{{ counts.activity }} events</p>
+          </div>
+          <a href="{% url 'activity:log' %}" class="text-xs font-medium text-brand-600 hover:underline">View</a>
+        </div>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Notifications</p>
+            <p class="text-xs text-slate-500">{{ counts.notifications }} unread</p>
+          </div>
+          <a href="{% url 'notifications:list' %}" class="text-xs font-medium text-brand-600 hover:underline">View</a>
+        </div>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-800">Django Admin</p>
+            <p class="text-xs text-slate-500">Raw database access</p>
+          </div>
+          <a href="/backoffice/" class="text-xs font-medium text-slate-600 hover:underline">Open</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -476,3 +476,35 @@ def waitlist_leave_view(request, pk):
         return redirect('reservations:waitlist_list')
 
     return render(request, 'reservations/waitlist_confirm_leave.html', {'entry': entry})
+
+
+@login_required
+def reservation_delete_view(request, pk):
+    """Delete a reservation (admin or the requester only)."""
+    reservation = get_object_or_404(
+        Reservation.objects.select_related('requester', 'equipment', 'kit'),
+        pk=pk,
+    )
+
+    if not _is_admin(request.user) and reservation.requester != request.user:
+        messages.error(request, 'You do not have permission to delete this reservation.')
+        return redirect('reservations:list')
+
+    if request.method == 'POST':
+        item_name = str(reservation.equipment or reservation.kit)
+        reservation.delete()
+        log_activity(
+            actor=request.user,
+            action='RESERVATION_DELETED',
+            description=f'{request.user.username} deleted reservation for {item_name}',
+            content_type_label='reservation',
+            object_id=pk,
+            object_repr=item_name,
+            request=request,
+        )
+        messages.success(request, f'Reservation for "{item_name}" has been deleted.')
+        return redirect('reservations:list')
+
+    return render(request, 'reservations/reservation_confirm_delete.html', {
+        'reservation': reservation,
+    })

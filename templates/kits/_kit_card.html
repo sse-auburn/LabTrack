@@ -70,10 +70,14 @@
          class="flex-1 text-center px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-50 transition">
         View Details
       </a>
-      {% if show_actions %}
+      {% if show_actions or user.is_admin %}
       <a href="{% url 'kits:edit' kit.pk %}"
          class="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-50 transition">
         Edit
+      </a>
+      <a href="{% url 'kits:delete' kit.pk %}"
+         class="px-3 py-1.5 border border-red-300 text-red-600 rounded-lg text-xs font-medium hover:bg-red-50 transition">
+        Delete
       </a>
       {% else %}
       <a href="{% url 'reservations:create' %}?kit={{ kit.pk }}"

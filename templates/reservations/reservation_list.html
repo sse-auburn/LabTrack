@@ -132,8 +132,14 @@
               {{ reservation.created_at|date:"M d, Y" }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-              <a href="{% url 'reservations:detail' reservation.pk %}"
-                 class="text-indigo-600 hover:text-indigo-800 font-medium">View</a>
+              <div class="flex items-center justify-end gap-2">
+                <a href="{% url 'reservations:detail' reservation.pk %}"
+                   class="text-indigo-600 hover:text-indigo-800 font-medium">View</a>
+                {% if user.is_admin or reservation.requester == user %}
+                <a href="{% url 'reservations:delete' reservation.pk %}"
+                   class="text-red-600 hover:text-red-800 font-medium">Delete</a>
+                {% endif %}
+              </div>
             </td>
           </tr>
           {% empty %}

@@ -517,3 +517,42 @@ def return_queue_view(request):
         'equipment_returns': equipment_returns,
         'kit_approvals': kit_approvals,
     })
+
+
+@login_required
+def borrow_request_delete_view(request, pk):
+    """Delete a borrow request (admin or the borrower only)."""
+    borrow = get_object_or_404(
+        BorrowRequest.objects.select_related('borrower', 'equipment', 'kit'),
+        pk=pk,
+    )
+
+    if not _is_admin(request.user) and borrow.borrower != request.user:
+        messages.error(request, 'You do not have permission to delete this borrow request.')
+        return redirect('borrowing:list')
+
+    if request.method == 'POST':
+        item_name = str(borrow.item)
+        # Free up equipment/kit if still borrowed
+        if borrow.equipment and borrow.equipment.status == 'BORROWED':
+            borrow.equipment.status = 'AVAILABLE'
+            borrow.equipment.save(update_fields=['status'])
+        if borrow.kit:
+            for kit_item in borrow.kit.items.select_related('equipment'):
+                if kit_item.equipment.status == 'BORROWED':
+                    kit_item.equipment.status = 'AVAILABLE'
+                    kit_item.equipment.save(update_fields=['status'])
+        borrow.delete()
+        log_activity(
+            actor=request.user,
+            action='BORROW_DELETED',
+            description=f'{request.user.username} deleted borrow request for {item_name}',
+            content_type_label='borrowrequest',
+            object_id=pk,
+            object_repr=item_name,
+            request=request,
+        )
+        messages.success(request, f'Borrow request for "{item_name}" has been deleted.')
+        return redirect('borrowing:list')
+
+    return render(request, 'borrowing/borrow_confirm_delete.html', {'borrow': borrow})

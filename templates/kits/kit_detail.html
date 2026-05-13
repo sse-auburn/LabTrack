@@ -71,7 +71,7 @@
         </svg>
         Borrow Kit
       </a>
-      {% if kit.created_by == request.user %}
+      {% if kit.created_by == request.user or user.is_admin %}
       <a href="{% url 'kits:edit' kit.pk %}"
          class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,18 +87,14 @@
         </svg>
         Add Item
       </a>
-      <form method="post" action="{% url 'kits:delete' kit.pk %}"
-            onsubmit="return confirm('Delete this kit permanently?')" class="inline">
-        {% csrf_token %}
-        <button type="submit"
-                class="inline-flex items-center px-4 py-2 border border-red-300 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 transition">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-          </svg>
-          Delete Kit
-        </button>
-      </form>
+      <a href="{% url 'kits:delete' kit.pk %}"
+         class="inline-flex items-center px-4 py-2 border border-red-300 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 transition">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+        Delete Kit
+      </a>
       {% endif %}
     </div>
   </div>

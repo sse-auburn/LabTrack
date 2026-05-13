@@ -458,3 +458,84 @@ def calibration_create_view(request):
         'title': 'Record Calibration',
         'submit_label': 'Save',
     })
+
+
+@login_required
+def incident_delete_view(request, pk):
+    """Delete an incident report (admin or reporter only)."""
+    incident = get_object_or_404(IncidentReport, pk=pk)
+
+    if request.user.role != 'ADMIN' and incident.reported_by != request.user:
+        messages.error(request, 'You do not have permission to delete this incident.')
+        return redirect('incidents:detail', pk=pk)
+
+    if request.method == 'POST':
+        title = incident.title
+        incident.delete()
+        log_activity(
+            actor=request.user,
+            action='INCIDENT_DELETED',
+            description=f'{request.user.username} deleted incident "{title}"',
+            content_type_label='incidentreport',
+            object_id=pk,
+            object_repr=title,
+            request=request,
+        )
+        messages.success(request, f'Incident "{title}" has been deleted.')
+        return redirect('incidents:list')
+
+    return render(request, 'incidents/incident_confirm_delete.html', {'incident': incident})
+
+
+@login_required
+def maintenance_delete_view(request, pk):
+    """Delete a maintenance log (admin or the performer only)."""
+    log = get_object_or_404(MaintenanceLog, pk=pk)
+
+    if request.user.role != 'ADMIN' and log.performed_by != request.user:
+        messages.error(request, 'You do not have permission to delete this maintenance log.')
+        return redirect('incidents:maintenance_detail', pk=pk)
+
+    if request.method == 'POST':
+        equipment_name = log.equipment.name
+        log.delete()
+        log_activity(
+            actor=request.user,
+            action='MAINTENANCE_DELETED',
+            description=f'{request.user.username} deleted maintenance log for "{equipment_name}"',
+            content_type_label='maintenancelog',
+            object_id=pk,
+            object_repr=equipment_name,
+            request=request,
+        )
+        messages.success(request, f'Maintenance log for "{equipment_name}" has been deleted.')
+        return redirect('incidents:maintenance_list')
+
+    return render(request, 'incidents/maintenance_confirm_delete.html', {'log': log})
+
+
+@login_required
+def calibration_delete_view(request, pk):
+    """Delete a calibration log (admin or the performer only)."""
+    calibration = get_object_or_404(CalibrationLog, pk=pk)
+
+    if request.user.role != 'ADMIN' and calibration.calibrated_by != request.user:
+        messages.error(request, 'You do not have permission to delete this calibration log.')
+        return redirect('incidents:calibration_list')
+
+    if request.method == 'POST':
+        equipment_name = calibration.equipment.name
+        calibration.delete()
+        log_activity(
+            actor=request.user,
+            action='OTHER',
+            description=f'{request.user.username} deleted calibration log for "{equipment_name}"',
+            content_type_label='calibrationlog',
+            object_id=pk,
+            object_repr=equipment_name,
+            request=request,
+        )
+        messages.success(request, f'Calibration log for "{equipment_name}" has been deleted.')
+        return redirect('incidents:calibration_list')
+
+    return render(request, 'incidents/calibration_confirm_delete.html', {'calibration': calibration})

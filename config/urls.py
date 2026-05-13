@@ -10,9 +10,14 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 
+from apps.dashboard.views import admin_panel_view
+
 urlpatterns = [
-    # Django admin
-    path('admin/', admin.site.urls),
+    # Admin panel (functional management hub)
+    path('admin/', admin_panel_view, name='admin_panel'),
+
+    # Django's built-in admin
+    path('backoffice/', admin.site.urls),
 
     # Root redirect → dashboard
     path('', RedirectView.as_view(url='/dashboard/', permanent=False), name='home'),

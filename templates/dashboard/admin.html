@@ -8,77 +8,69 @@
 {% block content %}
 <div class="space-y-6">
 
+  <!-- Welcome Banner -->
+  <div class="bg-gradient-to-r from-brand-600 to-brand-800 rounded-2xl px-6 py-5 text-white shadow-md">
+    <p class="text-brand-200 text-sm font-medium">Admin Panel</p>
+    <h2 class="text-2xl font-bold mt-0.5">Lab Management Overview</h2>
+    <p class="text-brand-200 text-sm mt-1">System-wide statistics and administrative actions.</p>
+  </div>
+
   <!-- ── Stats Overview (4 cards) ── -->
   <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
     <!-- Total Equipment -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-      <div class="flex items-start justify-between">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Total Equipment</p>
-          <p class="text-3xl font-bold text-slate-800">{{ total_equipment }}</p>
-          <p class="text-xs text-slate-400 mt-1">Active items in lab</p>
-        </div>
-        <div class="w-11 h-11 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0">
-          <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
-          </svg>
-        </div>
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4">
+      <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-brand-100 flex items-center justify-center">
+        <svg class="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-2xl font-bold text-slate-800">{{ total_equipment }}</p>
+        <p class="text-sm text-slate-500 font-medium">Total Equipment</p>
       </div>
     </div>
 
     <!-- Available Equipment -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-      <div class="flex items-start justify-between">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Available</p>
-          <p class="text-3xl font-bold text-green-600">{{ available_equipment }}</p>
-          <p class="text-xs text-slate-400 mt-1">Ready to be borrowed</p>
-        </div>
-        <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
-          <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4">
+      <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-2xl font-bold text-slate-800">{{ available_equipment }}</p>
+        <p class="text-sm text-slate-500 font-medium">Available</p>
       </div>
     </div>
 
-    <!-- Pending Returns -->
-    <a href="{% url 'borrowing:return_queue' %}"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 hover:border-yellow-300 hover:shadow-md transition-all block">
-      <div class="flex items-start justify-between">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Kit Returns Pending</p>
-          <p class="text-3xl font-bold text-yellow-600">{{ pending_approvals }}</p>
-          <p class="text-xs text-brand-600 mt-1 font-medium hover:underline">Go to return queue &rarr;</p>
-        </div>
-        <div class="w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center flex-shrink-0">
-          <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
+    <!-- Kit Returns Pending -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4">
+      <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center">
+        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
       </div>
-    </a>
+      <div>
+        <p class="text-2xl font-bold text-slate-800">{{ pending_approvals }}</p>
+        <p class="text-sm text-slate-500 font-medium">Kit Returns Pending</p>
+      </div>
+    </div>
 
     <!-- Open Incidents -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-      <div class="flex items-start justify-between">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Open Incidents</p>
-          <p class="text-3xl font-bold {% if open_incidents > 0 %}text-red-600{% else %}text-slate-800{% endif %}">
-            {{ open_incidents }}
-          </p>
-          <p class="text-xs text-slate-400 mt-1">Open or investigating</p>
-        </div>
-        <div class="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
-          <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-          </svg>
-        </div>
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4">
+      <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-2xl font-bold text-slate-800">{{ open_incidents }}</p>
+        <p class="text-sm text-slate-500 font-medium">Open Incidents</p>
       </div>
     </div>
 
@@ -126,44 +118,52 @@
   {% endif %}
 
   <!-- ── Quick Actions ── -->
-  <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-    <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-4">Quick Actions</h3>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-5 py-4 border-b border-slate-100">
+      <h3 class="text-base font-semibold text-slate-800 flex items-center gap-2">
+        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        Quick Actions
+      </h3>
+    </div>
+    <div class="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
 
       <a href="{% url 'borrowing:list' %}?status=PENDING"
-         class="flex items-center gap-3 px-4 py-3 rounded-xl bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 hover:border-yellow-300 text-yellow-800 transition-all group">
-        <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+         class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-yellow-400 hover:bg-yellow-50 text-slate-600 hover:text-yellow-700 transition-all group">
+        <svg class="w-6 h-6 text-slate-400 group-hover:text-yellow-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
-        <span class="text-sm font-semibold">Approve Borrows</span>
+        <span class="text-xs font-semibold text-center leading-tight">Approve Borrows</span>
       </a>
 
       <a href="{% url 'equipment:list' %}"
-         class="flex items-center gap-3 px-4 py-3 rounded-xl bg-brand-50 hover:bg-brand-100 border border-brand-200 hover:border-brand-300 text-brand-800 transition-all group">
-        <svg class="w-5 h-5 text-brand-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+         class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-brand-400 hover:bg-brand-50 text-slate-600 hover:text-brand-700 transition-all group">
+        <svg class="w-6 h-6 text-slate-400 group-hover:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
         </svg>
-        <span class="text-sm font-semibold">Manage Equipment</span>
+        <span class="text-xs font-semibold text-center leading-tight">Manage Equipment</span>
       </a>
 
       <a href="{% url 'accounts:user_list' %}"
-         class="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 text-slate-800 transition-all group">
-        <svg class="w-5 h-5 text-slate-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+         class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-50 text-slate-600 hover:text-slate-700 transition-all group">
+        <svg class="w-6 h-6 text-slate-400 group-hover:text-slate-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
         </svg>
-        <span class="text-sm font-semibold">Manage Users</span>
+        <span class="text-xs font-semibold text-center leading-tight">Manage Users</span>
       </a>
 
       <a href="{% url 'incidents:list' %}"
-         class="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 text-red-800 transition-all group">
-        <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+         class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-red-400 hover:bg-red-50 text-slate-600 hover:text-red-700 transition-all group">
+        <svg class="w-6 h-6 text-slate-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
         </svg>
-        <span class="text-sm font-semibold">View Incidents</span>
+        <span class="text-xs font-semibold text-center leading-tight">View Incidents</span>
       </a>
 
     </div>
@@ -187,15 +187,11 @@
       </div>
 
       {% if recent_activity %}
-        <div class="relative px-4 py-3">
-          <!-- Timeline line -->
-          <div class="absolute left-[2.25rem] top-3 bottom-3 w-0.5 bg-slate-100"></div>
-
-          <div class="space-y-3">
-            {% for log in recent_activity %}
-            <div class="flex items-start gap-3 relative">
-              <!-- Icon -->
-              <div class="flex-shrink-0 z-10 flex items-center justify-center w-8 h-8 rounded-full ring-2 ring-white
+        <div class="divide-y divide-slate-100">
+          {% for log in recent_activity %}
+          <div class="px-5 py-3 flex items-start gap-3">
+            <div class="flex-shrink-0 mt-0.5">
+              <span class="flex items-center justify-center w-8 h-8 rounded-full
                 {% if 'CREATED' in log.action or 'REGISTERED' in log.action %}bg-green-100
                 {% elif 'DELETED' in log.action or 'OVERDUE' in log.action %}bg-red-100
                 {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action %}bg-blue-100
@@ -213,22 +209,21 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
-              </div>
-              <!-- Content -->
-              <div class="flex-1 min-w-0 bg-slate-50 rounded-lg px-3 py-2">
-                <div class="flex items-center justify-between gap-2">
-                  <span class="text-xs font-semibold text-slate-700 truncate">
-                    {% if log.actor %}{{ log.actor.full_name }}{% else %}System{% endif %}
-                  </span>
-                  <span class="text-xs text-slate-400 whitespace-nowrap flex-shrink-0">
-                    {{ log.timestamp|timesince }} ago
-                  </span>
-                </div>
-                <p class="text-xs text-slate-500 mt-0.5 leading-relaxed line-clamp-2">{{ log.description }}</p>
-              </div>
+              </span>
             </div>
-            {% endfor %}
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <p class="text-sm font-medium text-slate-800 leading-snug">
+                  {% if log.actor %}{{ log.actor.full_name }}{% else %}System{% endif %}
+                </p>
+                <span class="text-xs text-slate-400 whitespace-nowrap flex-shrink-0">
+                  {{ log.timestamp|timesince }} ago
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5 line-clamp-2">{{ log.description }}</p>
+            </div>
           </div>
+          {% endfor %}
         </div>
       {% else %}
         <div class="flex flex-col items-center justify-center py-12 text-center">
@@ -388,11 +383,9 @@
             </td>
             <td class="px-5 py-3 text-slate-600">{{ borrow.due_date|date:"M j, Y" }}</td>
             <td class="px-5 py-3">
-              {% with days=borrow.due_date|timesince %}
               <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
                 {{ borrow.due_date|timesince }}
               </span>
-              {% endwith %}
             </td>
             <td class="px-5 py-3">
               <a href="{% url 'borrowing:detail' borrow.pk %}"

@@ -1,9 +1,11 @@
 """Views for the activity app."""
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 
+from apps.accounts.decorators import admin_required
 from apps.activity.models import ActivityLog
 
 
@@ -59,3 +61,17 @@ def my_activity_view(request):
         'action_choices': action_choices,
         'current_action': action_filter,
     })
+
+
+@login_required
+@admin_required
+def activity_log_delete_view(request, pk):
+    """Delete an activity log entry (admin only)."""
+    log = get_object_or_404(ActivityLog, pk=pk)
+
+    if request.method == 'POST':
+        log.delete()
+        messages.success(request, 'Activity log entry has been deleted.')
+        return redirect('activity:feed')
+
+    return render(request, 'activity/activity_confirm_delete.html', {'log': log})

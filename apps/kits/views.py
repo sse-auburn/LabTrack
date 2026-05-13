@@ -103,7 +103,7 @@ def kit_delete_view(request, pk):
     """Delete a kit (admin or the creator only)."""
     kit = get_object_or_404(Kit, pk=pk)
 
-    if kit.created_by != request.user:
+    if kit.created_by != request.user and request.user.role != 'ADMIN':
         messages.error(request, 'You do not have permission to delete this kit.')
         return redirect('kits:detail', pk=kit.pk)
 

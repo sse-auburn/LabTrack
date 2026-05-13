@@ -15,6 +15,7 @@ urlpatterns = [
     path('<int:pk>/return/', views.borrow_return_view, name='return'),
     path('<int:pk>/return/confirm/', views.borrow_return_confirm_view, name='return_confirm'),
     path('kit-item/<int:approval_pk>/confirm/', views.kit_item_return_confirm_view, name='kit_item_confirm'),
+    path('<int:pk>/delete/', views.borrow_request_delete_view, name='delete'),
     path('overdue/', views.overdue_list_view, name='overdue'),
     path('returns/', views.return_queue_view, name='return_queue'),
     # Legacy URL kept for old notification links stored in the database

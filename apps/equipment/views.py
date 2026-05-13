@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
+from apps.accounts.decorators import admin_required
 from apps.activity.utils import log_activity
 from apps.equipment.forms import (
     CategoryForm,
@@ -184,11 +185,11 @@ def equipment_edit_view(request, pk):
 
 @login_required
 def equipment_delete_view(request, pk):
-    """Soft-delete (deactivate) a piece of equipment. Owner only."""
+    """Soft-delete (deactivate) a piece of equipment. Owner or admin only."""
     equipment = get_object_or_404(Equipment, pk=pk)
 
-    if request.user != equipment.owner:
-        messages.error(request, 'Only the equipment owner can delete it.')
+    if request.user != equipment.owner and request.user.role != 'ADMIN':
+        messages.error(request, 'Only the equipment owner or an admin can delete it.')
         return redirect('equipment:detail', pk=pk)
 
     if request.method == 'POST':
@@ -335,6 +336,42 @@ def category_create_view(request):
     })
 
 
+@login_required
+def category_edit_view(request, pk):
+    """Edit an existing equipment category."""
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Category "{category.name}" has been updated.')
+            return redirect('equipment:category_list')
+    else:
+        form = CategoryForm(instance=category)
+
+    return render(request, 'equipment/category_form.html', {
+        'form': form,
+        'category': category,
+        'action': 'Edit',
+    })
+
+
+@login_required
+@admin_required
+def category_delete_view(request, pk):
+    """Delete an equipment category (admin only)."""
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        name = category.name
+        category.delete()
+        messages.success(request, f'Category "{name}" has been deleted.')
+        return redirect('equipment:category_list')
+
+    return render(request, 'equipment/category_confirm_delete.html', {
+        'category': category,
+    })
+
+
 # ---------------------------------------------------------------------------
 # Location views
 # ---------------------------------------------------------------------------
@@ -367,4 +404,40 @@ def location_create_view(request):
     return render(request, 'equipment/location_form.html', {
         'form': form,
         'action': 'Create',
+    })
+
+
+@login_required
+def location_edit_view(request, pk):
+    """Edit an existing lab location."""
+    location = get_object_or_404(Location, pk=pk)
+    if request.method == 'POST':
+        form = LocationForm(request.POST, instance=location)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Location "{location.name}" has been updated.')
+            return redirect('equipment:location_list')
+    else:
+        form = LocationForm(instance=location)
+
+    return render(request, 'equipment/location_form.html', {
+        'form': form,
+        'location': location,
+        'action': 'Edit',
+    })
+
+
+@login_required
+@admin_required
+def location_delete_view(request, pk):
+    """Delete a lab location (admin only)."""
+    location = get_object_or_404(Location, pk=pk)
+    if request.method == 'POST':
+        name = location.name
+        location.delete()
+        messages.success(request, f'Location "{name}" has been deleted.')
+        return redirect('equipment:location_list')
+
+    return render(request, 'equipment/location_confirm_delete.html', {
+        'location': location,
     })
