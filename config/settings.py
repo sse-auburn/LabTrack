@@ -117,7 +117,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # ---------------------------------------------------------------------------
 # Database
-# PostgreSQL is used when DB_HOST is set (e.g. in Docker / production).
+# MySQL is used when DB_HOST is set (e.g. in Docker / production).
 # Falls back to SQLite for local development without any extra setup.
 # ---------------------------------------------------------------------------
 _DB_HOST = config('DB_HOST', default='')
@@ -125,12 +125,17 @@ _DB_HOST = config('DB_HOST', default='')
 if _DB_HOST:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
+            'ENGINE': 'django.db.backends.mysql',
             'NAME': config('DB_NAME', default='labtrack'),
             'USER': config('DB_USER', default='labtrack'),
             'PASSWORD': config('DB_PASSWORD', default=''),
             'HOST': _DB_HOST,
-            'PORT': config('DB_PORT', default='5432'),
+            'PORT': config('DB_PORT', default='3306'),
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'ssl': {'ca': None},
+            },
         }
     }
 else:

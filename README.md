@@ -44,7 +44,7 @@ A full-featured lab equipment management system built with Django 4.2. LabTrack 
 | Layer | Technology |
 |---|---|
 | Backend | Django 4.2, Python 3.11 |
-| Database | PostgreSQL 15 (production) · SQLite (development) |
+| Database | MySQL 8.0 (production) · SQLite (development) |
 | Cache / Queue | Redis 7, Celery 5 |
 | Frontend | Tailwind CSS (CDN), vanilla JS |
 | Static files | WhiteNoise |
@@ -101,7 +101,7 @@ This starts four containers:
 
 | Container | Role |
 |---|---|
-| `db` | PostgreSQL 15 |
+| `db` | MySQL 8.0 |
 | `redis` | Redis 7 |
 | `web` | Django + Gunicorn (port 8000, internal) |
 | `nginx` | Reverse proxy (port 80, public) |
@@ -223,11 +223,11 @@ All variables are read from `.env` via `python-decouple`. None are mandatory whe
 | `DEBUG` | `True` | Set to `False` in production. |
 | `ALLOWED_HOSTS` | `localhost,127.0.0.1` | Comma-separated list of allowed hostnames. |
 | **Database** | | |
-| `DB_HOST` | _(empty)_ | PostgreSQL host. Leave blank to use SQLite. |
-| `DB_PORT` | `5432` | PostgreSQL port. |
-| `DB_NAME` | `labtrack` | PostgreSQL database name. |
-| `DB_USER` | `labtrack` | PostgreSQL user. |
-| `DB_PASSWORD` | _(empty)_ | PostgreSQL password. |
+| `DB_HOST` | _(empty)_ | MySQL host. Leave blank to use SQLite. |
+| `DB_PORT` | `3306` | MySQL port. |
+| `DB_NAME` | `labtrack` | MySQL database name. |
+| `DB_USER` | `labtrack` | MySQL user. |
+| `DB_PASSWORD` | _(empty)_ | MySQL password. |
 | **Redis** | | |
 | `REDIS_URL` | `redis://localhost:6379/0` | Redis connection URL (Celery broker). |
 | **Email** | | |
@@ -423,7 +423,7 @@ Available at `/admin/` for direct database inspection and bulk operations. Recom
 - [ ] Strong unique `SECRET_KEY` (50+ characters)
 - [ ] `ALLOWED_HOSTS` set to your domain(s)
 - [ ] `SITE_URL` set to your public URL (e.g. `https://labtrack.yourdomain.com`) — used in email links
-- [ ] PostgreSQL configured (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`)
+- [ ] MySQL configured (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`)
 - [ ] `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD` set to enable SMTP delivery
 - [ ] `DEFAULT_FROM_EMAIL` set to a valid sender address
 - [ ] Nginx is the only publicly exposed port
@@ -494,7 +494,7 @@ docker compose logs web
 ```
 
 **Common causes:**
-- `DB_HOST` is set but the database isn't ready — the entrypoint retries for 30 seconds. If PostgreSQL is slow to start, run `docker compose restart web`.
+- `DB_HOST` is set but the database isn't ready — the entrypoint retries for 30 seconds. If MySQL is slow to start, run `docker compose restart web`.
 - Wrong `DB_PASSWORD` — verify it matches what is set in both `.env` and the `db` service.
 
 ### Static files return 404

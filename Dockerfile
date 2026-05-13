@@ -6,9 +6,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# System deps needed to build psycopg2
+# System deps needed to build mysqlclient
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        libpq-dev \
+        default-libmysqlclient-dev \
+        pkg-config \
         gcc \
     && rm -rf /var/lib/apt/lists/*
 
@@ -28,7 +29,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     ALLOWED_HOSTS=localhost \
     # Database — leave DB_HOST blank to use SQLite (dev only)
     DB_HOST="" \
-    DB_PORT=5432 \
+    DB_PORT=3306 \
     DB_NAME=labtrack \
     DB_USER=labtrack \
     # Redis / Celery
@@ -47,9 +48,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Runtime system deps (libpq for psycopg2)
+# Runtime system deps (MySQL client library)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        libpq5 \
+        libmariadb3 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy installed packages from builder

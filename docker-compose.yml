@@ -2,18 +2,19 @@ version: "3.9"
 
 services:
 
-  # ── PostgreSQL ────────────────────────────────────────────────────────────────
+  # ── MySQL ─────────────────────────────────────────────────────────────────────
   db:
-    image: postgres:15-alpine
+    image: mysql:8.0
     restart: unless-stopped
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - mysql_data:/var/lib/mysql
     environment:
-      POSTGRES_DB: ${DB_NAME:-labtrack}
-      POSTGRES_USER: ${DB_USER:-labtrack}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-labtrack}
+      MYSQL_DATABASE: ${DB_NAME:-labtrack}
+      MYSQL_USER: ${DB_USER:-labtrack}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-labtrack}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-labtrack}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-labtrack} -d ${DB_NAME:-labtrack}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -64,7 +65,7 @@ services:
       - web
 
 volumes:
-  postgres_data:
+  mysql_data:
   redis_data:
   media_data:
   static_data:

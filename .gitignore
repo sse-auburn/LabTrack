@@ -71,7 +71,9 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# Migrations (optional - some teams commit these)
-# apps/*/migrations/*.py
-# !apps/*/migrations/__init__.py
+Migrations (optional - some teams commit these)
+apps/*/migrations/*.py
+!apps/*/migrations/__init__.py
+
+# Claude assistant artifacts
 .claude

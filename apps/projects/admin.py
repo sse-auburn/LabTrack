@@ -16,3 +16,11 @@ class ProjectAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     search_fields = ('name',)
     raw_id_fields = ('lead',)
+
+
+@admin.register(ProjectMember)
+class ProjectMemberAdmin(admin.ModelAdmin):
+    list_display = ('project', 'user', 'role', 'joined_at')
+    list_filter = ('role',)
+    search_fields = ('project__name', 'user__email', 'user__username')
+    raw_id_fields = ('project', 'user')

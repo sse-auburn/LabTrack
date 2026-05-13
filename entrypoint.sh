@@ -10,7 +10,7 @@ if not db_host:
 import socket, time
 for i in range(30):
     try:
-        socket.create_connection((db_host, int(os.environ.get('DB_PORT', 5432))), timeout=1)
+        socket.create_connection((db_host, int(os.environ.get('DB_PORT', 3306))), timeout=1)
         sys.exit(0)
     except OSError:
         time.sleep(1)

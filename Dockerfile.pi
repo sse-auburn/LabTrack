@@ -14,8 +14,8 @@ WORKDIR /app
 RUN pip install --no-cache-dir --upgrade pip
 
 COPY requirements.txt .
-# Install everything except psycopg2 (not needed with SQLite)
-RUN grep -iv psycopg2 requirements.txt | pip install --no-cache-dir -r /dev/stdin
+# Install everything except mysqlclient (not needed with SQLite)
+RUN grep -iv mysqlclient requirements.txt | pip install --no-cache-dir -r /dev/stdin
 
 COPY . .
 

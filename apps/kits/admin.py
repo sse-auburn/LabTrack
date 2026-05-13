@@ -16,3 +16,11 @@ class KitAdmin(admin.ModelAdmin):
     list_filter = ('is_active',)
     search_fields = ('name',)
     raw_id_fields = ('created_by',)
+
+
+@admin.register(KitItem)
+class KitItemAdmin(admin.ModelAdmin):
+    list_display = ('kit', 'equipment', 'quantity')
+    list_filter = ('kit',)
+    search_fields = ('kit__name', 'equipment__name')
+    raw_id_fields = ('kit', 'equipment')

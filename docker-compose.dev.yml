@@ -4,7 +4,7 @@ version: "3.9"
 #   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 #
 # Differences from production:
-#   - Uses SQLite instead of PostgreSQL (no DB_HOST set)
+#   - Uses SQLite instead of MySQL (no DB_HOST set)
 #   - Django development server instead of Gunicorn
 #   - Source code mounted for live reload
 #   - Port 8000 exposed directly (no Nginx)
@@ -28,7 +28,7 @@ services:
 
   # Disable services not needed in dev
   db:
-    profiles: ["postgres"]   # opt-in only
+    profiles: ["mysql"]      # opt-in only
   redis:
     profiles: ["redis"]      # opt-in only
   nginx:
