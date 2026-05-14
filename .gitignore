@@ -77,3 +77,4 @@ apps/*/migrations/*.py
 
 # Claude assistant artifacts
 .claude
+data

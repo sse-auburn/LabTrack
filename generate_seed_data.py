@@ -266,7 +266,7 @@ def create_projects_xlsx():
     rows = [
         ["Smart Sensor Network", "IoT sensor network for environmental monitoring across campus", "hhs0015", "ACTIVE"],
         ["Autonomous Drone Fleet", "Multi-drone coordination for aerial surveillance and mapping", "mzw0147", "ACTIVE"],
-        ["Edge AI Vision System", "Real-time object detection using Jetson and camera modules", "fza0070", "PLANNING"],
+        ["Edge AI Vision System", "Real-time object detection using Jetson and camera modules", "fza0070", "ACTIVE"],
     ]
     for row in rows:
         ws.append(row)
@@ -358,6 +358,60 @@ def create_borrows_xlsx():
     print("  Created borrows.xlsx")
 
 
+
+def create_incidents_xlsx():
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Incidents"
+    headers = ["equipment_serial_number", "reported_by_username", "title", "description", "severity", "status", "assigned_to_username", "resolution", "image_path"]
+    ws.append(headers)
+    rows = [
+        ["SN-OSC-001", "hhs0015", "Broken Display", "The oscilloscope screen has visible cracks after a drop.", "HIGH", "OPEN", "tur0001", "", "incidents/incident_01.png"],
+        ["SN-MMT-001", "mzw0147", "Frayed Test Leads", "Test leads show exposed wire near the probe tips.", "MEDIUM", "INVESTIGATING", "mzr0134", "Replace leads with new set.", "incidents/incident_02.png"],
+    ]
+    for row in rows:
+        ws.append(row)
+    style_header(ws)
+    wb.save(os.path.join(DATA_DIR, 'incidents.xlsx'))
+    print("  Created incidents.xlsx")
+
+
+def create_maintenance_xlsx():
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Maintenance"
+    headers = ["equipment_serial_number", "maintenance_type", "status", "performed_by_username", "description", "scheduled_date", "completed_date", "cost", "notes"]
+    ws.append(headers)
+    rows = [
+        ["SN-OSC-001", "PREVENTIVE", "COMPLETED", "tur0001", "Annual calibration and firmware update", "2025-01-15", "2025-01-16", "150.00", "Firmware v2.4 installed"],
+        ["SN-3DP-001", "CORRECTIVE", "IN_PROGRESS", "mzr0134", "Nozzle clog removal and bed re-leveling", "2025-05-20", "", "25.00", "Waiting on replacement nozzle"],
+        ["SN-SPA-001", "CALIBRATION", "SCHEDULED", "", "RF calibration verification", "2025-07-01", "", "200.00", ""],
+    ]
+    for row in rows:
+        ws.append(row)
+    style_header(ws)
+    wb.save(os.path.join(DATA_DIR, 'maintenance.xlsx'))
+    print("  Created maintenance.xlsx")
+
+
+def create_calibration_xlsx():
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Calibration"
+    headers = ["equipment_serial_number", "calibrated_by_username", "calibration_date", "next_calibration_date", "status", "certificate_number", "notes"]
+    ws.append(headers)
+    rows = [
+        ["SN-OSC-001", "tur0001", "2025-01-16", "2026-01-16", "PASS", "CAL-2025-001", "Within tolerance across all channels"],
+        ["SN-MMT-001", "mzr0134", "2024-08-10", "2025-08-10", "PASS", "CAL-2024-042", "True RMS verified"],
+        ["SN-SPA-001", "", "2024-03-20", "", "PENDING", "", "Overdue — schedule ASAP"],
+    ]
+    for row in rows:
+        ws.append(row)
+    style_header(ws)
+    wb.save(os.path.join(DATA_DIR, 'calibration.xlsx'))
+    print("  Created calibration.xlsx")
+
+
 if __name__ == '__main__':
     generate_images()
     create_users_xlsx()
@@ -371,4 +425,8 @@ if __name__ == '__main__':
     create_consumables_xlsx()
     create_reservations_xlsx()
     create_borrows_xlsx()
+
+    create_incidents_xlsx()
+    create_maintenance_xlsx()
+    create_calibration_xlsx()
     print("\nAll seed data files generated successfully!")

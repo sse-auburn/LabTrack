@@ -1,209 +1,421 @@
+import os
+from datetime import date, datetime, timedelta
+from decimal import Decimal, InvalidOperation
+
+from django.core.files import File
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
-from django.db.utils import OperationalError
-from django.contrib.auth import get_user_model
-from apps.equipment.models import Category, Location, Equipment
-from apps.equipment.utils import generate_unique_color
-from apps.kits.models import Kit, KitItem
-from apps.projects.models import Project, ProjectMember
-from apps.consumables.models import Consumable
+from django.db.utils import OperationalError, ProgrammingError
+from django.utils import timezone
+from openpyxl import load_workbook
 
-User = get_user_model()
+User = __import__('django.contrib.auth', fromlist=['get_user_model']).get_user_model()
 
 
 class Command(BaseCommand):
-    help = 'Seed database with sample data for development (auto-runs migrations if needed)'
+    help = 'Seed database with sample data from Excel files (auto-runs migrations if needed)'
+
+    DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))), 'data')
+    IMAGES_DIR = os.path.join(DATA_DIR, 'images')
 
     def _ensure_migrated(self):
-        """Check if the User table exists; if not, run migrate first."""
         try:
             User.objects.exists()
-        except OperationalError:
-            self.stdout.write(
-                self.style.WARNING('Database tables missing. Running migrations first...')
-            )
+        except (OperationalError, ProgrammingError):
+            self.stdout.write(self.style.WARNING('Database tables missing. Running migrations first...'))
             call_command('migrate', interactive=False)
             self.stdout.write(self.style.SUCCESS('Migrations complete.'))
 
+    def _load_sheet(self, filename):
+        path = os.path.join(self.DATA_DIR, filename)
+        if not os.path.exists(path):
+            self.stdout.write(self.style.WARNING(f'  Missing {filename} — skipping.'))
+            return []
+        wb = load_workbook(path, data_only=True)
+        ws = wb.active
+        headers = [cell.value for cell in ws[1]]
+        rows = []
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            if all(v is None for v in row):
+                continue
+            rows.append(dict(zip(headers, row)))
+        return rows
+
+    def _load_image(self, image_path):
+        """Return a Django File object from a relative image path."""
+        if not image_path:
+            return None
+        full_path = os.path.join(self.IMAGES_DIR, image_path.replace('/', os.sep))
+        if not os.path.exists(full_path):
+            self.stdout.write(self.style.WARNING(f'    Image not found: {full_path}'))
+            return None
+        return File(open(full_path, 'rb'), name=os.path.basename(full_path))
+
+    def _parse_date(self, val):
+        if val is None or val == '':
+            return None
+        if isinstance(val, datetime):
+            return val.date()
+        if isinstance(val, date):
+            return val
+        for fmt in ('%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y'):
+            try:
+                return datetime.strptime(str(val).strip(), fmt).date()
+            except ValueError:
+                continue
+        return None
+
+    def _parse_decimal(self, val):
+        if val is None or val == '':
+            return None
+        try:
+            return Decimal(str(val))
+        except InvalidOperation:
+            return None
+
     def handle(self, *args, **options):
         self._ensure_migrated()
-        self.stdout.write('Creating sample data...')
+        self.stdout.write('Loading sample data from Excel files...')
 
-        # ── Admin user ──────────────────────────────────────────────
-        admin, created = User.objects.get_or_create(
-            username='tur0001',
-            defaults={
-                'email': 'tur0001@auburn.edu',
-                'first_name': 'Dr. Tanzeel',
-                'last_name': 'Rehman',
-                'role': 'ADMIN',
-                'is_staff': True,
-                'is_superuser': True,
+        # ── Users ────────────────────────────────────────────────────
+        self.stdout.write('Seeding users...')
+        from apps.accounts.models import UserProfile
+        users = {}
+        for row in self._load_sheet('users.xlsx'):
+            username = row.get('username')
+            if not username:
+                continue
+            defaults = {
+                'email': row.get('email', ''),
+                'first_name': row.get('first_name', ''),
+                'last_name': row.get('last_name', ''),
+                'role': row.get('role', 'MEMBER'),
+                'is_staff': row.get('role', 'MEMBER') == 'ADMIN',
+                'is_superuser': username == 'tur0001',
             }
-        )
-        if created:
-            admin.set_password('admin123')
-            admin.save()
-            self.stdout.write(f'  Created admin: tur0001@auburn.edu / admin123')
-        else:
-            self.stdout.write(f'  Using existing admin: {admin.email}')
-
-        # ── Admin users ─────────────────────────────────────────────
-        admin_data = [
-            ('mzr0134@auburn.edu', 'mzr0134', 'Md Hasibur', 'Rahman'),
-            ('mzr0167@auburn.edu', 'mzr0167', 'Mohtasim Hadi', 'Rafi'),
-        ]
-        extra_admins = []
-        for email, username, first, last in admin_data:
-            user, created = User.objects.get_or_create(
-                username=username,
-                defaults={
-                    'email': email, 'first_name': first, 'last_name': last,
-                    'role': 'ADMIN', 'is_staff': True,
-                }
-            )
+            user, created = User.objects.get_or_create(username=username, defaults=defaults)
             if created:
-                user.set_password('admin123')
+                user.set_password(row.get('password', 'changeme'))
                 user.save()
+                self.stdout.write(f'  Created user: {username}')
             else:
-                user.role = 'ADMIN'
-                user.is_staff = True
-                user.save(update_fields=['role', 'is_staff'])
-            extra_admins.append(user)
-        self.stdout.write(f'  Created/updated {len(extra_admins)} extra admins (password: admin123)')
+                self.stdout.write(f'  Using existing user: {username}')
+            # Set avatar if image provided
+            image_path = row.get('image_path', '')
+            if image_path:
+                profile = UserProfile.objects.get_or_create(user=user)[0]
+                img_file = self._load_image(image_path)
+                if img_file:
+                    profile.avatar.save(os.path.basename(image_path), img_file, save=True)
+                    self.stdout.write(f'    Set avatar for {username}')
+            users[username] = user
 
-        # ── Member users ────────────────────────────────────────────
-        member_data = [
-            ('hhs0015@auburn.edu', 'hhs0015', 'Hamid Habib', 'Syed'),
-            ('mzw0147@auburn.edu', 'mzw0147', 'Mohammad', 'Waseem'),
-            ('fza0070@auburn.edu', 'fza0070', 'Faraz', 'Ahmad'),
-            ('mzm0411@auburn.edu', 'mzm0411', 'Md Mesbahul', 'Maruf'),
-            ('mza0291@auburn.edu', 'mza0291', 'Rohan', 'Afzal'),
-        ]
-        members = []
-        for email, username, first, last in member_data:
-            user, created = User.objects.get_or_create(
-                username=username,
-                defaults={'email': email, 'first_name': first, 'last_name': last, 'role': 'MEMBER'}
-            )
+        # ── Categories ───────────────────────────────────────────────
+        self.stdout.write('Seeding categories...')
+        from apps.equipment.models import Category
+        categories = {}
+        for row in self._load_sheet('categories.xlsx'):
+            name = row.get('name')
+            if not name:
+                continue
+            cat, created = Category.objects.get_or_create(name=name, defaults={
+                'description': row.get('description', ''),
+                'color': row.get('color', ''),
+            })
             if created:
-                user.set_password('member123')
-                user.save()
-            members.append(user)
-        self.stdout.write(f'  Created/updated {len(members)} member users (password: member123)')
+                cat.save()  # triggers auto-color generation if blank
+                self.stdout.write(f'  Created category: {name}')
+            categories[name] = cat
 
-        # ── Categories ──────────────────────────────────────────────
-        categories_data = [
-            'Jetson',
-            'Desktop Computer',
-            'Laptop Computer',
-            'Edge Device',
-            'Router',
-            'Drone',
-            'Camera',
-            'Storage Device',
-        ]
-        categories = []
-        for name in categories_data:
-            cat, created = Category.objects.get_or_create(name=name)
+        # ── Locations ────────────────────────────────────────────────
+        self.stdout.write('Seeding locations...')
+        from apps.equipment.models import Location
+        locations = {}
+        for row in self._load_sheet('locations.xlsx'):
+            name = row.get('name')
+            if not name:
+                continue
+            loc, created = Location.objects.get_or_create(name=name, defaults={
+                'description': row.get('description', ''),
+                'building': row.get('building', ''),
+                'room': row.get('room', ''),
+            })
             if created:
-                # save() auto-generates a unique color when blank
-                cat.save()
-            categories.append(cat)
-        self.stdout.write(f'  Created {len(categories)} categories')
+                self.stdout.write(f'  Created location: {name}')
+            locations[name] = loc
 
-        # ── Locations ───────────────────────────────────────────────
-        locations_data = [
-            ('Main Lab', 'Engineering Building', 'Room 101'),
-            ('Storage Room', 'Engineering Building', 'Room 105'),
-            ('Electronics Bench', 'Engineering Building', 'Room 102'),
-            ('Clean Room', 'Science Center', 'Room 201'),
-            ('Workshop', 'Engineering Building', 'Room 110'),
-        ]
-        locations = []
-        for name, building, room in locations_data:
-            loc, _ = Location.objects.get_or_create(name=name, defaults={'building': building, 'room': room})
-            locations.append(loc)
-        self.stdout.write(f'  Created {len(locations)} locations')
-
-        # ── Equipment ───────────────────────────────────────────────
-        equipment_data = [
-            ('Oscilloscope Tektronix MSO44', 'Digital oscilloscope with 4 channels, 200MHz bandwidth', 'SN-OSC-001', 'Tektronix', categories[0], locations[2], 'EXCELLENT'),
-            ('Multimeter Fluke 87V', 'Professional industrial multimeter', 'SN-MMT-001', 'Fluke', categories[2], locations[2], 'GOOD'),
-            ('Arduino Mega 2560', 'Microcontroller development board', 'SN-ARD-001', 'Arduino', categories[0], locations[0], 'GOOD'),
-            ('Raspberry Pi 4 (8GB)', 'Single-board computer', 'SN-RPI-001', 'Raspberry Pi Foundation', categories[3], locations[0], 'EXCELLENT'),
-            ('3D Printer - Prusa MK4', 'FDM 3D printer', 'SN-3DP-001', 'Prusa Research', categories[6], locations[4], 'GOOD'),
-            ('Laser Cutter 60W', 'CO2 laser cutter/engraver', 'SN-LC-001', 'xTool', categories[6], locations[4], 'GOOD'),
-            ('Signal Generator', 'Function/arbitrary waveform generator', 'SN-SIG-001', 'Rigol', categories[0], locations[2], 'GOOD'),
-            ('Spectrum Analyzer', 'RF spectrum analyzer 9kHz-3GHz', 'SN-SPA-001', 'Rigol', categories[0], locations[2], 'EXCELLENT'),
-            ('Soldering Station', 'Temperature-controlled soldering station', 'SN-SOL-001', 'Hakko', categories[0], locations[2], 'GOOD'),
-            ('Logic Analyzer', '16-channel logic analyzer', 'SN-LA-001', 'Saleae', categories[0], locations[2], 'GOOD'),
-            ('Digital Microscope', 'USB digital microscope 1000x', 'SN-MIC-001', 'AmScope', categories[1], locations[0], 'GOOD'),
-            ('Power Supply (Bench)', 'Programmable DC power supply 0-30V/5A', 'SN-PSU-001', 'Rigol', categories[0], locations[2], 'GOOD'),
-        ]
-        equipment_list = []
-        for i, item in enumerate(equipment_data):
-            name, desc, serial, manufacturer, cat, loc, condition = item[0], item[1], item[2], item[3], item[4], item[5], item[6]
-            eq, created = Equipment.objects.get_or_create(
-                serial_number=serial,
-                defaults={
-                    'name': name, 'description': desc,
-                    'manufacturer': manufacturer, 'category': cat,
-                    'location': loc, 'condition': condition,
-                    'owner': admin, 'status': 'AVAILABLE',
-                }
-            )
-            equipment_list.append(eq)
-        self.stdout.write(f'  Created {len(equipment_list)} equipment items')
-
-        # ── Kit ─────────────────────────────────────────────────────
-        kit, created = Kit.objects.get_or_create(
-            name='Electronics Starter Kit',
-            defaults={'description': 'Complete kit for electronics prototyping', 'created_by': admin}
-        )
-        if created and len(equipment_list) >= 3:
-            from apps.kits.models import KitItem
-            KitItem.objects.get_or_create(kit=kit, equipment=equipment_list[0], defaults={'quantity': 1})
-            KitItem.objects.get_or_create(kit=kit, equipment=equipment_list[1], defaults={'quantity': 1})
-            KitItem.objects.get_or_create(kit=kit, equipment=equipment_list[8], defaults={'quantity': 1})
-        self.stdout.write(f'  Created kit: {kit.name}')
-
-        # ── Project ─────────────────────────────────────────────────
-        project, created = Project.objects.get_or_create(
-            name='Smart Sensor Network',
-            defaults={
-                'description': 'IoT sensor network for environmental monitoring',
-                'lead': members[0], 'status': 'ACTIVE'
+        # ── Equipment ────────────────────────────────────────────────
+        self.stdout.write('Seeding equipment...')
+        from apps.equipment.models import Equipment
+        equipment_map = {}  # key by serial_number
+        for row in self._load_sheet('equipment.xlsx'):
+            serial = row.get('serial_number')
+            if not serial:
+                continue
+            cat = categories.get(row.get('category_name'))
+            loc = locations.get(row.get('location_name'))
+            owner = users.get(row.get('owner_username'))
+            defaults = {
+                'name': row.get('name') or '',
+                'description': row.get('description') or '',
+                'model_number': row.get('model_number') or '',
+                'manufacturer': row.get('manufacturer') or '',
+                'category': cat,
+                'location': loc,
+                'owner': owner,
+                'created_by': owner,
+                'condition': row.get('condition') or 'GOOD',
+                'status': row.get('status') or 'AVAILABLE',
+                'approval_status': 'APPROVED',
+                'purchase_date': self._parse_date(row.get('purchase_date')),
+                'purchase_price': self._parse_decimal(row.get('purchase_price')),
+                'notes': row.get('notes') or '',
             }
-        )
-        if created:
-            ProjectMember.objects.get_or_create(project=project, user=members[0], defaults={'role': 'LEAD'})
-            ProjectMember.objects.get_or_create(project=project, user=members[1], defaults={'role': 'MEMBER'})
+            eq, created = Equipment.objects.get_or_create(serial_number=serial, defaults=defaults)
+            if created:
+                # Auto-approve if creator == owner
+                eq.approval_status = 'APPROVED'
+                eq.save(update_fields=['approval_status'])
+                self.stdout.write(f'  Created equipment: {eq.name}')
+                img_path = row.get('image_path', '')
+                if img_path:
+                    img_file = self._load_image(img_path)
+                    if img_file:
+                        eq.image.save(os.path.basename(img_path), img_file, save=True)
+                        self.stdout.write(f'    Set image for {eq.name}')
+            else:
+                self.stdout.write(f'  Using existing equipment: {eq.name}')
+            equipment_map[serial] = eq
 
-        # ── Consumables ─────────────────────────────────────────────
-        consumables_data = [
-            ('Resistor Kit 1/4W', 600, 50, 'PIECE', 'Electronics', 0.01),
-            ('Capacitor Kit (ceramic)', 400, 30, 'PIECE', 'Electronics', 0.02),
-            ('Jumper Wires (M-M)', 100, 20, 'PIECE', 'Electronics', 0.05),
-            ('Solder Wire 60/40 500g', 8, 2, 'ROLL', 'Electronics', 5.00),
-            ('Isopropyl Alcohol 99%', 5, 1, 'BOTTLE', 'Chemistry', 8.00),
-            ('Safety Gloves (box)', 3, 1, 'BOX', 'Safety', 12.00),
-            ('Thermal Paste', 4, 1, 'PIECE', 'Electronics', 6.50),
-            ('PCB Prototype Boards', 25, 5, 'PIECE', 'Electronics', 1.50),
-        ]
-        for name, qty, threshold, unit, cat_name, cost in consumables_data:
-            cat = Category.objects.filter(name=cat_name).first() or categories[0]
-            Consumable.objects.get_or_create(
-                name=name,
+        # ── Kits ─────────────────────────────────────────────────────
+        self.stdout.write('Seeding kits...')
+        from apps.kits.models import Kit, KitItem
+        kits = {}
+        for row in self._load_sheet('kits.xlsx'):
+            name = row.get('name')
+            if not name:
+                continue
+            creator = users.get(row.get('created_by_username'))
+            kit, created = Kit.objects.get_or_create(name=name, defaults={
+                'description': row.get('description', ''),
+                'created_by': creator,
+            })
+            if created:
+                self.stdout.write(f'  Created kit: {name}')
+            kits[name] = kit
+
+        # ── Kit Items ────────────────────────────────────────────────
+        self.stdout.write('Seeding kit items...')
+        for row in self._load_sheet('kit_items.xlsx'):
+            kit_name = row.get('kit_name')
+            eq_serial = row.get('equipment_serial_number')
+            qty = row.get('quantity', 1)
+            if not kit_name or not eq_serial:
+                continue
+            kit = kits.get(kit_name)
+            eq = equipment_map.get(eq_serial)
+            if kit and eq:
+                KitItem.objects.get_or_create(kit=kit, equipment=eq, defaults={'quantity': qty})
+                self.stdout.write(f'  Added {eq.name} to {kit.name} (qty={qty})')
+
+        # ── Projects ─────────────────────────────────────────────────
+        self.stdout.write('Seeding projects...')
+        from apps.projects.models import Project, ProjectMember
+        projects = {}
+        for row in self._load_sheet('projects.xlsx'):
+            name = row.get('name')
+            if not name:
+                continue
+            lead = users.get(row.get('lead_username'))
+            proj, created = Project.objects.get_or_create(name=name, defaults={
+                'description': row.get('description', ''),
+                'lead': lead,
+                'status': row.get('status', 'ACTIVE'),
+            })
+            if created:
+                self.stdout.write(f'  Created project: {name}')
+            projects[name] = proj
+
+        # ── Project Members ──────────────────────────────────────────
+        self.stdout.write('Seeding project members...')
+        for row in self._load_sheet('project_members.xlsx'):
+            proj_name = row.get('project_name')
+            user_name = row.get('user_username')
+            role = row.get('role', 'MEMBER')
+            if not proj_name or not user_name:
+                continue
+            proj = projects.get(proj_name)
+            user = users.get(user_name)
+            if proj and user:
+                ProjectMember.objects.get_or_create(project=proj, user=user, defaults={'role': role})
+                self.stdout.write(f'  Added {user_name} to {proj_name} as {role}')
+
+        # ── Consumables ──────────────────────────────────────────────
+        self.stdout.write('Seeding consumables...')
+        from apps.consumables.models import Consumable
+        for row in self._load_sheet('consumables.xlsx'):
+            name = row.get('name')
+            if not name:
+                continue
+            cat = categories.get(row.get('category_name'))
+            loc = locations.get(row.get('location_name'))
+            Consumable.objects.get_or_create(name=name, defaults={
+                'quantity': self._parse_decimal(row.get('quantity')) or 0,
+                'low_stock_threshold': self._parse_decimal(row.get('low_stock_threshold')) or 10,
+                'unit': row.get('unit', 'PIECE'),
+                'category': cat,
+                'location': loc,
+                'unit_cost': self._parse_decimal(row.get('unit_cost')),
+                'description': row.get('description', ''),
+            })
+            self.stdout.write(f'  Created consumable: {name}')
+
+        # ── Reservations ─────────────────────────────────────────────
+        self.stdout.write('Seeding reservations...')
+        from apps.reservations.models import Reservation
+        for row in self._load_sheet('reservations.xlsx'):
+            requester = users.get(row.get('requester_username'))
+            eq = equipment_map.get(row.get('equipment_serial_number', '')) or None
+            kit = kits.get(row.get('kit_name', '')) or None
+            start_date = self._parse_date(row.get('start_date'))
+            end_date = self._parse_date(row.get('end_date'))
+            if not requester or (not eq and not kit) or not start_date or not end_date:
+                continue
+            status = row.get('status', 'PENDING')
+            res, created = Reservation.objects.get_or_create(
+                requester=requester,
+                equipment=eq,
+                kit=kit,
+                start_date=start_date,
+                end_date=end_date,
                 defaults={
-                    'quantity': qty, 'low_stock_threshold': threshold,
-                    'unit': unit, 'category': cat, 'unit_cost': cost,
-                    'location': locations[1],
+                    'purpose': row.get('purpose', ''),
+                    'status': status,
                 }
             )
-        self.stdout.write(f'  Created consumables')
+            if created:
+                # Update equipment status for confirmed reservations
+                if status == 'CONFIRMED':
+                    if eq:
+                        eq.status = 'RESERVED'
+                        eq.save(update_fields=['status'])
+                    elif kit:
+                        for ki in kit.items.select_related('equipment'):
+                            ki.equipment.status = 'RESERVED'
+                            ki.equipment.save(update_fields=['status'])
+                self.stdout.write(f'  Created reservation: {res}')
 
-        self.stdout.write(self.style.SUCCESS('\nSample data created successfully!'))
+        # ── Borrows ──────────────────────────────────────────────────
+        self.stdout.write('Seeding borrows...')
+        from apps.borrowing.models import BorrowRequest
+        for row in self._load_sheet('borrows.xlsx'):
+            borrower = users.get(row.get('borrower_username'))
+            eq = equipment_map.get(row.get('equipment_serial_number', '')) or None
+            kit = kits.get(row.get('kit_name', '')) or None
+            due_date = self._parse_date(row.get('due_date'))
+            if not borrower or (not eq and not kit) or not due_date:
+                continue
+            status = row.get('status', 'PENDING')
+            defaults = {
+                'purpose': row.get('purpose', ''),
+                'status': status,
+                'due_date': due_date,
+            }
+            # Create a unique-enough filter; borrow requests don't have a natural unique key
+            # so we just create new ones each time seed is run.
+            br = BorrowRequest.objects.create(**defaults, borrower=borrower, equipment=eq, kit=kit)
+            if status in ('APPROVED', 'ACTIVE'):
+                if eq:
+                    eq.status = 'BORROWED'
+                    eq.save(update_fields=['status'])
+                elif kit:
+                    for ki in kit.items.select_related('equipment'):
+                        ki.equipment.status = 'BORROWED'
+                        ki.equipment.save(update_fields=['status'])
+            self.stdout.write(f'  Created borrow: {br}')
+
+        # ── Incidents ────────────────────────────────────────────────
+        self.stdout.write('Seeding incidents...')
+        from apps.incidents.models import IncidentReport
+        for row in self._load_sheet('incidents.xlsx'):
+            eq = equipment_map.get(row.get('equipment_serial_number', ''))
+            if not eq:
+                continue
+            reporter = users.get(row.get('reported_by_username', ''))
+            assigned = users.get(row.get('assigned_to_username', '')) if row.get('assigned_to_username') else None
+            incident, created = IncidentReport.objects.get_or_create(
+                equipment=eq,
+                title=row.get('title', ''),
+                defaults={
+                    'description': row.get('description', ''),
+                    'severity': row.get('severity', 'MEDIUM'),
+                    'status': row.get('status', 'OPEN'),
+                    'reported_by': reporter,
+                    'assigned_to': assigned,
+                    'resolution': row.get('resolution', ''),
+                }
+            )
+            if created:
+                img_path = row.get('image_path', '')
+                if img_path:
+                    img_file = self._load_image(img_path)
+                    if img_file:
+                        incident.image.save(os.path.basename(img_path), img_file, save=True)
+                self.stdout.write(f'  Created incident: {incident.title}')
+
+        # ── Maintenance Logs ─────────────────────────────────────────
+        self.stdout.write('Seeding maintenance logs...')
+        from apps.incidents.models import MaintenanceLog
+        for row in self._load_sheet('maintenance.xlsx'):
+            eq = equipment_map.get(row.get('equipment_serial_number', ''))
+            if not eq:
+                continue
+            performer = users.get(row.get('performed_by_username', '')) if row.get('performed_by_username') else None
+            scheduled = self._parse_date(row.get('scheduled_date'))
+            if not scheduled:
+                continue
+            ml, created = MaintenanceLog.objects.get_or_create(
+                equipment=eq,
+                maintenance_type=row.get('maintenance_type', 'PREVENTIVE'),
+                scheduled_date=scheduled,
+                defaults={
+                    'status': row.get('status', 'SCHEDULED'),
+                    'performed_by': performer,
+                    'description': row.get('description', ''),
+                    'completed_date': self._parse_date(row.get('completed_date')),
+                    'cost': self._parse_decimal(row.get('cost')),
+                    'notes': row.get('notes', ''),
+                }
+            )
+            if created:
+                self.stdout.write(f'  Created maintenance: {ml}')
+
+        # ── Calibration Logs ─────────────────────────────────────────
+        self.stdout.write('Seeding calibration logs...')
+        from apps.incidents.models import CalibrationLog
+        for row in self._load_sheet('calibration.xlsx'):
+            eq = equipment_map.get(row.get('equipment_serial_number', ''))
+            if not eq:
+                continue
+            calibrator = users.get(row.get('calibrated_by_username', '')) if row.get('calibrated_by_username') else None
+            cal_date = self._parse_date(row.get('calibration_date'))
+            if not cal_date:
+                continue
+            cl, created = CalibrationLog.objects.get_or_create(
+                equipment=eq,
+                calibration_date=cal_date,
+                defaults={
+                    'calibrated_by': calibrator,
+                    'next_calibration_date': self._parse_date(row.get('next_calibration_date')),
+                    'status': row.get('status', 'PENDING'),
+                    'certificate_number': row.get('certificate_number', ''),
+                    'notes': row.get('notes', ''),
+                }
+            )
+            if created:
+                self.stdout.write(f'  Created calibration: {cl}')
+
+        self.stdout.write(self.style.SUCCESS('\nAll sample data loaded successfully!'))
         self.stdout.write('\nTest accounts:')
         self.stdout.write('  Admin:    tur0001@auburn.edu / admin123')
         self.stdout.write('  Members:  hhs0015@auburn.edu, mzw0147@auburn.edu, ... / member123')

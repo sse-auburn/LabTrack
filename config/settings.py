@@ -135,7 +135,9 @@ if _DB_HOST:
             'OPTIONS': {
                 'charset': 'utf8mb4',
                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-                'ssl': {'ca': None},
+                # Auburn MySQL 8.0 requires SSL. check_hostname=False allows
+                # connecting without a CA certificate (self-signed / internal PKI).
+                'ssl': {'check_hostname': False},
             },
         }
     }
