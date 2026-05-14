@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}P-Card Transactions{% endblock %}
+
+{% block page_title %}P-Card Transactions{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">P-Card Transactions</h1>
+        {% if total_count is not None %}
+        <p class="mt-1 text-sm text-gray-500">{{ total_count }} transaction{{ total_count|pluralize }} total</p>
+        {% endif %}
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <a href="{% url 'pcard:export_excel' %}?{{ request.GET.urlencode }}"
+           class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+           title="Download Excel with transaction details">
+          <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+          </svg>
+          Excel
+        </a>
+        <a href="{% url 'pcard:export_pdf' %}?{{ request.GET.urlencode }}"
+           class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+           title="Download PDF with all receipts">
+          <svg class="w-4 h-4 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+          </svg>
+          Receipts PDF
+        </a>
+        <a href="{% url 'pcard:create' %}"
+           class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          New Transaction
+        </a>
+      </div>
+    </div>
+
+    <!-- Summary Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6 flex items-center gap-4">
+      <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-2xl font-bold text-slate-800">
+          {% if total_spent %}${{ total_spent|intcomma }}{% else %}$0.00{% endif %}
+        </p>
+        <p class="text-sm text-slate-500 font-medium">Total Spent (filtered)</p>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <form method="get" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <!-- Search -->
+        <div>
+          <label for="search" class="block text-xs font-medium text-gray-500 mb-1">Search</label>
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+            </svg>
+            <input type="text" id="search" name="q" value="{{ search }}"
+                   placeholder="Search items or notes..."
+                   class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+        </div>
+
+        <!-- Date From -->
+        <div>
+          <label for="id_date_from" class="block text-xs font-medium text-gray-500 mb-1">From Date</label>
+          <input type="date" id="id_date_from" name="date_from"
+                 value="{{ request.GET.date_from }}"
+                 class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <!-- Date To -->
+        <div>
+          <label for="id_date_to" class="block text-xs font-medium text-gray-500 mb-1">To Date</label>
+          <input type="date" id="id_date_to" name="date_to"
+                 value="{{ request.GET.date_to }}"
+                 class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 mt-3">
+        <button type="submit"
+                class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors duration-150">
+          Apply Filters
+        </button>
+        <a href="{% url 'pcard:list' %}"
+           class="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
+          Clear
+        </a>
+      </div>
+    </form>
+
+    <!-- Transaction List -->
+    {% if transaction_list %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+              <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Date</th>
+              <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Items</th>
+              <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Total</th>
+              <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Receipt</th>
+              <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Recorded By</th>
+              <th class="text-right px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for tx in transaction_list %}
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-5 py-3 whitespace-nowrap">
+                <span class="font-medium text-slate-800">{{ tx.transaction_date|date:"M j, Y" }}</span>
+              </td>
+              <td class="px-5 py-3">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                  {{ tx.item_count }} item{{ tx.item_count|pluralize }}
+                </span>
+                <p class="text-xs text-slate-500 mt-1 truncate max-w-xs">
+                  {% for item in tx.items.all %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                </p>
+              </td>
+              <td class="px-5 py-3 whitespace-nowrap">
+                <span class="font-semibold text-slate-800">${{ tx.total_price|intcomma }}</span>
+              </td>
+              <td class="px-5 py-3 whitespace-nowrap">
+                {% if tx.receipt_file %}
+                <a href="{{ tx.receipt_file.url }}" target="_blank"
+                   class="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                  View
+                </a>
+                {% else %}
+                <span class="text-xs text-slate-400">—</span>
+                {% endif %}
+              </td>
+              <td class="px-5 py-3 whitespace-nowrap">
+                {% if tx.created_by %}
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
+                    <span class="text-white text-xs font-semibold">{{ tx.created_by.first_name|first|upper }}</span>
+                  </div>
+                  <span class="text-slate-700 text-xs">{{ tx.created_by.full_name }}</span>
+                </div>
+                {% else %}
+                <span class="text-xs text-slate-400">Unknown</span>
+                {% endif %}
+              </td>
+              <td class="px-5 py-3 whitespace-nowrap text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <a href="{% url 'pcard:detail' tx.pk %}"
+                     class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium rounded-lg border border-gray-300 transition-colors">
+                    View
+                  </a>
+                  {% if user == tx.created_by or user.is_admin %}
+                  <a href="{% url 'pcard:edit' tx.pk %}"
+                     class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium rounded-lg border border-gray-300 transition-colors">
+                    Edit
+                  </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 rounded-xl shadow-sm mt-6">
+      <div class="flex flex-1 justify-between sm:hidden">
+        {% if page_obj.has_previous %}
+        <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}"
+           class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}"
+           class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
+        {% endif %}
+      </div>
+      <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm text-gray-700">
+            Showing <span class="font-medium">{{ page_obj.start_index }}</span> to
+            <span class="font-medium">{{ page_obj.end_index }}</span> of
+            <span class="font-medium">{{ page_obj.paginator.count }}</span> results
+          </p>
+        </div>
+        <div>
+          <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}"
+               class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd"/>
+              </svg>
+            </a>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+              <a href="?page={{ num }}" aria-current="page"
+                 class="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{{ num }}</a>
+              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <a href="?page={{ num }}"
+                 class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">{{ num }}</a>
+              {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}"
+               class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
+              </svg>
+            </a>
+            {% endif %}
+          </nav>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
+      <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+      </svg>
+      <h3 class="mt-4 text-base font-semibold text-gray-900">No transactions found</h3>
+      <p class="mt-1 text-sm text-gray-500">Try adjusting your filters or add a new transaction.</p>
+      <div class="mt-6">
+        <a href="{% url 'pcard:create' %}"
+           class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors duration-150">
+          New Transaction
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

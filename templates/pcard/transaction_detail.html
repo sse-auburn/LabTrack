@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}P-Card Transaction — {{ transaction.transaction_date|date:"M j, Y" }}{% endblock %}
+
+{% block page_title %}P-Card Transaction Detail{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Breadcrumb -->
+    <nav class="flex mb-4" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1">
+        <li><a href="{% url 'pcard:list' %}" class="text-sm text-gray-500 hover:text-indigo-600 transition-colors">P-Card</a></li>
+        <li class="flex items-center">
+          <svg class="w-4 h-4 text-gray-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+          <span class="text-sm text-gray-700">Transaction #{{ transaction.pk }}</span>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Transaction on {{ transaction.transaction_date|date:"F j, Y" }}</h1>
+        <p class="mt-1 text-sm text-gray-500">
+          Recorded {{ transaction.created_at|timesince }} ago
+          {% if transaction.created_by %}by {{ transaction.created_by.full_name }}{% endif %}
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        {% if user == transaction.created_by or user.is_admin %}
+        <a href="{% url 'pcard:edit' transaction.pk %}"
+           class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          Edit
+        </a>
+        <a href="{% url 'pcard:delete' transaction.pk %}"
+           class="inline-flex items-center px-4 py-2 bg-red-50 border border-red-200 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100 transition-colors">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+          Delete
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Left: Items & Details -->
+      <div class="lg:col-span-2 space-y-6">
+
+        <!-- Total -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 font-medium">Total Amount</p>
+              <p class="text-3xl font-bold text-gray-900 mt-1">${{ transaction.total_price|intcomma }}</p>
+            </div>
+            <div class="w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center">
+              <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Itemized List -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100">
+            <h3 class="text-base font-semibold text-gray-900">Itemized Products</h3>
+          </div>
+          {% if transaction.items.all %}
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Item</th>
+                  <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Description</th>
+                  <th class="text-right px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Qty</th>
+                  <th class="text-right px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Unit Price</th>
+                  <th class="text-right px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Line Total</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                {% for item in transaction.items.all %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-5 py-3 font-medium text-slate-800">{{ item.name }}</td>
+                  <td class="px-5 py-3 text-slate-600">{% if item.description %}{{ item.description }}{% else %}—{% endif %}</td>
+                  <td class="px-5 py-3 text-right text-slate-700">{{ item.quantity }}</td>
+                  <td class="px-5 py-3 text-right text-slate-700">
+                    {% if item.unit_price %}${{ item.unit_price|intcomma }}{% else %}—{% endif %}
+                  </td>
+                  <td class="px-5 py-3 text-right font-semibold text-slate-800">
+                    {% if item.line_total %}${{ item.line_total|intcomma }}{% else %}—{% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="px-5 py-8 text-center">
+            <p class="text-sm text-gray-500">No items listed for this transaction.</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Notes -->
+        {% if transaction.notes %}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Notes</h3>
+          <p class="text-sm text-gray-700 whitespace-pre-line">{{ transaction.notes }}</p>
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- Right: Receipt & Metadata -->
+      <div class="lg:col-span-1 space-y-6">
+
+        <!-- Receipt -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 class="text-base font-semibold text-gray-900 mb-4">Receipt</h3>
+          {% if transaction.receipt_file %}
+            {% with mime=transaction.receipt_file.storage.size %}
+            {% endwith %}
+            {% if transaction.receipt_file.url %}
+              <a href="{{ transaction.receipt_file.url }}" target="_blank"
+                 class="block rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                <div class="bg-gray-100 flex items-center justify-center p-8">
+                  <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                </div>
+                <div class="p-3 text-center">
+                  <span class="text-sm font-medium text-indigo-600 hover:text-indigo-700">View Receipt</span>
+                </div>
+              </a>
+              <p class="mt-2 text-xs text-gray-400 text-center">Opens in new tab</p>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+              <svg class="mx-auto h-8 w-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="mt-2 text-sm text-gray-500">No receipt uploaded</p>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Metadata -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 class="text-base font-semibold text-gray-900 mb-4">Details</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-500">Transaction Date</span>
+              <span class="font-medium text-gray-800">{{ transaction.transaction_date|date:"M j, Y" }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Recorded</span>
+              <span class="font-medium text-gray-800">{{ transaction.created_at|date:"M j, Y g:i A" }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Recorded By</span>
+              <span class="font-medium text-gray-800">
+                {% if transaction.created_by %}{{ transaction.created_by.full_name }}{% else %}Unknown{% endif %}
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Items</span>
+              <span class="font-medium text-gray-800">{{ transaction.item_count }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

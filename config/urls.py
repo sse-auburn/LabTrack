@@ -57,6 +57,9 @@ urlpatterns = [
 
     # Activity log
     path('activity/', include('apps.activity.urls', namespace='activity')),
+
+    # P-Card purchase tracking
+    path('pcard/', include('apps.pcard.urls', namespace='pcard')),
 ]
 
 # Serve media files during development

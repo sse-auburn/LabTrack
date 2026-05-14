@@ -536,6 +536,7 @@ def category_list_view(request):
 
     return render(request, 'equipment/category_list.html', {
         'page_obj': page_obj,
+        'categories': page_obj,
     })
 
 
@@ -664,6 +665,7 @@ def location_list_view(request):
 
     return render(request, 'equipment/location_list.html', {
         'page_obj': page_obj,
+        'locations': page_obj,
     })
 
 
