@@ -438,8 +438,18 @@ def export_pdf_view(request):
             continue
 
         receipt_name = tx.receipt_file.name
-        receipt_mime, _ = mimetypes.guess_type(receipt_name)
-        if receipt_mime is None:
+        receipt_mime = None
+        try:
+            stored_pk = int(receipt_name)
+            from apps.files.models import StoredFile
+            stored = StoredFile.objects.filter(pk=stored_pk).first()
+            if stored and stored.mimetype:
+                receipt_mime = stored.mimetype
+        except (ValueError, TypeError):
+            pass
+        if not receipt_mime:
+            receipt_mime, _ = mimetypes.guess_type(receipt_name)
+        if not receipt_mime:
             receipt_mime = 'application/octet-stream'
 
         try:

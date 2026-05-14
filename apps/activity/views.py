@@ -36,6 +36,7 @@ def activity_feed_view(request):
         'page_obj': page_obj,
         'action_choices': action_choices,
         'current_action': action_filter,
+        'is_mine': False,
     })
 
 
@@ -60,6 +61,7 @@ def my_activity_view(request):
         'page_obj': page_obj,
         'action_choices': action_choices,
         'current_action': action_filter,
+        'is_mine': True,
     })
 
 

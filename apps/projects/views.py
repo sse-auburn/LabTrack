@@ -2,6 +2,8 @@
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db import models
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.activity.utils import log_activity
@@ -20,15 +22,34 @@ def project_list_view(request):
 
     Admins see all projects. Members see projects they are a part of (either as
     lead or as a project member).
+    Supports ?status= filter and ?q= search.
     """
     if _is_admin(request.user):
-        projects = Project.objects.select_related('lead').prefetch_related('project_members')
+        qs = Project.objects.select_related('lead').prefetch_related('project_members')
     else:
-        projects = Project.objects.filter(
-            project_members__user=request.user
+        qs = Project.objects.filter(
+            models.Q(project_members__user=request.user) | models.Q(lead=request.user)
         ).select_related('lead').prefetch_related('project_members').distinct()
 
-    return render(request, 'projects/project_list.html', {'projects': projects})
+    status_filter = request.GET.get('status', '').strip()
+    search = request.GET.get('q', '').strip()
+    if status_filter:
+        qs = qs.filter(status=status_filter)
+    if search:
+        qs = qs.filter(
+            models.Q(name__icontains=search) | models.Q(description__icontains=search)
+        )
+
+    paginator = Paginator(qs.order_by('-created_at'), 20)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'projects/project_list.html', {
+        'projects': page_obj,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+        'status_filter': status_filter,
+        'search': search,
+    })
 
 
 @login_required
@@ -41,10 +62,10 @@ def project_detail_view(request, pk):
         pk=pk,
     )
 
-    # Members can only view projects they belong to.
+    # Members can only view projects they belong to (or lead).
     if not _is_admin(request.user):
         is_member = project.project_members.filter(user=request.user).exists()
-        if not is_member:
+        if not is_member and project.lead != request.user:
             messages.error(request, 'You do not have permission to view this project.')
             return redirect('projects:list')
 

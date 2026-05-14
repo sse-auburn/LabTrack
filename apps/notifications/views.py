@@ -17,6 +17,10 @@ def notification_list_view(request):
     """List all of the current user's notifications, paginated.
     Unread notifications are marked as read when this page is opened.
     """
+    Notification.objects.filter(
+        recipient=request.user, is_read=False
+    ).update(is_read=True, read_at=timezone.now())
+
     notifications = Notification.objects.filter(
         recipient=request.user
     ).order_by('-created_at')

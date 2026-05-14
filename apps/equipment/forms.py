@@ -3,6 +3,7 @@
 from django import forms
 
 from apps.equipment.models import Category, Equipment, LifecycleEvent, Location, MovementLog
+from apps.equipment.utils import generate_unique_color
 
 
 class CategoryForm(forms.ModelForm):
@@ -31,7 +32,13 @@ class CategoryForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['color'].required = False
-        self.fields['color'].help_text = 'Leave blank for a random unique color.'
+        self.fields['color'].help_text = 'Pick a color or keep the auto-generated one.'
+
+        # Pre-populate new categories with a unique color so the picker never
+        # defaults to black. On edit, the existing color is already in initial.
+        if not (self.instance and self.instance.pk) and not self.data.get('color'):
+            existing = set(Category.objects.values_list('color', flat=True))
+            self.initial.setdefault('color', generate_unique_color(existing))
 
 
 class LocationForm(forms.ModelForm):

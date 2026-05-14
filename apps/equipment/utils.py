@@ -1,6 +1,63 @@
 """Utility functions for the equipment app."""
 
 import random
+from datetime import date
+
+
+def sync_equipment_status(equipment, exclude_borrow_pk=None):
+    """Compute and save the correct status for *equipment* by querying live data.
+
+    Priority (highest first):
+    1. DAMAGED / RETIRED — never overridden automatically.
+    2. BORROWED  — any active BorrowRequest (APPROVED / ACTIVE / RETURN_PENDING).
+    3. MAINTENANCE — any active MaintenanceLog (SCHEDULED / IN_PROGRESS).
+    4. RESERVED  — a CONFIRMED Reservation whose window spans today.
+    5. AVAILABLE — nothing else blocking.
+
+    Parameters
+    ----------
+    equipment : Equipment instance
+    exclude_borrow_pk : int | None
+        Skip this BorrowRequest PK when checking for active borrows. Used when
+        confirming a kit-item return where the parent borrow is still
+        RETURN_PENDING while individual items are freed one by one.
+    """
+    if equipment.status in ('DAMAGED', 'RETIRED'):
+        return
+
+    from apps.borrowing.models import BorrowRequest
+    from apps.incidents.models import MaintenanceLog
+    from apps.reservations.models import Reservation
+
+    today = date.today()
+
+    borrow_qs = BorrowRequest.objects.filter(
+        equipment=equipment,
+        status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING', 'OVERDUE'],
+    )
+    if exclude_borrow_pk is not None:
+        borrow_qs = borrow_qs.exclude(pk=exclude_borrow_pk)
+
+    if borrow_qs.exists():
+        new_status = 'BORROWED'
+    elif MaintenanceLog.objects.filter(
+        equipment=equipment,
+        status__in=['SCHEDULED', 'IN_PROGRESS'],
+    ).exists():
+        new_status = 'MAINTENANCE'
+    elif Reservation.objects.filter(
+        equipment=equipment,
+        status='CONFIRMED',
+        start_date__lte=today,
+        end_date__gte=today,
+    ).exists():
+        new_status = 'RESERVED'
+    else:
+        new_status = 'AVAILABLE'
+
+    if equipment.status != new_status:
+        equipment.status = new_status
+        equipment.save(update_fields=['status'])
 
 
 # A curated list of pleasant, distinct Tailwind-ish hex colors.

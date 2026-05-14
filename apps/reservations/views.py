@@ -2,6 +2,7 @@
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -9,6 +10,8 @@ from django.utils import timezone
 
 from apps.activity.utils import log_activity
 from apps.borrowing.forms import ReturnForm
+from apps.equipment.models import Equipment
+from apps.equipment.utils import sync_equipment_status
 from apps.notifications.utils import notify, notify_admins
 from apps.reservations.forms import BulkReservationForm, ReservationForm, WaitlistEntryForm
 from apps.reservations.models import Reservation, WaitlistEntry
@@ -53,7 +56,6 @@ def reservation_calendar_view(request):
     """Render a month-grid calendar of reservations."""
     import calendar
     from datetime import date
-    from apps.equipment.models import Equipment
 
     today = date.today()
     try:
@@ -136,14 +138,18 @@ def reservation_create_view(request):
             reservation.status = 'CONFIRMED'
             reservation.save()
 
-            # Mark equipment/kit as RESERVED immediately
-            if reservation.equipment:
-                reservation.equipment.status = 'RESERVED'
-                reservation.equipment.save(update_fields=['status'])
-            if reservation.kit:
+            # Only block the item now if the reservation starts today or earlier.
+            # Future reservations leave the equipment available until their start date.
+            today = timezone.now().date()
+            if reservation.equipment and reservation.start_date <= today:
+                if reservation.equipment.status == 'AVAILABLE':
+                    reservation.equipment.status = 'RESERVED'
+                    reservation.equipment.save(update_fields=['status'])
+            if reservation.kit and reservation.start_date <= today:
                 for kit_item in reservation.kit.items.select_related('equipment'):
-                    kit_item.equipment.status = 'RESERVED'
-                    kit_item.equipment.save(update_fields=['status'])
+                    if kit_item.equipment.status == 'AVAILABLE':
+                        kit_item.equipment.status = 'RESERVED'
+                        kit_item.equipment.save(update_fields=['status'])
 
             log_activity(
                 actor=request.user,
@@ -217,38 +223,34 @@ def reservation_bulk_create_view(request):
             end_date = form.cleaned_data['end_date']
             purpose = form.cleaned_data['purpose']
 
-            created = []
-            for item in items:
-                # Check for overlapping confirmed reservations
-                overlap = Reservation.objects.filter(
-                    status='CONFIRMED',
-                    equipment=item,
-                    start_date__lte=end_date,
-                    end_date__gte=start_date,
-                ).exists()
-                if overlap:
-                    continue
+            with transaction.atomic():
+                locked_items = Equipment.objects.select_for_update().filter(
+                    pk__in=[i.pk for i in items]
+                )
+                created = []
+                for item in locked_items:
+                    # Check for overlapping confirmed reservations
+                    overlap = Reservation.objects.filter(
+                        status='CONFIRMED',
+                        equipment=item,
+                        start_date__lte=end_date,
+                        end_date__gte=start_date,
+                    ).exists()
+                    if overlap:
+                        continue
 
-                reservation = Reservation.objects.create(
-                    requester=request.user,
-                    equipment=item,
-                    start_date=start_date,
-                    end_date=end_date,
-                    purpose=purpose,
-                    status='CONFIRMED',
-                )
-                item.status = 'RESERVED'
-                item.save(update_fields=['status'])
-                log_activity(
-                    actor=request.user,
-                    action='RESERVATION_CREATED',
-                    description=f'{request.user.username} reserved {item} ({start_date} – {end_date})',
-                    content_type_label='reservation',
-                    object_id=reservation.pk,
-                    object_repr=str(reservation),
-                    request=request,
-                )
-                created.append(item.name)
+                    reservation = Reservation.objects.create(
+                        requester=request.user,
+                        equipment=item,
+                        start_date=start_date,
+                        end_date=end_date,
+                        purpose=purpose,
+                        status='CONFIRMED',
+                    )
+                    if start_date <= timezone.now().date() and item.status == 'AVAILABLE':
+                        item.status = 'RESERVED'
+                        item.save(update_fields=['status'])
+                    created.append(item.name)
 
             if created:
                 messages.success(
@@ -263,7 +265,7 @@ def reservation_bulk_create_view(request):
                     link=reverse('reservations:list'),
                     category='reservations',
                 )
-            skipped = len(items) - len(created)
+            skipped = len(locked_items) - len(created)
             if skipped:
                 messages.warning(request, f'{skipped} item(s) were skipped due to overlapping reservations.')
 
@@ -346,18 +348,15 @@ def reservation_cancel_view(request, pk):
         return redirect('reservations:detail', pk=reservation.pk)
 
     if request.method == 'POST':
-        # Free up equipment/kit if reserved
-        if reservation.equipment and reservation.equipment.status == 'RESERVED':
-            reservation.equipment.status = 'AVAILABLE'
-            reservation.equipment.save(update_fields=['status'])
-        if reservation.kit:
-            for kit_item in reservation.kit.items.select_related('equipment'):
-                if kit_item.equipment.status == 'RESERVED':
-                    kit_item.equipment.status = 'AVAILABLE'
-                    kit_item.equipment.save(update_fields=['status'])
-
         reservation.status = 'CANCELLED'
         reservation.save()
+
+        # Recompute status — another borrow/maintenance may still be blocking.
+        if reservation.equipment:
+            sync_equipment_status(reservation.equipment)
+        if reservation.kit:
+            for kit_item in reservation.kit.items.select_related('equipment'):
+                sync_equipment_status(kit_item.equipment)
 
         log_activity(
             actor=request.user,
@@ -437,14 +436,17 @@ def reservation_confirm_view(request, pk):
         reservation.status = 'CONFIRMED'
         reservation.save()
 
-        # Mark equipment/kit as RESERVED
-        if reservation.equipment:
-            reservation.equipment.status = 'RESERVED'
-            reservation.equipment.save(update_fields=['status'])
-        if reservation.kit:
+        # Only block the item now if the reservation starts today or earlier.
+        today = timezone.now().date()
+        if reservation.equipment and reservation.start_date <= today:
+            if reservation.equipment.status == 'AVAILABLE':
+                reservation.equipment.status = 'RESERVED'
+                reservation.equipment.save(update_fields=['status'])
+        if reservation.kit and reservation.start_date <= today:
             for kit_item in reservation.kit.items.select_related('equipment'):
-                kit_item.equipment.status = 'RESERVED'
-                kit_item.equipment.save(update_fields=['status'])
+                if kit_item.equipment.status == 'AVAILABLE':
+                    kit_item.equipment.status = 'RESERVED'
+                    kit_item.equipment.save(update_fields=['status'])
 
         log_activity(
             actor=request.user,
@@ -570,15 +572,12 @@ def reservation_return_confirm_view(request, pk):
         reservation.status = 'RETURNED'
         reservation.save()
 
-        # Free up equipment/kit
-        if reservation.equipment and reservation.equipment.status == 'RESERVED':
-            reservation.equipment.status = 'AVAILABLE'
-            reservation.equipment.save(update_fields=['status'])
+        # Recompute status — another borrow/maintenance may still be blocking.
+        if reservation.equipment:
+            sync_equipment_status(reservation.equipment)
         if reservation.kit:
             for kit_item in reservation.kit.items.select_related('equipment'):
-                if kit_item.equipment.status == 'RESERVED':
-                    kit_item.equipment.status = 'AVAILABLE'
-                    kit_item.equipment.save(update_fields=['status'])
+                sync_equipment_status(kit_item.equipment)
 
         notify(
             recipient=reservation.requester,
@@ -719,7 +718,18 @@ def reservation_delete_view(request, pk):
 
     if request.method == 'POST':
         item_name = str(reservation.equipment or reservation.kit)
+        equipment = reservation.equipment
+        kit = reservation.kit
+        requester = reservation.requester
         reservation.delete()
+
+        # Recompute status now that this reservation is gone.
+        if equipment:
+            sync_equipment_status(equipment)
+        if kit:
+            for kit_item in kit.items.select_related('equipment'):
+                sync_equipment_status(kit_item.equipment)
+
         log_activity(
             actor=request.user,
             action='RESERVATION_DELETED',
@@ -730,7 +740,6 @@ def reservation_delete_view(request, pk):
             request=request,
         )
 
-        requester = reservation.requester
         if requester:
             notify(
                 recipient=requester,
@@ -742,7 +751,7 @@ def reservation_delete_view(request, pk):
             )
         notify_admins(
             title='Reservation Deleted',
-            message=f'Reservation for "{item_name}" by {reservation.requester.full_name if reservation.requester else "unknown"} was deleted.',
+            message=f'Reservation for "{item_name}" by {requester.full_name if requester else "unknown"} was deleted.',
             level='warning',
             link=reverse('reservations:list'),
             category='reservations',

@@ -18,6 +18,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from apps.activity.utils import log_activity
+from apps.equipment.utils import sync_equipment_status
 from apps.reservations.models import Reservation
 
 
@@ -40,18 +41,18 @@ class Command(BaseCommand):
         updated = 0
         with transaction.atomic():
             for reservation in expired_reservations:
-                # Free up equipment/kit
-                if reservation.equipment and reservation.equipment.status == 'RESERVED':
-                    reservation.equipment.status = 'AVAILABLE'
-                    reservation.equipment.save(update_fields=['status'])
-                if reservation.kit:
-                    for kit_item in reservation.kit.items.select_related('equipment'):
-                        if kit_item.equipment.status == 'RESERVED':
-                            kit_item.equipment.status = 'AVAILABLE'
-                            kit_item.equipment.save(update_fields=['status'])
+                equipment = reservation.equipment
+                kit = reservation.kit
 
                 reservation.status = 'EXPIRED'
                 reservation.save(update_fields=['status'])
+
+                # Recompute status after expiry — another blocker may still apply.
+                if equipment:
+                    sync_equipment_status(equipment)
+                if kit:
+                    for kit_item in kit.items.select_related('equipment'):
+                        sync_equipment_status(kit_item.equipment)
 
                 log_activity(
                     actor=None,

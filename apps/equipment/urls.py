@@ -28,6 +28,9 @@ urlpatterns = [
     path('categories/<int:pk>/edit/', views.category_edit_view, name='category_edit'),
     path('categories/<int:pk>/delete/', views.category_delete_view, name='category_delete'),
 
+    # Availability JSON
+    path('availability/', views.equipment_availability_json, name='availability_json'),
+
     # Locations
     path('locations/', views.location_list_view, name='location_list'),
     path('locations/create/', views.location_create_view, name='location_create'),

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
   <!-- Page Header -->
   <div class="mb-6">
@@ -13,18 +13,17 @@
     <h1 class="text-2xl font-bold text-gray-900">
       {% if form.instance.pk %}Edit Reservation{% else %}Make a Reservation{% endif %}
     </h1>
-    <p class="mt-1 text-sm text-gray-500">Reserve equipment or a kit for a specific date range.</p>
+    <p class="mt-1 text-sm text-gray-500">Select an item, then click a start and end date on the calendar.</p>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-    <!-- Form -->
+    <!-- Left: Form fields -->
     <div class="lg:col-span-2">
       <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <form method="post" novalidate>
+        <form method="post" novalidate id="reservation-form">
           {% csrf_token %}
 
-          <!-- Non-field errors -->
           {% if form.non_field_errors %}
           <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
             {% for error in form.non_field_errors %}
@@ -34,17 +33,12 @@
           {% endif %}
 
           <!-- Item Selection -->
-          <div class="mb-6">
-            <h3 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">
-              Select Item to Reserve
-            </h3>
+          <div class="mb-5">
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Select Item</h3>
 
-            <!-- Equipment -->
-            <div class="mb-4">
-              <label for="{{ form.equipment.id_for_label }}"
-                     class="block text-sm font-medium text-gray-700 mb-1">
-                Equipment
-                <span class="text-gray-400 font-normal ml-1">(or choose a Kit below)</span>
+            <div class="mb-3">
+              <label for="{{ form.equipment.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                Equipment <span class="text-gray-400 font-normal">(or Kit below)</span>
               </label>
               <select name="{{ form.equipment.html_name }}"
                       id="{{ form.equipment.id_for_label }}"
@@ -52,9 +46,8 @@
                 <option value="">-- Select Equipment --</option>
                 {% for eq in form.equipment.field.queryset %}
                   <option value="{{ eq.pk }}"
-                          data-status="{{ eq.status }}"
                           {% if form.equipment.value == eq.pk|stringformat:"s" %}selected{% endif %}>
-                    {{ eq.name }} {% if eq.status != 'AVAILABLE' %}({{ eq.get_status_display }}){% endif %}
+                    {{ eq.name }}{% if eq.status != 'AVAILABLE' %} ({{ eq.get_status_display }}){% endif %}
                   </option>
                 {% endfor %}
               </select>
@@ -63,12 +56,9 @@
               {% endfor %}
             </div>
 
-            <!-- Kit -->
-            <div class="mb-2">
-              <label for="{{ form.kit.id_for_label }}"
-                     class="block text-sm font-medium text-gray-700 mb-1">
-                Kit
-                <span class="text-gray-400 font-normal ml-1">(or choose Equipment above)</span>
+            <div class="mb-1">
+              <label for="{{ form.kit.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                Kit <span class="text-gray-400 font-normal">(or Equipment above)</span>
               </label>
               <select name="{{ form.kit.html_name }}"
                       id="{{ form.kit.id_for_label }}"
@@ -87,53 +77,50 @@
             </div>
           </div>
 
-          <!-- Date Range -->
-          <div class="mb-6">
-            <h3 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">
-              Date Range
-            </h3>
-            <div class="grid grid-cols-2 gap-4">
+          <!-- Hidden date inputs updated by calendar -->
+          <input type="hidden" name="{{ form.start_date.html_name }}" id="{{ form.start_date.id_for_label }}"
+                 value="{{ form.start_date.value|date:'Y-m-d'|default:'' }}">
+          <input type="hidden" name="{{ form.end_date.html_name }}" id="{{ form.end_date.id_for_label }}"
+                 value="{{ form.end_date.value|date:'Y-m-d'|default:'' }}">
+
+          {% if form.start_date.errors %}
+          <p class="mb-2 text-xs text-red-600">{{ form.start_date.errors.0 }}</p>
+          {% endif %}
+          {% if form.end_date.errors %}
+          <p class="mb-2 text-xs text-red-600">{{ form.end_date.errors.0 }}</p>
+          {% endif %}
+
+          <!-- Date range display -->
+          <div id="date-range-display" class="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-sm hidden">
+            <div class="flex items-center justify-between">
               <div>
-                <label for="{{ form.start_date.id_for_label }}"
-                       class="block text-sm font-medium text-gray-700 mb-1">
-                  Start Date <span class="text-red-500">*</span>
-                </label>
-                <input type="date"
-                       name="{{ form.start_date.html_name }}"
-                       id="{{ form.start_date.id_for_label }}"
-                       value="{{ form.start_date.value|date:'Y-m-d'|default:'' }}"
-                       class="w-full border {% if form.start_date.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                {% for error in form.start_date.errors %}
-                  <p class="mt-1 text-xs text-red-600">{{ error }}</p>
-                {% endfor %}
+                <span class="text-gray-500 text-xs">From</span>
+                <div id="display-start" class="font-semibold text-indigo-800 text-sm">—</div>
               </div>
-              <div>
-                <label for="{{ form.end_date.id_for_label }}"
-                       class="block text-sm font-medium text-gray-700 mb-1">
-                  End Date <span class="text-red-500">*</span>
-                </label>
-                <input type="date"
-                       name="{{ form.end_date.html_name }}"
-                       id="{{ form.end_date.id_for_label }}"
-                       value="{{ form.end_date.value|date:'Y-m-d'|default:'' }}"
-                       class="w-full border {% if form.end_date.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                {% for error in form.end_date.errors %}
-                  <p class="mt-1 text-xs text-red-600">{{ error }}</p>
-                {% endfor %}
+              <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+              <div class="text-right">
+                <span class="text-gray-500 text-xs">To</span>
+                <div id="display-end" class="font-semibold text-indigo-800 text-sm">—</div>
               </div>
             </div>
+            <button type="button" id="clear-range-btn" class="mt-2 text-xs text-red-500 hover:text-red-700">Clear dates</button>
+          </div>
+
+          <div id="date-range-hint" class="mb-4 text-xs text-gray-400 italic">
+            Click a start date on the calendar, then click an end date.
           </div>
 
           <!-- Purpose -->
-          <div class="mb-6">
-            <label for="{{ form.purpose.id_for_label }}"
-                   class="block text-sm font-medium text-gray-700 mb-1">
+          <div class="mb-5">
+            <label for="{{ form.purpose.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
               Purpose / Notes
             </label>
             <textarea name="{{ form.purpose.html_name }}"
                       id="{{ form.purpose.id_for_label }}"
-                      rows="4"
-                      placeholder="Briefly describe why you need this equipment..."
+                      rows="3"
+                      placeholder="Briefly describe why you need this..."
                       class="w-full border {% if form.purpose.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none">{{ form.purpose.value|default:'' }}</textarea>
             {% for error in form.purpose.errors %}
               <p class="mt-1 text-xs text-red-600">{{ error }}</p>
@@ -143,8 +130,8 @@
           <!-- Actions -->
           <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
             <button type="submit"
-                    class="px-6 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
-              {% if form.instance.pk %}Update Reservation{% else %}Submit Reservation{% endif %}
+                    class="px-5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
+              {% if form.instance.pk %}Update{% else %}Submit Reservation{% endif %}
             </button>
             <a href="{% url 'reservations:list' %}"
                class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50 transition">
@@ -153,65 +140,334 @@
           </div>
         </form>
       </div>
-    </div>
 
-    <!-- Sidebar: Availability Info -->
-    <div class="space-y-4">
-      <!-- Info Card -->
-      <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+      <!-- How it works -->
+      <div class="mt-4 bg-indigo-50 border border-indigo-200 rounded-xl p-4">
         <h3 class="text-sm font-semibold text-indigo-800 mb-2 flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
           How It Works
         </h3>
-        <ul class="text-xs text-indigo-700 space-y-1.5">
-          <li class="flex items-start gap-1.5">
-            <span class="mt-0.5">1.</span> Select the equipment or kit you need.
-          </li>
-          <li class="flex items-start gap-1.5">
-            <span class="mt-0.5">2.</span> Choose start and end dates.
-          </li>
-          <li class="flex items-start gap-1.5">
-            <span class="mt-0.5">3.</span> Your request will be reviewed and confirmed.
-          </li>
-          <li class="flex items-start gap-1.5">
-            <span class="mt-0.5">4.</span> You'll receive a notification on approval.
-          </li>
-        </ul>
+        <ol class="text-xs text-indigo-700 space-y-1.5 list-none">
+          <li class="flex gap-1.5"><span>1.</span> Choose an equipment or kit.</li>
+          <li class="flex gap-1.5"><span>2.</span> Click a start date, then an end date on the calendar.</li>
+          <li class="flex gap-1.5"><span>3.</span> Submit — an admin will confirm your reservation.</li>
+          <li class="flex gap-1.5"><span>4.</span> You'll be notified on approval.</li>
+        </ol>
       </div>
+    </div>
 
-      <!-- Current Availability -->
-      {% if availability_info %}
-      <div class="bg-white rounded-xl border border-gray-200 p-4">
-        <h3 class="text-sm font-semibold text-gray-700 mb-3">Upcoming Reservations</h3>
-        <div class="space-y-2">
-          {% for item in availability_info %}
-          <div class="flex items-center justify-between text-xs">
-            <span class="text-gray-600">{{ item.start_date|date:"M d" }} – {{ item.end_date|date:"M d" }}</span>
-            <span class="font-medium
-              {% if item.status == 'CONFIRMED' %}text-green-600
-              {% elif item.status == 'PENDING' %}text-yellow-600
-              {% else %}text-gray-500{% endif %}">
-              {{ item.get_status_display }}
-            </span>
+    <!-- Right: Availability Calendar -->
+    <div class="lg:col-span-3">
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold text-gray-700">Availability Calendar</h2>
+          <div class="flex items-center gap-2">
+            <button type="button" id="cal-prev" class="p-1.5 rounded hover:bg-gray-100 text-gray-500">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <span id="cal-month-label" class="text-sm font-medium text-gray-800 min-w-[130px] text-center"></span>
+            <button type="button" id="cal-next" class="p-1.5 rounded hover:bg-gray-100 text-gray-500">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
           </div>
+        </div>
+
+        <!-- Day headers -->
+        <div class="grid grid-cols-7 mb-2">
+          {% for d in "SMTWTFS" %}
+          <div class="text-center text-xs font-medium text-gray-400 py-1">{{ d }}</div>
           {% endfor %}
         </div>
+
+        <!-- Calendar grid -->
+        <div id="cal-grid" class="grid grid-cols-7 gap-y-1"></div>
+
+        <!-- Legend -->
+        <div class="mt-4 flex flex-wrap gap-3 text-xs text-gray-500">
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-indigo-600 inline-block"></span> Start</div>
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-indigo-300 inline-block"></span> Range</div>
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-orange-200 inline-block"></span> Borrowed</div>
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-blue-200 inline-block"></span> Reserved</div>
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-yellow-200 inline-block"></span> Maintenance</div>
+        </div>
+
+        <div id="cal-status" class="mt-3 text-xs text-gray-400 italic">Select equipment or a kit to see availability.</div>
       </div>
-      {% endif %}
 
       <!-- Calendar link -->
       <a href="{% url 'reservations:calendar' %}"
-         class="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 font-medium p-3 bg-white border border-gray-200 rounded-xl hover:bg-indigo-50 transition">
+         class="mt-3 flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 font-medium p-3 bg-white border border-gray-200 rounded-xl hover:bg-indigo-50 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
         </svg>
-        View Availability Calendar
+        View Full Availability Calendar
       </a>
     </div>
   </div>
 </div>
+
+<style>
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 0.375rem;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+    user-select: none;
+  }
+  .cal-day:hover:not(.cal-past):not(.cal-empty):not(.cal-busy) { background: #e0e7ff; }
+  .cal-empty { cursor: default; }
+  .cal-past { color: #d1d5db; cursor: not-allowed; }
+  .cal-today { background: #ecfdf5; border: 1px solid #6ee7b7; font-weight: 600; }
+  .cal-start { background: #4f46e5 !important; color: white !important; font-weight: 700; border-radius: 0.375rem 0 0 0.375rem; }
+  .cal-end { background: #4f46e5 !important; color: white !important; font-weight: 700; border-radius: 0 0.375rem 0.375rem 0; }
+  .cal-start.cal-end { border-radius: 0.375rem !important; }
+  .cal-in-range { background: #c7d2fe; color: #312e81; border-radius: 0; }
+  .cal-borrowed { background: #fed7aa; color: #9a3412; }
+  .cal-reserved { background: #bfdbfe; color: #1e40af; }
+  .cal-maintenance { background: #fef08a; color: #713f12; }
+  .cal-busy { cursor: not-allowed !important; }
+</style>
+
+<script>
+(function () {
+  const AVAILABILITY_URL = "{% url 'equipment:availability_json' %}";
+
+  let busyRanges = [];
+  let viewYear, viewMonth;
+  let startDate = null;
+  let endDate = null;
+  let selectingEnd = false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  viewYear = today.getFullYear();
+  viewMonth = today.getMonth();
+
+  // Restore previously selected dates (after form error re-submit)
+  const existingStart = document.getElementById('id_start_date').value;
+  const existingEnd = document.getElementById('id_end_date').value;
+  if (existingStart) {
+    startDate = existingStart;
+    selectingEnd = true;
+  }
+  if (existingEnd) {
+    endDate = existingEnd;
+    selectingEnd = false;
+  }
+  if (startDate || endDate) updateDateDisplay();
+
+  function toDateStr(year, month, day) {
+    return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  }
+
+  function isBusy(dateStr) {
+    return busyRanges.some(r => dateStr >= r.start && dateStr <= r.end);
+  }
+
+  function busyReason(dateStr) {
+    const r = busyRanges.find(r => dateStr >= r.start && dateStr <= r.end);
+    return r ? r.reason : null;
+  }
+
+  function inRange(dateStr) {
+    if (!startDate || !endDate) return false;
+    return dateStr > startDate && dateStr < endDate;
+  }
+
+  function renderCalendar() {
+    const MONTHS = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+    document.getElementById('cal-month-label').textContent = `${MONTHS[viewMonth]} ${viewYear}`;
+
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+
+    const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+      const el = document.createElement('div');
+      el.className = 'cal-day cal-empty';
+      grid.appendChild(el);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = toDateStr(viewYear, viewMonth, d);
+      const cellDate = new Date(viewYear, viewMonth, d);
+      const isPast = cellDate < today;
+      const isToday = cellDate.getTime() === today.getTime();
+      const busy = isBusy(dateStr);
+      const reason = busyReason(dateStr);
+      const isStart = dateStr === startDate;
+      const isEnd = dateStr === endDate;
+      const isInRange = inRange(dateStr);
+
+      const el = document.createElement('div');
+      el.textContent = d;
+      el.dataset.date = dateStr;
+
+      let cls = 'cal-day';
+      if (isPast) {
+        cls += ' cal-past';
+      } else if (isStart && isEnd) {
+        cls += ' cal-start cal-end';
+      } else if (isStart) {
+        cls += ' cal-start';
+      } else if (isEnd) {
+        cls += ' cal-end';
+      } else if (isInRange) {
+        // in-range dates that are also busy get busy coloring overriding range
+        cls += busy ? ` cal-${reason} cal-busy` : ' cal-in-range';
+      } else if (busy) {
+        cls += ` cal-${reason} cal-busy`;
+      } else if (isToday) {
+        cls += ' cal-today';
+      }
+
+      el.className = cls;
+
+      if (!isPast) {
+        el.addEventListener('click', () => handleDateClick(dateStr, busy));
+      }
+
+      grid.appendChild(el);
+    }
+  }
+
+  function handleDateClick(dateStr, busy) {
+    if (!selectingEnd) {
+      // Selecting start date — busy dates are allowed as start? No, block them.
+      if (busy) return;
+      startDate = dateStr;
+      endDate = null;
+      selectingEnd = true;
+      document.getElementById('id_start_date').value = dateStr;
+      document.getElementById('id_end_date').value = '';
+      document.getElementById('cal-status').textContent = 'Now click an end date (must be after the start date).';
+    } else {
+      // Selecting end date
+      if (dateStr < startDate) {
+        // Treat as new start
+        startDate = dateStr;
+        endDate = null;
+        document.getElementById('id_start_date').value = dateStr;
+        document.getElementById('id_end_date').value = '';
+        document.getElementById('cal-status').textContent = 'Now click an end date.';
+      } else {
+        // Check if any busy date falls within the range
+        const hasBusyInRange = busyRanges.some(r => {
+          // overlap: busy_start <= end AND busy_end >= start
+          return r.start <= dateStr && r.end >= startDate;
+        });
+        if (hasBusyInRange) {
+          document.getElementById('cal-status').textContent = 'That range overlaps a busy period. Choose different dates.';
+          return;
+        }
+        endDate = dateStr;
+        selectingEnd = false;
+        document.getElementById('id_end_date').value = dateStr;
+        document.getElementById('cal-status').textContent = 'Range selected. You can adjust by clicking new dates.';
+      }
+    }
+    updateDateDisplay();
+    renderCalendar();
+  }
+
+  function updateDateDisplay() {
+    const display = document.getElementById('date-range-display');
+    const hint = document.getElementById('date-range-hint');
+    if (startDate || endDate) {
+      display.classList.remove('hidden');
+      hint.classList.add('hidden');
+      document.getElementById('display-start').textContent = startDate ? fmtDate(startDate) : '—';
+      document.getElementById('display-end').textContent = endDate ? fmtDate(endDate) : 'pick end date...';
+    } else {
+      display.classList.add('hidden');
+      hint.classList.remove('hidden');
+    }
+  }
+
+  function fmtDate(dateStr) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  document.getElementById('clear-range-btn').addEventListener('click', () => {
+    startDate = null;
+    endDate = null;
+    selectingEnd = false;
+    document.getElementById('id_start_date').value = '';
+    document.getElementById('id_end_date').value = '';
+    updateDateDisplay();
+    renderCalendar();
+    document.getElementById('cal-status').textContent = 'Click a start date on the calendar.';
+  });
+
+  document.getElementById('cal-prev').addEventListener('click', () => {
+    viewMonth--;
+    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    renderCalendar();
+  });
+
+  document.getElementById('cal-next').addEventListener('click', () => {
+    viewMonth++;
+    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    renderCalendar();
+  });
+
+  function fetchBusy(params) {
+    document.getElementById('cal-status').textContent = 'Loading availability...';
+    fetch(AVAILABILITY_URL + '?' + params, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(r => r.json())
+      .then(data => {
+        busyRanges = data.busy || [];
+        renderCalendar();
+        document.getElementById('cal-status').textContent =
+          busyRanges.length ? 'Busy dates highlighted. Click a start date.' : 'All dates available. Click a start date.';
+      })
+      .catch(() => {
+        document.getElementById('cal-status').textContent = 'Could not load availability.';
+        renderCalendar();
+      });
+  }
+
+  function onSelectionChange() {
+    const eqVal = document.getElementById('id_equipment').value;
+    const kitVal = document.getElementById('id_kit').value;
+    // Reset range when item changes
+    startDate = null; endDate = null; selectingEnd = false;
+    document.getElementById('id_start_date').value = '';
+    document.getElementById('id_end_date').value = '';
+    updateDateDisplay();
+
+    if (eqVal) {
+      fetchBusy('equipment=' + eqVal);
+    } else if (kitVal) {
+      fetchBusy('kit=' + kitVal);
+    } else {
+      busyRanges = [];
+      renderCalendar();
+      document.getElementById('cal-status').textContent = 'Select equipment or a kit to see availability.';
+    }
+  }
+
+  document.getElementById('id_equipment').addEventListener('change', onSelectionChange);
+  document.getElementById('id_kit').addEventListener('change', onSelectionChange);
+
+  // Initial render
+  renderCalendar();
+  updateDateDisplay();
+  // Fetch busy if item already selected (e.g. after form error)
+  (function () {
+    const eqVal = document.getElementById('id_equipment').value;
+    const kitVal = document.getElementById('id_kit').value;
+    if (eqVal) fetchBusy('equipment=' + eqVal);
+    else if (kitVal) fetchBusy('kit=' + kitVal);
+  })();
+})();
+</script>
 {% endblock %}

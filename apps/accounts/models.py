@@ -54,14 +54,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     @property
     def is_admin(self):
-        return self.role == 'ADMIN'
+        return self.role == 'ADMIN' or self.is_superuser
 
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}".strip() or self.username
 
     def __str__(self):
-        return f"{self.email} ({self.get_role_display()})"
+        name = f"{self.first_name} {self.last_name}".strip()
+        return f"{name} ({self.username})" if name else self.username
 
     class Meta:
         ordering = ['username']

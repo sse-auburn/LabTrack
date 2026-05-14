@@ -5,6 +5,7 @@ from datetime import date
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -13,6 +14,7 @@ from apps.activity.utils import log_activity
 from apps.borrowing.forms import BorrowRequestForm, BulkBorrowForm, ReturnForm
 from apps.borrowing.models import BorrowRequest, KitItemReturnApproval
 from apps.equipment.models import Equipment
+from apps.equipment.utils import sync_equipment_status
 from apps.notifications.utils import notify, notify_admins
 from apps.reservations.models import WaitlistEntry
 
@@ -121,18 +123,9 @@ def borrow_request_create_view(request):
 def borrow_bulk_create_view(request):
     """Borrow multiple equipment items at once."""
     if request.method == 'POST':
-        # Distinguish between the selection step (equipment_ids only) and
-        # the final confirmation step (has purpose + due_date too).
         equipment_ids = request.POST.getlist('equipment_ids')
         if not equipment_ids:
             messages.error(request, 'No items selected.')
-            return redirect('equipment:list')
-
-        items = Equipment.objects.filter(
-            pk__in=equipment_ids, is_active=True, status='AVAILABLE'
-        )
-        if not items.exists():
-            messages.error(request, 'None of the selected items are available.')
             return redirect('equipment:list')
 
         form = BulkBorrowForm(request.POST)
@@ -141,34 +134,47 @@ def borrow_bulk_create_view(request):
             due_date = form.cleaned_data['due_date']
             project = form.cleaned_data.get('project')
 
-            created = []
-            for item in items:
-                borrow = BorrowRequest.objects.create(
-                    borrower=request.user,
-                    equipment=item,
-                    project=project,
-                    purpose=purpose,
-                    due_date=due_date,
-                    status='APPROVED',
+            with transaction.atomic():
+                items = Equipment.objects.select_for_update().filter(
+                    pk__in=equipment_ids, is_active=True, status='AVAILABLE'
                 )
-                item.status = 'BORROWED'
-                item.save(update_fields=['status'])
-                log_activity(
-                    actor=request.user,
-                    action='BORROW_CREATED',
-                    description=f'{request.user.username} borrowed {item} (due {due_date})',
-                    content_type_label='borrowrequest',
-                    object_id=borrow.pk,
-                    object_repr=str(borrow),
-                    request=request,
-                )
-                created.append(item.name)
+                if not items.exists():
+                    messages.error(request, 'None of the selected items are available.')
+                    return redirect('equipment:list')
+
+                created = []
+                for item in items:
+                    # Skip items with overlapping reservations
+                    from apps.reservations.models import Reservation
+                    overlap = Reservation.objects.filter(
+                        status='CONFIRMED',
+                        equipment=item,
+                        start_date__lte=due_date,
+                        end_date__gte=timezone.now().date(),
+                    ).exists()
+                    if overlap:
+                        continue
+
+                    borrow = BorrowRequest.objects.create(
+                        borrower=request.user,
+                        equipment=item,
+                        project=project,
+                        purpose=purpose,
+                        due_date=due_date,
+                        status='APPROVED',
+                    )
+                    item.status = 'BORROWED'
+                    item.save(update_fields=['status'])
+                    created.append(item.name)
+
+                if not created:
+                    messages.error(request, 'All selected items have overlapping reservations.')
+                    return redirect('equipment:list')
 
             messages.success(
                 request,
                 f'Borrowed {len(created)} item(s): {", ".join(created)}. Due back by {due_date}.'
             )
-
             notify(
                 recipient=request.user,
                 title='Items Borrowed',
@@ -184,7 +190,6 @@ def borrow_bulk_create_view(request):
                 link=reverse('borrowing:list'),
                 category='borrowing',
             )
-
             return redirect('borrowing:list')
 
         # Form invalid — re-show confirmation page with errors
@@ -356,8 +361,7 @@ def borrow_return_confirm_view(request, pk):
         borrow.status = 'RETURNED'
         borrow.save()
 
-        borrow.equipment.status = 'AVAILABLE'
-        borrow.equipment.save(update_fields=['status'])
+        sync_equipment_status(borrow.equipment)
 
         notify(
             recipient=borrow.borrower,
@@ -433,8 +437,9 @@ def kit_item_return_confirm_view(request, approval_pk):
         approval.confirmed_at = tz.now()
         approval.save()
 
-        approval.equipment.status = 'AVAILABLE'
-        approval.equipment.save(update_fields=['status'])
+        # Free this individual item. The parent borrow is still RETURN_PENDING,
+        # so we exclude it from the active-borrow check.
+        sync_equipment_status(approval.equipment, exclude_borrow_pk=borrow.pk)
 
         log_activity(
             actor=request.user,
@@ -570,8 +575,7 @@ def borrow_owner_reclaim_view(request, pk):
         borrow.returned_date = timezone.now()
         borrow.save()
 
-        borrow.equipment.status = 'AVAILABLE'
-        borrow.equipment.save(update_fields=['status'])
+        sync_equipment_status(borrow.equipment)
 
         notify(
             recipient=borrow.borrower,
@@ -618,18 +622,18 @@ def borrow_request_delete_view(request, pk):
 
     if request.method == 'POST':
         item_name = str(borrow.item)
-        # Free up equipment/kit if still borrowed
-        if borrow.equipment and borrow.equipment.status == 'BORROWED':
-            borrow.equipment.status = 'AVAILABLE'
-            borrow.equipment.save(update_fields=['status'])
-        if borrow.kit:
-            for kit_item in borrow.kit.items.select_related('equipment'):
-                if kit_item.equipment.status == 'BORROWED':
-                    kit_item.equipment.status = 'AVAILABLE'
-                    kit_item.equipment.save(update_fields=['status'])
+        equipment = borrow.equipment
+        kit = borrow.kit
         # Clean up any pending kit item return approvals
         borrow.kit_item_approvals.all().delete()
         borrow.delete()
+
+        # Recompute status now that the borrow is gone.
+        if equipment:
+            sync_equipment_status(equipment)
+        if kit:
+            for kit_item in kit.items.select_related('equipment'):
+                sync_equipment_status(kit_item.equipment)
         log_activity(
             actor=request.user,
             action='BORROW_DELETED',

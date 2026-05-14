@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import OuterRef, Q, Subquery, Value
 from django.db.models.functions import Concat
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
@@ -140,6 +141,10 @@ def equipment_detail_view(request, pk):
         'from_location', 'to_location', 'moved_by'
     ).order_by('-timestamp')[:10]
 
+    # Incident reports and maintenance logs
+    incidents = equipment.incidents.select_related('reported_by').order_by('-created_at')[:10]
+    maintenance_logs = equipment.maintenance_logs.select_related('performed_by').order_by('-created_at')[:10]
+
     # Form for adding a lifecycle note inline
     lifecycle_form = LifecycleEventForm(initial={'equipment': equipment})
 
@@ -148,6 +153,8 @@ def equipment_detail_view(request, pk):
         'borrow_history': borrow_history,
         'lifecycle_events': lifecycle_events,
         'movement_logs': movement_logs,
+        'incidents': incidents,
+        'maintenance_logs': maintenance_logs,
         'lifecycle_form': lifecycle_form,
         'can_approve': (is_admin or request.user == equipment.owner) and equipment.approval_status == 'PENDING',
     })
@@ -842,3 +849,79 @@ def location_delete_view(request, pk):
     return render(request, 'equipment/location_confirm_delete.html', {
         'location': location,
     })
+
+
+# ---------------------------------------------------------------------------
+# Availability JSON endpoint
+# ---------------------------------------------------------------------------
+
+@login_required
+def equipment_availability_json(request):
+    """Return busy date ranges for an equipment item or kit as JSON.
+
+    Query params: ?equipment=<pk>  OR  ?kit=<pk>
+    Response: {"busy": [{"start": "YYYY-MM-DD", "end": "YYYY-MM-DD", "reason": "..."}]}
+    """
+    from apps.borrowing.models import BorrowRequest
+    from apps.incidents.models import MaintenanceLog
+    from apps.kits.models import Kit
+    from apps.reservations.models import Reservation
+
+    equipment_pk = request.GET.get('equipment')
+    kit_pk = request.GET.get('kit')
+
+    if not equipment_pk and not kit_pk:
+        return JsonResponse({'busy': []})
+
+    busy = []
+    today = timezone.now().date()
+
+    def add_borrow(br):
+        start = br.requested_date.date() if br.requested_date else today
+        end = br.due_date or start
+        busy.append({'start': str(start), 'end': str(end), 'reason': 'borrowed'})
+
+    def add_reservation(res):
+        busy.append({'start': str(res.start_date), 'end': str(res.end_date), 'reason': 'reserved'})
+
+    def add_maintenance(mlog):
+        start = mlog.scheduled_date or today
+        end = mlog.completed_date or start
+        busy.append({'start': str(start), 'end': str(end), 'reason': 'maintenance'})
+
+    if equipment_pk:
+        try:
+            Equipment.objects.get(pk=equipment_pk, is_active=True)
+        except Equipment.DoesNotExist:
+            return JsonResponse({'busy': []})
+
+        for br in BorrowRequest.objects.filter(equipment_id=equipment_pk, status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING']):
+            add_borrow(br)
+        for res in Reservation.objects.filter(equipment_id=equipment_pk, status__in=['CONFIRMED', 'PENDING']):
+            add_reservation(res)
+        for mlog in MaintenanceLog.objects.filter(equipment_id=equipment_pk, status__in=['SCHEDULED', 'IN_PROGRESS']):
+            add_maintenance(mlog)
+
+    else:
+        try:
+            kit_obj = Kit.objects.get(pk=kit_pk, is_active=True)
+        except Kit.DoesNotExist:
+            return JsonResponse({'busy': []})
+
+        # Kit-level borrows and reservations
+        for br in BorrowRequest.objects.filter(kit_id=kit_pk, status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING']):
+            add_borrow(br)
+        for res in Reservation.objects.filter(kit_id=kit_pk, status__in=['CONFIRMED', 'PENDING']):
+            add_reservation(res)
+
+        # Per-item equipment borrows, reservations, maintenance
+        eq_pks = list(kit_obj.items.values_list('equipment__pk', flat=True))
+        for eq_pk in eq_pks:
+            for br in BorrowRequest.objects.filter(equipment_id=eq_pk, status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING']):
+                add_borrow(br)
+            for res in Reservation.objects.filter(equipment_id=eq_pk, status__in=['CONFIRMED', 'PENDING']):
+                add_reservation(res)
+            for mlog in MaintenanceLog.objects.filter(equipment_id=eq_pk, status__in=['SCHEDULED', 'IN_PROGRESS']):
+                add_maintenance(mlog)
+
+    return JsonResponse({'busy': busy})

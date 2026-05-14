@@ -3,6 +3,7 @@
 from django import forms
 from django.utils import timezone
 
+from apps.borrowing.models import BorrowRequest
 from apps.equipment.models import Equipment
 from apps.kits.models import Kit
 from apps.reservations.models import Reservation, WaitlistEntry
@@ -81,6 +82,40 @@ class ReservationForm(forms.ModelForm):
                     f'"{item_name}" already has a confirmed reservation overlapping '
                     f'the selected dates ({start_date} – {end_date}).'
                 )
+
+            # Check for an active borrow that would still be in progress on the start date.
+            if equipment:
+                active_borrow = BorrowRequest.objects.filter(
+                    equipment=equipment,
+                    status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING'],
+                    due_date__gte=start_date,
+                ).select_related('borrower').first()
+                if active_borrow:
+                    borrower_name = (
+                        active_borrow.borrower.get_full_name()
+                        or active_borrow.borrower.username
+                    )
+                    raise forms.ValidationError(
+                        f'"{equipment.name}" is currently borrowed by {borrower_name} '
+                        f'(due {active_borrow.due_date}). '
+                        f'The reservation cannot start while the item may still be borrowed.'
+                    )
+            if kit:
+                active_borrow = BorrowRequest.objects.filter(
+                    kit=kit,
+                    status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING'],
+                    due_date__gte=start_date,
+                ).select_related('borrower').first()
+                if active_borrow:
+                    borrower_name = (
+                        active_borrow.borrower.get_full_name()
+                        or active_borrow.borrower.username
+                    )
+                    raise forms.ValidationError(
+                        f'Kit "{kit.name}" is currently borrowed by {borrower_name} '
+                        f'(due {active_borrow.due_date}). '
+                        f'The reservation cannot start while the kit may still be borrowed.'
+                    )
 
         return cleaned_data
 

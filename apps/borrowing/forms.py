@@ -56,18 +56,20 @@ class BorrowRequestForm(forms.ModelForm):
             )
 
         # Validate equipment availability.
-        if equipment and equipment.status != 'AVAILABLE':
+        # RESERVED is handled by the date-overlap check below — a future reservation
+        # must not block a borrow whose due_date falls before the reservation starts.
+        if equipment and equipment.status in ('BORROWED', 'MAINTENANCE', 'DAMAGED', 'RETIRED'):
             raise forms.ValidationError(
                 f'"{equipment.name}" is currently not available '
                 f'(status: {equipment.get_status_display()}).'
             )
 
-        # Validate kit availability: all items in the kit must be available.
+        # Validate kit availability.
         if kit:
             unavailable = [
                 item.equipment.name
                 for item in kit.items.select_related('equipment')
-                if item.equipment.status != 'AVAILABLE'
+                if item.equipment.status in ('BORROWED', 'MAINTENANCE', 'DAMAGED', 'RETIRED')
             ]
             if unavailable:
                 raise forms.ValidationError(

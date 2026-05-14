@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from apps.activity.utils import log_activity
+from apps.equipment.utils import sync_equipment_status
 from apps.incidents.forms import (
     CalibrationLogForm,
     IncidentAssignForm,
@@ -307,7 +308,7 @@ def maintenance_list_view(request):
     paginator = Paginator(logs, 20)
     page_obj = paginator.get_page(request.GET.get('page'))
 
-    return render(request, 'incidents/maintenance_list.html', {'page_obj': page_obj})
+    return render(request, 'incidents/maintenance_list.html', {'page_obj': page_obj, 'maintenance_logs': page_obj})
 
 
 @login_required
@@ -326,6 +327,12 @@ def maintenance_create_view(request):
             log = form.save(commit=False)
             log.performed_by = request.user
             log.save()
+
+            # Block the equipment if it is not already in a higher-priority state.
+            equipment = log.equipment
+            if equipment.status not in ('BORROWED', 'DAMAGED', 'RETIRED'):
+                equipment.status = 'MAINTENANCE'
+                equipment.save(update_fields=['status'])
 
             log_activity(
                 actor=request.user,
@@ -378,13 +385,9 @@ def maintenance_complete_view(request, pk):
         form = MaintenanceCompleteForm(request.POST, instance=log)
         if form.is_valid():
             log = form.save(commit=False)
-            if log.status == 'COMPLETED':
-                # Set equipment back to available
-                equipment = log.equipment
-                if equipment.status == 'MAINTENANCE':
-                    equipment.status = 'AVAILABLE'
-                    equipment.save(update_fields=['status', 'updated_at'])
             log.save()
+            if log.status == 'COMPLETED':
+                sync_equipment_status(log.equipment)
 
             log_activity(
                 actor=request.user,
@@ -440,7 +443,12 @@ def calibration_list_view(request):
     paginator = Paginator(logs, 20)
     page_obj = paginator.get_page(request.GET.get('page'))
 
-    return render(request, 'incidents/calibration_list.html', {'page_obj': page_obj})
+    from datetime import date
+    return render(request, 'incidents/calibration_list.html', {
+        'page_obj': page_obj,
+        'calibration_logs': page_obj,
+        'today': date.today(),
+    })
 
 
 @login_required
@@ -535,8 +543,13 @@ def maintenance_delete_view(request, pk):
         return redirect('incidents:maintenance_detail', pk=pk)
 
     if request.method == 'POST':
-        equipment_name = log.equipment.name
+        equipment = log.equipment
+        equipment_name = equipment.name
         log.delete()
+
+        # Recompute status — deleting the log may unblock the equipment.
+        sync_equipment_status(equipment)
+
         log_activity(
             actor=request.user,
             action='MAINTENANCE_DELETED',

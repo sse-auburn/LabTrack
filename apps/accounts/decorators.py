@@ -19,7 +19,7 @@ def admin_required(view_func):
     def _wrapped(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('accounts:login')
-        if request.user.role != 'ADMIN':
+        if request.user.role != 'ADMIN' and not getattr(request.user, 'is_superuser', False):
             messages.error(
                 request,
                 'You do not have permission to access that page. Admin access is required.',

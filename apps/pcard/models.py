@@ -47,7 +47,8 @@ class PcardDeletionRequest(models.Model):
 
     transaction = models.ForeignKey(
         PcardTransaction,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
         related_name='deletion_requests',
     )
     requested_by = models.ForeignKey(
@@ -77,7 +78,8 @@ class PcardDeletionRequest(models.Model):
         verbose_name_plural = 'P-Card Deletion Requests'
 
     def __str__(self):
-        return f"Delete request for #{self.transaction.pk} by {self.requested_by.full_name} ({self.status})"
+        tx_id = self.transaction.pk if self.transaction else 'deleted'
+        return f"Delete request for #{tx_id} by {self.requested_by.full_name} ({self.status})"
 
 
 class PcardItem(models.Model):
