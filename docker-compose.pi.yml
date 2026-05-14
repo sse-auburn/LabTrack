@@ -10,6 +10,10 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      # Force SQLite — mysqlclient is not installed in the Pi image.
+      # This overrides any DB_HOST value that may be set in .env.
+      DB_HOST: ""
     volumes:
       - sqlite_data:/app/db
       - media_data:/app/media
