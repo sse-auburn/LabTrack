@@ -90,6 +90,7 @@ def admin_dashboard_view(request):
     # Core counts
     total_equipment = Equipment.objects.filter(is_active=True).count()
     available_equipment = Equipment.objects.filter(status='AVAILABLE', is_active=True).count()
+    pending_equipment = Equipment.objects.filter(approval_status='PENDING', is_active=True).count()
     # Admins handle kit returns (equipment returns go to equipment owners)
     pending_approvals = BorrowRequest.objects.filter(
         status='RETURN_PENDING', kit__isnull=False
@@ -159,6 +160,7 @@ def admin_dashboard_view(request):
     return render(request, 'dashboard/admin.html', {
         'total_equipment': total_equipment,
         'available_equipment': available_equipment,
+        'pending_equipment': pending_equipment,
         'pending_approvals': pending_approvals,
         'overdue_borrows': overdue_borrows,
         'low_stock_consumables': low_stock_consumables,
@@ -193,7 +195,8 @@ def admin_panel_view(request):
         'projects': Project.objects.count(),
         'consumables': Consumable.objects.filter(is_active=True).count(),
         'borrow_requests': BorrowRequest.objects.count(),
-        'pending_borrows': BorrowRequest.objects.filter(status='PENDING').count(),
+        'pending_returns': BorrowRequest.objects.filter(status='RETURN_PENDING').count(),
+        'pending_equipment': Equipment.objects.filter(approval_status='PENDING', is_active=True).count(),
         'overdue': BorrowRequest.objects.filter(due_date__lt=today, status__in=['APPROVED', 'ACTIVE']).count(),
         'reservations': Reservation.objects.count(),
         'incidents_open': IncidentReport.objects.filter(status__in=['OPEN', 'INVESTIGATING']).count(),

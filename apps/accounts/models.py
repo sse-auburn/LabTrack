@@ -80,10 +80,51 @@ class UserProfile(models.Model):
     student_id = models.CharField(max_length=50, blank=True)
     avatar = models.ImageField(upload_to='profiles/', blank=True, null=True)
     bio = models.TextField(blank=True)
+
+    # Global notification toggles
+    in_app_notifications = models.BooleanField(
+        default=True,
+        help_text='Receive in-app notifications.',
+    )
     email_notifications = models.BooleanField(
         default=True,
-        help_text='Receive email notifications for important events.',
+        help_text='Receive email notifications.',
     )
+
+    # Per-category notification preferences
+    notify_borrowing = models.BooleanField(
+        default=True,
+        help_text='Borrow requests, approvals, returns, and overdue alerts.',
+    )
+    notify_reservations = models.BooleanField(
+        default=True,
+        help_text='Reservation confirmations, cancellations, and returns.',
+    )
+    notify_incidents = models.BooleanField(
+        default=True,
+        help_text='Incident reports, assignments, and resolutions.',
+    )
+    notify_equipment = models.BooleanField(
+        default=True,
+        help_text='New equipment, edits, moves, and deletions.',
+    )
+    notify_kits = models.BooleanField(
+        default=True,
+        help_text='Kit creations, updates, and deletions.',
+    )
+    notify_consumables = models.BooleanField(
+        default=True,
+        help_text='Consumable usage, restocking, and low-stock alerts.',
+    )
+    notify_projects = models.BooleanField(
+        default=True,
+        help_text='Project creations and updates.',
+    )
+    notify_system = models.BooleanField(
+        default=True,
+        help_text='User management, role changes, and system events.',
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

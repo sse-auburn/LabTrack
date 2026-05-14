@@ -12,39 +12,58 @@ class ActivityLog(models.Model):
         ('EQUIPMENT_CREATED', 'Equipment Created'),
         ('EQUIPMENT_UPDATED', 'Equipment Updated'),
         ('EQUIPMENT_DELETED', 'Equipment Deleted'),
+        ('EQUIPMENT_APPROVED', 'Equipment Approved'),
+        ('EQUIPMENT_REJECTED', 'Equipment Rejected'),
         # Borrowing
         ('BORROW_REQUESTED', 'Borrow Requested'),
+        ('BORROW_CREATED', 'Borrow Created'),
         ('BORROW_APPROVED', 'Borrow Approved'),
         ('BORROW_REJECTED', 'Borrow Rejected'),
         ('BORROW_RETURNED', 'Borrow Returned'),
         ('BORROW_OVERDUE', 'Borrow Overdue'),
+        ('BORROW_RETURN_SUBMITTED', 'Borrow Return Submitted'),
+        ('BORROW_DELETED', 'Borrow Deleted'),
         # Reservations
         ('RESERVATION_CREATED', 'Reservation Created'),
         ('RESERVATION_CONFIRMED', 'Reservation Confirmed'),
         ('RESERVATION_CANCELLED', 'Reservation Cancelled'),
         ('RESERVATION_RETURN_SUBMITTED', 'Reservation Return Submitted'),
         ('RESERVATION_RETURN_CONFIRMED', 'Reservation Return Confirmed'),
+        ('RESERVATION_DELETED', 'Reservation Deleted'),
+        ('RESERVATION_EXPIRED', 'Reservation Expired'),
         # Consumables
         ('CONSUMABLE_USED', 'Consumable Used'),
         ('CONSUMABLE_RESTOCKED', 'Consumable Restocked'),
+        ('CONSUMABLE_CREATED', 'Consumable Created'),
+        ('CONSUMABLE_UPDATED', 'Consumable Updated'),
+        ('CONSUMABLE_DELETED', 'Consumable Deleted'),
         # Incidents
         ('INCIDENT_REPORTED', 'Incident Reported'),
         ('INCIDENT_RESOLVED', 'Incident Resolved'),
+        ('INCIDENT_ASSIGNED', 'Incident Assigned'),
+        ('INCIDENT_DELETED', 'Incident Deleted'),
         # Maintenance
         ('MAINTENANCE_SCHEDULED', 'Maintenance Scheduled'),
         ('MAINTENANCE_COMPLETED', 'Maintenance Completed'),
+        ('MAINTENANCE_DELETED', 'Maintenance Deleted'),
+        # Calibration
+        ('CALIBRATION_CREATED', 'Calibration Created'),
+        ('CALIBRATION_DELETED', 'Calibration Deleted'),
         # Users
         ('USER_REGISTERED', 'User Registered'),
+        ('USER_CREATED', 'User Created'),
+        ('USER_UPDATED', 'User Updated'),
+        ('USER_DELETED', 'User Deleted'),
         ('USER_ROLE_CHANGED', 'User Role Changed'),
         ('USER_STATUS_CHANGED', 'User Status Changed'),
-        # Borrowing (extended)
-        ('BORROW_CREATED', 'Borrow Created'),
         # Kits
         ('KIT_CREATED', 'Kit Created'),
         ('KIT_UPDATED', 'Kit Updated'),
+        ('KIT_DELETED', 'Kit Deleted'),
         # Projects
         ('PROJECT_CREATED', 'Project Created'),
         ('PROJECT_UPDATED', 'Project Updated'),
+        ('PROJECT_DELETED', 'Project Deleted'),
         # Generic
         ('OTHER', 'Other'),
     ]

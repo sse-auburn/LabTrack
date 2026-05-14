@@ -1,4 +1,6 @@
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
+from django.db.utils import OperationalError
 from django.contrib.auth import get_user_model
 from apps.equipment.models import Category, Location, Equipment
 from apps.equipment.utils import generate_unique_color
@@ -8,10 +10,23 @@ from apps.consumables.models import Consumable
 
 User = get_user_model()
 
+
 class Command(BaseCommand):
-    help = 'Seed database with sample data for development'
+    help = 'Seed database with sample data for development (auto-runs migrations if needed)'
+
+    def _ensure_migrated(self):
+        """Check if the User table exists; if not, run migrate first."""
+        try:
+            User.objects.exists()
+        except OperationalError:
+            self.stdout.write(
+                self.style.WARNING('Database tables missing. Running migrations first...')
+            )
+            call_command('migrate', interactive=False)
+            self.stdout.write(self.style.SUCCESS('Migrations complete.'))
 
     def handle(self, *args, **options):
+        self._ensure_migrated()
         self.stdout.write('Creating sample data...')
 
         # ── Admin user ──────────────────────────────────────────────

@@ -143,7 +143,15 @@
           {% endif %}
 
           <!-- Status Badge Overlay -->
-          <div class="absolute top-3 right-3">
+          <div class="absolute top-3 right-3 flex flex-col gap-1 items-end">
+            {% if item.approval_status == 'PENDING' %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Pending Approval
+            </span>
+            {% endif %}
             {% if item.status == 'AVAILABLE' %}
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Available</span>
             {% elif item.status == 'BORROWED' %}
@@ -197,7 +205,7 @@
                class="flex-1 text-center px-3 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
               View Details
             </a>
-            {% if item.status == 'AVAILABLE' and user.is_authenticated %}
+            {% if item.status == 'AVAILABLE' and item.approval_status == 'APPROVED' and user.is_authenticated %}
             <a href="{% url 'borrowing:create' %}?equipment={{ item.pk }}"
                class="flex-1 text-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors duration-150">
               Borrow

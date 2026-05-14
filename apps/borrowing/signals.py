@@ -47,6 +47,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
             ),
             level='info',
             link=reverse('borrowing:detail', args=[instance.pk]),
+            category='borrowing',
         )
         log_activity(
             actor=instance.borrower,
@@ -69,6 +70,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
             message=f"Your request to borrow '{item_name}' has been approved.",
             level='success',
             link=reverse('borrowing:detail', args=[instance.pk]),
+            category='borrowing',
         )
         log_activity(
             actor=instance.approved_by,
@@ -89,6 +91,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
             message=f"Your request to borrow '{item_name}' has been rejected.",
             level='error',
             link=reverse('borrowing:detail', args=[instance.pk]),
+            category='borrowing',
         )
         log_activity(
             actor=instance.approved_by,
@@ -109,6 +112,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
             message=f"'{item_name}' has been marked as returned. Thank you!",
             level='success',
             link=reverse('borrowing:detail', args=[instance.pk]),
+            category='borrowing',
         )
         log_activity(
             actor=instance.borrower,
@@ -129,6 +133,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
             ),
             level='warning',
             link=reverse('borrowing:detail', args=[instance.pk]),
+            category='borrowing',
         )
         notify_admins(
             title='Overdue Borrow Alert',
@@ -138,6 +143,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
             ),
             level='warning',
             link=reverse('borrowing:detail', args=[instance.pk]),
+            category='borrowing',
         )
         log_activity(
             actor=instance.borrower,

@@ -148,6 +148,13 @@
         </div>
         <div class="px-5 py-3 flex items-center justify-between">
           <div>
+            <p class="text-sm font-medium text-slate-800">Pending Approvals</p>
+            <p class="text-xs text-slate-500">{{ counts.pending_equipment }} awaiting review</p>
+          </div>
+          <a href="{% url 'equipment:pending_list' %}" class="text-xs font-medium text-yellow-600 hover:underline">Review</a>
+        </div>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <div>
             <p class="text-sm font-medium text-slate-800">Categories</p>
             <p class="text-xs text-slate-500">{{ counts.categories }} categories</p>
           </div>
@@ -226,7 +233,7 @@
         <div class="px-5 py-3 flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-slate-800">Borrow Requests</p>
-            <p class="text-xs text-slate-500">{{ counts.borrow_requests }} total, {{ counts.pending_borrows }} pending</p>
+            <p class="text-xs text-slate-500">{{ counts.borrow_requests }} total, {{ counts.pending_returns }} awaiting return confirmation</p>
           </div>
           <a href="{% url 'borrowing:list' %}" class="text-xs font-medium text-brand-600 hover:underline">Manage</a>
         </div>
@@ -336,7 +343,7 @@
             <p class="text-sm font-medium text-slate-800">Activity Log</p>
             <p class="text-xs text-slate-500">{{ counts.activity }} events</p>
           </div>
-          <a href="{% url 'activity:log' %}" class="text-xs font-medium text-brand-600 hover:underline">View</a>
+          <a href="{% url 'activity:feed' %}" class="text-xs font-medium text-brand-600 hover:underline">View</a>
         </div>
         <div class="px-5 py-3 flex items-center justify-between">
           <div>

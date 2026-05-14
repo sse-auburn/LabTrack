@@ -17,6 +17,7 @@ from apps.accounts.forms import (
 )
 from apps.accounts.models import CustomUser, UserProfile
 from apps.activity.utils import log_activity
+from apps.notifications.utils import notify, notify_admins
 
 
 # ---------------------------------------------------------------------------
@@ -47,6 +48,22 @@ def register_view(request):
                 object_id=user.pk,
                 object_repr=str(user),
                 request=request,
+            )
+
+            notify(
+                recipient=user,
+                title='Welcome to LabTrack',
+                message=f'Your account has been created successfully. Welcome, {user.full_name}!',
+                level='success',
+                link='/',
+                category='system',
+            )
+            notify_admins(
+                title='New User Registered',
+                message=f'New user registered: {user.full_name} ({user.email}).',
+                level='info',
+                link='/accounts/users/',
+                category='system',
             )
 
             login(request, user)
@@ -163,6 +180,23 @@ def user_create_view(request):
                 object_repr=str(user),
                 request=request,
             )
+
+            notify(
+                recipient=user,
+                title='Account Created',
+                message=f'An account has been created for you by {request.user.full_name}. Welcome to LabTrack!',
+                level='success',
+                link='/',
+                category='system',
+            )
+            notify_admins(
+                title='New User Created',
+                message=f'Admin {request.user.full_name} created user {user.full_name} ({user.email}).',
+                level='info',
+                link='/accounts/users/',
+                category='system',
+            )
+
             messages.success(request, f'User {user.full_name} has been created.')
             return redirect('accounts:user_list')
     else:
@@ -188,6 +222,33 @@ def user_edit_view(request, pk):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
+
+            log_activity(
+                actor=request.user,
+                action='USER_UPDATED',
+                description=f'Admin updated user: {target_user.email}',
+                content_type_label='customuser',
+                object_id=target_user.pk,
+                object_repr=str(target_user),
+                request=request,
+            )
+
+            notify(
+                recipient=target_user,
+                title='Profile Updated',
+                message=f'Your profile has been updated by {request.user.full_name}.',
+                level='info',
+                link=f'/accounts/users/{target_user.pk}/',
+                category='system',
+            )
+            notify_admins(
+                title='User Updated',
+                message=f'Admin {request.user.full_name} updated user {target_user.full_name} ({target_user.email}).',
+                level='info',
+                link='/accounts/users/',
+                category='system',
+            )
+
             messages.success(request, f'{target_user.full_name} has been updated.')
             return redirect('accounts:user_detail', pk=pk)
     else:
@@ -279,6 +340,23 @@ def assign_role_view(request, pk):
                 object_repr=str(target_user),
                 request=request,
             )
+
+            notify(
+                recipient=target_user,
+                title='Role Changed',
+                message=f'Your role has been changed from {old_role} to {new_role} by {request.user.full_name}.',
+                level='info',
+                link='/accounts/profile/',
+                category='system',
+            )
+            notify_admins(
+                title='User Role Changed',
+                message=f'Role of {target_user.full_name} changed from {old_role} to {new_role} by {request.user.full_name}.',
+                level='info',
+                link='/accounts/users/',
+                category='system',
+            )
+
             messages.success(
                 request,
                 f"Role for {target_user.full_name} updated to {new_role}.",
@@ -312,6 +390,23 @@ def toggle_active_view(request, pk):
             object_repr=str(target_user),
             request=request,
         )
+
+        notify(
+            recipient=target_user,
+            title='Account Status Changed',
+            message=f'Your account has been {status} by {request.user.full_name}.',
+            level='warning',
+            link='/accounts/profile/',
+            category='system',
+        )
+        notify_admins(
+            title='User Status Changed',
+            message=f'User {target_user.full_name} ({target_user.email}) has been {status} by {request.user.full_name}.',
+            level='warning',
+            link='/accounts/users/',
+            category='system',
+        )
+
         messages.success(request, f"{target_user.full_name} has been {status}.")
 
     return redirect('accounts:user_list')
@@ -339,6 +434,15 @@ def user_delete_view(request, pk):
             object_repr=name,
             request=request,
         )
+
+        notify_admins(
+            title='User Deleted',
+            message=f'User "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='/accounts/users/',
+            category='system',
+        )
+
         messages.success(request, f'User "{name}" has been deleted.')
         return redirect('accounts:user_list')
 

@@ -83,13 +83,13 @@ class ReservationCreateViewTests(TestCase):
         data.update(overrides)
         return data
 
-    # Test 1 – POST creates reservation with status=CONFIRMED (auto-approve)
-    def test_post_creates_confirmed_reservation(self):
+    # Test 1 – POST creates reservation with status=PENDING (requires owner confirmation)
+    def test_post_creates_pending_reservation(self):
         self.client.force_login(self.member)
         response = self.client.post(self.url, self._post_data())
         self.assertEqual(Reservation.objects.count(), 1)
         reservation = Reservation.objects.first()
-        self.assertEqual(reservation.status, 'CONFIRMED')
+        self.assertEqual(reservation.status, 'PENDING')
         self.assertEqual(reservation.requester, self.member)
 
     # Test 2 – anonymous GET redirects to login

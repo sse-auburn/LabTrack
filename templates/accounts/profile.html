@@ -142,32 +142,98 @@
     </div>
 
     <!-- Quick stats -->
-    <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
-      <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-        <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-        </svg>
-        Activity Stats
-      </h3>
-      <div class="space-y-3">
-        <div class="flex items-center justify-between p-3 bg-brand-50 rounded-xl">
-          <span class="text-sm text-brand-700 font-medium">Total Borrows</span>
-          <span class="text-lg font-bold text-brand-800">{{ total_borrows|default:0 }}</span>
-        </div>
-        <div class="flex items-center justify-between p-3 bg-green-50 rounded-xl">
-          <span class="text-sm text-green-700 font-medium">Active Borrows</span>
-          <span class="text-lg font-bold text-green-800">{{ active_borrows|default:0 }}</span>
-        </div>
-        <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-xl">
-          <span class="text-sm text-yellow-700 font-medium">Pending Requests</span>
-          <span class="text-lg font-bold text-yellow-800">{{ pending_borrows|default:0 }}</span>
-        </div>
-        <div class="flex items-center justify-between p-3 bg-red-50 rounded-xl">
-          <span class="text-sm text-red-700 font-medium">Overdue</span>
-          <span class="text-lg font-bold text-red-800">{{ overdue_borrows|default:0 }}</span>
+    <div class="space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
+        <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          Activity Stats
+        </h3>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-3 bg-brand-50 rounded-xl">
+            <span class="text-sm text-brand-700 font-medium">Total Borrows</span>
+            <span class="text-lg font-bold text-brand-800">{{ total_borrows|default:0 }}</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-green-50 rounded-xl">
+            <span class="text-sm text-green-700 font-medium">Active Borrows</span>
+            <span class="text-lg font-bold text-green-800">{{ active_borrows|default:0 }}</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-xl">
+            <span class="text-sm text-yellow-700 font-medium">Pending Requests</span>
+            <span class="text-lg font-bold text-yellow-800">{{ pending_borrows|default:0 }}</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-red-50 rounded-xl">
+            <span class="text-sm text-red-700 font-medium">Overdue</span>
+            <span class="text-lg font-bold text-red-800">{{ overdue_borrows|default:0 }}</span>
+          </div>
         </div>
       </div>
+
+      <!-- Notification Preferences Summary -->
+      {% if request.user == profile_user %}
+      <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
+        <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          Notifications
+        </h3>
+        <div class="space-y-2.5">
+          {% with prefs=profile_user.profile %}
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-600">In-app</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold {% if prefs.in_app_notifications %}bg-green-100 text-green-700{% else %}bg-slate-100 text-slate-500{% endif %}">
+              {% if prefs.in_app_notifications %}On{% else %}Off{% endif %}
+            </span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-600">Email</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold {% if prefs.email_notifications %}bg-green-100 text-green-700{% else %}bg-slate-100 text-slate-500{% endif %}">
+              {% if prefs.email_notifications %}On{% else %}Off{% endif %}
+            </span>
+          </div>
+          <div class="border-t border-slate-100 my-2"></div>
+          <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full {% if prefs.notify_borrowing %}bg-green-400{% else %}bg-slate-300{% endif %}"></span>
+              <span class="text-slate-600">Borrowing</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full {% if prefs.notify_reservations %}bg-green-400{% else %}bg-slate-300{% endif %}"></span>
+              <span class="text-slate-600">Reservations</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full {% if prefs.notify_equipment %}bg-green-400{% else %}bg-slate-300{% endif %}"></span>
+              <span class="text-slate-600">Equipment</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full {% if prefs.notify_kits %}bg-green-400{% else %}bg-slate-300{% endif %}"></span>
+              <span class="text-slate-600">Kits</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full {% if prefs.notify_consumables %}bg-green-400{% else %}bg-slate-300{% endif %}"></span>
+              <span class="text-slate-600">Consumables</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full {% if prefs.notify_incidents %}bg-green-400{% else %}bg-slate-300{% endif %}"></span>
+              <span class="text-slate-600">Incidents</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full {% if prefs.notify_projects %}bg-green-400{% else %}bg-slate-300{% endif %}"></span>
+              <span class="text-slate-600">Projects</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full {% if prefs.notify_system %}bg-green-400{% else %}bg-slate-300{% endif %}"></span>
+              <span class="text-slate-600">System</span>
+            </div>
+          </div>
+          {% endwith %}
+        </div>
+      </div>
+      {% endif %}
     </div>
 
   </div>

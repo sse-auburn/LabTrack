@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from apps.activity.utils import log_activity
 from apps.projects.forms import ProjectForm, ProjectMemberForm
 from apps.projects.models import Project, ProjectMember
+from apps.notifications.utils import notify_admins
 
 
 def _is_admin(user):
@@ -84,6 +85,14 @@ def project_create_view(request):
                 request=request,
             )
 
+            notify_admins(
+                title='Project Created',
+                message=f'Project "{project.name}" was created by {request.user.full_name or request.user.username}.',
+                level='info',
+                link=f'/projects/{project.pk}/',
+                category='projects',
+            )
+
             messages.success(request, f'Project "{project.name}" created successfully.')
             return redirect('projects:detail', pk=project.pk)
     else:
@@ -120,6 +129,14 @@ def project_edit_view(request, pk):
                 request=request,
             )
 
+            notify_admins(
+                title='Project Updated',
+                message=f'Project "{project.name}" was updated by {request.user.full_name or request.user.username}.',
+                level='info',
+                link=f'/projects/{project.pk}/',
+                category='projects',
+            )
+
             messages.success(request, f'Project "{project.name}" updated successfully.')
             return redirect('projects:detail', pk=project.pk)
     else:
@@ -144,6 +161,25 @@ def project_delete_view(request, pk):
     if request.method == 'POST':
         project_name = project.name
         project.delete()
+
+        log_activity(
+            actor=request.user,
+            action='PROJECT_DELETED',
+            description=f'{request.user.username} deleted project "{project_name}"',
+            content_type_label='project',
+            object_id=pk,
+            object_repr=project_name,
+            request=request,
+        )
+
+        notify_admins(
+            title='Project Deleted',
+            message=f'Project "{project_name}" was deleted by {request.user.full_name or request.user.username}.',
+            level='warning',
+            link='/projects/',
+            category='projects',
+        )
+
         messages.success(request, f'Project "{project_name}" deleted.')
         return redirect('projects:list')
 
@@ -181,6 +217,17 @@ def project_member_add_view(request, pk):
                 object_id=project.pk,
                 object_repr=str(project),
                 request=request,
+            )
+
+            notify_admins(
+                title='Project Member Added',
+                message=(
+                    f'{request.user.full_name or request.user.username} added '
+                    f'{membership.user.username} to project "{project.name}".'
+                ),
+                level='info',
+                link=f'/projects/{project.pk}/',
+                category='projects',
             )
 
             messages.success(
@@ -237,6 +284,17 @@ def project_member_remove_view(request, pk, mem_pk):
             object_id=project.pk,
             object_repr=str(project),
             request=request,
+        )
+
+        notify_admins(
+            title='Project Member Removed',
+            message=(
+                f'{request.user.full_name or request.user.username} removed '
+                f'{username} from project "{project.name}".'
+            ),
+            level='warning',
+            link=f'/projects/{project.pk}/',
+            category='projects',
         )
 
         messages.success(request, f'{username} removed from project "{project.name}".')

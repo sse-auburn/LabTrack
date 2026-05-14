@@ -80,26 +80,47 @@ class Equipment(models.Model):
         Category,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True,
         related_name='equipment',
     )
     location = models.ForeignKey(
         Location,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True,
         related_name='equipment',
     )
     owner = models.ForeignKey(
         'accounts.CustomUser',
         on_delete=models.SET_NULL,
         null=True,
-        blank=True,
         related_name='owned_equipment',
+    )
+    created_by = models.ForeignKey(
+        'accounts.CustomUser',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_equipment',
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='AVAILABLE')
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, default='GOOD')
     image = models.ImageField(upload_to='equipment/', blank=True, null=True)
+    approval_status = models.CharField(
+        max_length=20,
+        choices=[
+            ('APPROVED', 'Approved'),
+            ('PENDING', 'Pending Approval'),
+            ('REJECTED', 'Rejected'),
+        ],
+        default='APPROVED',
+    )
+    approved_by = models.ForeignKey(
+        'accounts.CustomUser',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='approved_equipment',
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
     purchase_date = models.DateField(blank=True, null=True)
     purchase_price = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True

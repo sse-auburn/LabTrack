@@ -1,10 +1,23 @@
 """Unit tests for the equipment app."""
 
+import io
+
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
 from apps.accounts.models import CustomUser, UserProfile
 from apps.equipment.models import Category, Equipment, Location
+
+
+def _minimal_gif():
+    """Return a minimal valid 1×1 GIF as a SimpleUploadedFile."""
+    gif_bytes = (
+        b'GIF89a\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00'
+        b'!\xf9\x04\x00\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01'
+        b'\x00\x00\x02\x02D\x01\x00;'
+    )
+    return SimpleUploadedFile('test.gif', gif_bytes, content_type='image/gif')
 
 
 class EquipmentModelTest(TestCase):
@@ -95,6 +108,8 @@ class EquipmentCreateViewTest(TestCase):
             last_name='User',
         )
         UserProfile.objects.get_or_create(user=self.user)
+        self.category = Category.objects.create(name='Test Category')
+        self.location = Location.objects.create(name='Test Location')
         self.client.force_login(self.user)
         self.url = reverse('equipment:create')
 
@@ -104,13 +119,16 @@ class EquipmentCreateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_post_creates_equipment_with_owner_as_request_user(self):
-        """A valid POST with no owner specified should assign the owner to request.user."""
+        """A valid POST with owner=self sets approval_status=APPROVED immediately."""
         response = self.client.post(self.url, {
             'name': 'New Multimeter',
             'description': 'A digital multimeter.',
             'status': 'AVAILABLE',
             'condition': 'GOOD',
-            # owner intentionally omitted — view sets it to request.user
+            'owner': self.user.pk,
+            'category': self.category.pk,
+            'location': self.location.pk,
+            'image': _minimal_gif(),
         })
         self.assertEqual(Equipment.objects.count(), 1)
         equipment = Equipment.objects.first()
@@ -163,9 +181,14 @@ class EquipmentEditViewTest(TestCase):
         )
         UserProfile.objects.get_or_create(user=self.non_owner)
 
+        self.category = Category.objects.create(name='Edit Test Category')
+        self.location = Location.objects.create(name='Edit Test Location')
+
         self.equipment = Equipment.objects.create(
             name='Power Supply Unit',
             owner=self.owner,
+            category=self.category,
+            location=self.location,
             is_active=True,
             status='AVAILABLE',
             condition='GOOD',
@@ -176,14 +199,17 @@ class EquipmentEditViewTest(TestCase):
         """The equipment owner should be able to successfully POST an update."""
         self.client.force_login(self.owner)
         response = self.client.post(self.url, {
-            'name': 'Power Supply Unit — Updated',
+            'name': 'Power Supply Unit Updated',
             'description': 'Updated description.',
             'status': 'AVAILABLE',
             'condition': 'EXCELLENT',
             'owner': self.owner.pk,
+            'category': self.category.pk,
+            'location': self.location.pk,
+            'image': _minimal_gif(),
         })
         self.equipment.refresh_from_db()
-        self.assertEqual(self.equipment.name, 'Power Supply Unit — Updated')
+        self.assertEqual(self.equipment.name, 'Power Supply Unit Updated')
         self.assertRedirects(response, reverse('equipment:detail', kwargs={'pk': self.equipment.pk}))
 
     def test_non_owner_cannot_edit_equipment(self):
@@ -195,6 +221,8 @@ class EquipmentEditViewTest(TestCase):
             'status': 'AVAILABLE',
             'condition': 'GOOD',
             'owner': self.non_owner.pk,
+            'category': self.category.pk,
+            'location': self.location.pk,
         })
         self.assertRedirects(response, reverse('equipment:detail', kwargs={'pk': self.equipment.pk}))
         self.equipment.refresh_from_db()

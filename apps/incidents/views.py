@@ -91,6 +91,7 @@ def incident_create_view(request):
                 ),
                 level='warning' if incident.severity in ('HIGH', 'CRITICAL') else 'info',
                 link=f'/incidents/{incident.pk}/',
+                category='incidents',
             )
 
             messages.success(request, 'Incident reported successfully.')
@@ -137,6 +138,15 @@ def incident_edit_view(request, pk):
                 object_repr=str(incident),
                 request=request,
             )
+
+            notify_admins(
+                title='Incident Updated',
+                message=f'Incident "{incident.title}" was updated by {request.user.full_name or request.user.username}.',
+                level='info',
+                link=f'/incidents/{incident.pk}/',
+                category='incidents',
+            )
+
             messages.success(request, 'Incident updated successfully.')
             return redirect('incidents:detail', pk=incident.pk)
     else:
@@ -197,6 +207,7 @@ def incident_resolve_view(request, pk):
                     ),
                     level='success' if incident.status == 'RESOLVED' else 'info',
                     link=f'/incidents/{incident.pk}/',
+                    category='incidents',
                 )
 
             messages.success(request, f'Incident updated to "{incident.get_status_display()}".')
@@ -249,6 +260,7 @@ def incident_assign_view(request, pk):
                     ),
                     level='info',
                     link=f'/incidents/{incident.pk}/',
+                    category='incidents',
                 )
 
             # Auto-set status to INVESTIGATING if it was OPEN
@@ -334,6 +346,7 @@ def maintenance_create_view(request):
                 ),
                 level='info',
                 link=f'/incidents/maintenance/{log.pk}/',
+                category='incidents',
             )
 
             messages.success(request, 'Maintenance log created successfully.')
@@ -380,6 +393,17 @@ def maintenance_complete_view(request, pk):
                 object_id=log.pk,
                 object_repr=str(log),
                 request=request,
+            )
+
+            notify_admins(
+                title='Maintenance Updated',
+                message=(
+                    f'Maintenance for "{log.equipment.name}" marked as '
+                    f'{log.get_status_display()} by {request.user.full_name or request.user.username}.'
+                ),
+                level='info',
+                link=f'/incidents/maintenance/{log.pk}/',
+                category='incidents',
             )
 
             messages.success(request, f'Maintenance log updated to "{log.get_status_display()}".')
@@ -446,6 +470,7 @@ def calibration_create_view(request):
                 ),
                 level='success' if calibration.status == 'PASS' else 'warning',
                 link=f'/incidents/calibration/',
+                category='incidents',
             )
 
             messages.success(request, 'Calibration log created successfully.')
@@ -481,6 +506,15 @@ def incident_delete_view(request, pk):
             object_repr=title,
             request=request,
         )
+
+        notify_admins(
+            title='Incident Deleted',
+            message=f'Incident "{title}" was deleted by {request.user.full_name or request.user.username}.',
+            level='warning',
+            link='/incidents/',
+            category='incidents',
+        )
+
         messages.success(request, f'Incident "{title}" has been deleted.')
         return redirect('incidents:list')
 
@@ -508,6 +542,15 @@ def maintenance_delete_view(request, pk):
             object_repr=equipment_name,
             request=request,
         )
+
+        notify_admins(
+            title='Maintenance Deleted',
+            message=f'Maintenance log for "{equipment_name}" was deleted by {request.user.full_name or request.user.username}.',
+            level='warning',
+            link='/incidents/maintenance/',
+            category='incidents',
+        )
+
         messages.success(request, f'Maintenance log for "{equipment_name}" has been deleted.')
         return redirect('incidents:maintenance_list')
 
@@ -535,6 +578,15 @@ def calibration_delete_view(request, pk):
             object_repr=equipment_name,
             request=request,
         )
+
+        notify_admins(
+            title='Calibration Deleted',
+            message=f'Calibration log for "{equipment_name}" was deleted by {request.user.full_name or request.user.username}.',
+            level='warning',
+            link='/incidents/calibration/',
+            category='incidents',
+        )
+
         messages.success(request, f'Calibration log for "{equipment_name}" has been deleted.')
         return redirect('incidents:calibration_list')
 

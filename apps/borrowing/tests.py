@@ -2,6 +2,7 @@
 
 import datetime
 
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
@@ -300,6 +301,23 @@ class BorrowSignalTests(TestCase):
             status='APPROVED',
         )
         new_count = Notification.objects.filter(recipient=self.admin).count()
+        self.assertGreater(new_count, initial_count)
+
+    # Test 13b – OVERDUE transition notifies the borrower
+    def test_overdue_status_notifies_borrower(self):
+        borrow = BorrowRequest.objects.create(
+            borrower=self.member,
+            equipment=self.equipment,
+            purpose='Overdue signal test',
+            due_date=datetime.date.today() - datetime.timedelta(days=1),
+            status='APPROVED',
+        )
+        initial_count = Notification.objects.filter(recipient=self.member).count()
+
+        borrow.status = 'OVERDUE'
+        borrow.save()
+
+        new_count = Notification.objects.filter(recipient=self.member).count()
         self.assertGreater(new_count, initial_count)
 
     # Test 14 – transitioning status to APPROVED notifies the borrower

@@ -30,6 +30,32 @@
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
       <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
         <div class="flex-1">
+          <!-- Pending Approval Banner -->
+          {% if equipment.approval_status == 'PENDING' %}
+          <div class="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
+            <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div class="flex-1">
+              <p class="text-sm font-semibold text-yellow-800">Awaiting Admin Approval</p>
+              <p class="text-xs text-yellow-700">This equipment was submitted by {{ equipment.created_by.full_name|default:"Unknown" }} and assigned to {{ equipment.owner.full_name|default:"Unknown" }}. It will be visible to everyone once approved.</p>
+            </div>
+            {% if can_approve %}
+            <div class="flex items-center gap-2">
+              <a href="{% url 'equipment:approve' equipment.pk %}"
+                 class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition-colors">
+                Approve
+              </a>
+              <a href="{% url 'equipment:reject' equipment.pk %}"
+                 class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                 onclick="return confirm('Reject this equipment? It will be retired.')">
+                Reject
+              </a>
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+
           <div class="flex flex-wrap items-center gap-3 mb-2">
             <h1 class="text-2xl font-bold text-gray-900">{{ equipment.name }}</h1>
             <!-- Status Badge -->
@@ -79,7 +105,7 @@
         <!-- Action Buttons -->
         <div class="flex flex-wrap gap-2 shrink-0">
           {% if user.is_authenticated %}
-            {% if equipment.status == 'AVAILABLE' %}
+            {% if equipment.status == 'AVAILABLE' and equipment.approval_status == 'APPROVED' %}
             <a href="{% url 'borrowing:create' %}?equipment={{ equipment.pk }}"
                class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors duration-150">
               <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

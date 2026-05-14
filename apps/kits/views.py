@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from apps.activity.utils import log_activity
 from apps.kits.forms import KitForm, KitItemForm
 from apps.kits.models import Kit, KitItem
+from apps.notifications.utils import notify_admins
 
 
 @login_required
@@ -58,6 +59,14 @@ def kit_create_view(request):
                 request=request,
             )
 
+            notify_admins(
+                title='Kit Created',
+                message=f'Kit "{kit.name}" was created by {request.user.full_name or request.user.username}.',
+                level='info',
+                link=f'/kits/{kit.pk}/',
+                category='kits',
+            )
+
             messages.success(request, f'Kit "{kit.name}" created successfully.')
             return redirect('kits:detail', pk=kit.pk)
     else:
@@ -90,6 +99,14 @@ def kit_edit_view(request, pk):
                 request=request,
             )
 
+            notify_admins(
+                title='Kit Updated',
+                message=f'Kit "{kit.name}" was updated by {request.user.full_name or request.user.username}.',
+                level='info',
+                link=f'/kits/{kit.pk}/',
+                category='kits',
+            )
+
             messages.success(request, f'Kit "{kit.name}" updated successfully.')
             return redirect('kits:detail', pk=kit.pk)
     else:
@@ -110,6 +127,25 @@ def kit_delete_view(request, pk):
     if request.method == 'POST':
         kit_name = kit.name
         kit.delete()
+
+        log_activity(
+            actor=request.user,
+            action='KIT_DELETED',
+            description=f'{request.user.username} deleted kit "{kit_name}"',
+            content_type_label='kit',
+            object_id=pk,
+            object_repr=kit_name,
+            request=request,
+        )
+
+        notify_admins(
+            title='Kit Deleted',
+            message=f'Kit "{kit_name}" was deleted by {request.user.full_name or request.user.username}.',
+            level='warning',
+            link='/kits/',
+            category='kits',
+        )
+
         messages.success(request, f'Kit "{kit_name}" deleted.')
         return redirect('kits:list')
 
@@ -142,6 +178,17 @@ def kit_item_add_view(request, pk):
                 object_id=kit.pk,
                 object_repr=str(kit),
                 request=request,
+            )
+
+            notify_admins(
+                title='Kit Item Added',
+                message=(
+                    f'{request.user.full_name or request.user.username} added '
+                    f'"{item.equipment.name}" to kit "{kit.name}".'
+                ),
+                level='info',
+                link=f'/kits/{kit.pk}/',
+                category='kits',
             )
 
             messages.success(
@@ -179,6 +226,17 @@ def kit_item_remove_view(request, pk, item_pk):
             object_id=kit.pk,
             object_repr=str(kit),
             request=request,
+        )
+
+        notify_admins(
+            title='Kit Item Removed',
+            message=(
+                f'{request.user.full_name or request.user.username} removed '
+                f'"{equipment_name}" from kit "{kit.name}".'
+            ),
+            level='warning',
+            link=f'/kits/{kit.pk}/',
+            category='kits',
         )
 
         messages.success(request, f'"{equipment_name}" removed from kit "{kit.name}".')

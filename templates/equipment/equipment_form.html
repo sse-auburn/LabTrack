@@ -123,7 +123,7 @@
 
               <!-- Category -->
               <div>
-                <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Category <span class="text-red-500">*</span></label>
                 <select name="{{ form.category.html_name }}" id="{{ form.category.id_for_label }}"
                         class="w-full px-3 py-2 text-sm border {% if form.category.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
                   <option value="">-- Select Category --</option>
@@ -138,7 +138,7 @@
 
               <!-- Location -->
               <div>
-                <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Location <span class="text-red-500">*</span></label>
                 <select name="{{ form.location.html_name }}" id="{{ form.location.id_for_label }}"
                         class="w-full px-3 py-2 text-sm border {% if form.location.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
                   <option value="">-- Select Location --</option>
@@ -147,6 +147,27 @@
                   {% endfor %}
                 </select>
                 {% for error in form.location.errors %}
+                <p class="mt-1 text-xs text-red-600">{{ error }}</p>
+                {% endfor %}
+              </div>
+
+              <!-- Owner -->
+              <div class="sm:col-span-2">
+                <label for="{{ form.owner.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Responsible Person <span class="text-red-500">*</span></label>
+                <p id="owner-warning" class="hidden text-xs text-amber-600 mt-1 mb-1">
+                  <svg class="w-3.5 h-3.5 inline mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                  </svg>
+                  Assigning to someone else will require admin approval before this equipment becomes visible.
+                </p>
+                <select name="{{ form.owner.html_name }}" id="{{ form.owner.id_for_label }}"
+                        class="w-full px-3 py-2 text-sm border {% if form.owner.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                  <option value="">-- Select Person --</option>
+                  {% for choice in form.owner.field.queryset %}
+                  <option value="{{ choice.pk }}" {% if form.owner.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                  {% endfor %}
+                </select>
+                {% for error in form.owner.errors %}
                 <p class="mt-1 text-xs text-red-600">{{ error }}</p>
                 {% endfor %}
               </div>
@@ -236,7 +257,7 @@
 
           <!-- Image Upload -->
           <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 class="text-base font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">Equipment Image</h2>
+            <h2 class="text-base font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">Equipment Image <span class="text-red-500">*</span></h2>
 
             <!-- Preview -->
             <div id="image-preview-container" class="mb-4">
@@ -248,23 +269,33 @@
                 <svg class="w-10 h-10 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
-                <p class="text-sm text-gray-400">No image uploaded</p>
+                <p class="text-sm text-gray-400">No image · paste (Ctrl+V)</p>
               </div>
               <img id="image-preview" src="" alt="Preview" class="w-full h-48 object-cover rounded-lg border border-gray-200 hidden">
               {% endif %}
             </div>
 
-            <label for="{{ form.image.id_for_label }}"
-                   class="cursor-pointer block w-full text-center px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
-              <svg class="w-4 h-4 inline mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-              </svg>
-              Upload Image
-            </label>
+            <div class="flex gap-2">
+              <label for="{{ form.image.id_for_label }}"
+                     class="cursor-pointer flex-1 text-center px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
+                <svg class="w-4 h-4 inline mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                </svg>
+                Upload
+              </label>
+              <button type="button" onclick="openCamera()"
+                      class="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                Camera
+              </button>
+            </div>
             <input type="file" name="{{ form.image.html_name }}" id="{{ form.image.id_for_label }}"
                    accept="image/*" class="sr-only"
                    onchange="previewImage(this)">
-            <p class="mt-2 text-xs text-gray-400 text-center">PNG, JPG, GIF up to 10MB</p>
+            <p class="mt-2 text-xs text-gray-400 text-center">PNG, JPG, GIF up to 10MB · or paste (Ctrl+V)</p>
             {% for error in form.image.errors %}
             <p class="mt-1 text-xs text-red-600">{{ error }}</p>
             {% endfor %}
@@ -274,9 +305,9 @@
           <div class="bg-indigo-50 rounded-xl border border-indigo-100 p-4">
             <h3 class="text-sm font-semibold text-indigo-800 mb-2">Tips</h3>
             <ul class="text-xs text-indigo-700 space-y-1">
-              <li>• Use a unique serial number to avoid duplicates.</li>
+              <li>• Category, Location, Responsible Person, and Image are required.</li>
               <li>• Set status to AVAILABLE unless the item is currently in use.</li>
-              <li>• Category and Location help with filtering and reporting.</li>
+              <li>• Assigning to someone else requires admin approval.</li>
             </ul>
           </div>
 
@@ -306,23 +337,113 @@
   </div>
 </div>
 
+<!-- Camera Modal -->
+<div id="camera-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+     onclick="handleModalBackdrop(event)">
+  <div class="bg-white rounded-xl shadow-xl p-4 w-full max-w-lg mx-4">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-base font-semibold text-gray-900">Take Photo</h3>
+      <button type="button" onclick="closeCamera()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <video id="camera-video" autoplay playsinline class="w-full rounded-lg bg-black aspect-video"></video>
+    <div class="flex gap-2 mt-3">
+      <button type="button" onclick="closeCamera()"
+              class="flex-1 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300">
+        Cancel
+      </button>
+      <button type="button" onclick="capturePhoto()"
+              class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg">
+        Capture
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
-function previewImage(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const preview = document.getElementById('image-preview');
-      const placeholder = document.getElementById('image-placeholder');
-      if (preview) {
-        preview.src = e.target.result;
-        preview.classList.remove('hidden');
-      }
-      if (placeholder) {
-        placeholder.classList.add('hidden');
-      }
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
+let cameraStream = null;
+
+function showPreview(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const preview = document.getElementById('image-preview');
+    const placeholder = document.getElementById('image-placeholder');
+    if (preview) { preview.src = e.target.result; preview.classList.remove('hidden'); }
+    if (placeholder) { placeholder.classList.add('hidden'); }
+  };
+  reader.readAsDataURL(file);
 }
+
+function setImageFile(file) {
+  const input = document.getElementById('{{ form.image.id_for_label }}');
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  input.files = dt.files;
+  showPreview(file);
+}
+
+function previewImage(input) {
+  if (input.files && input.files[0]) showPreview(input.files[0]);
+}
+
+function openCamera() {
+  document.getElementById('camera-modal').classList.remove('hidden');
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+    .then(stream => { cameraStream = stream; document.getElementById('camera-video').srcObject = stream; })
+    .catch(err => { alert('Camera not available: ' + err.message); closeCamera(); });
+}
+
+function closeCamera() {
+  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+  document.getElementById('camera-modal').classList.add('hidden');
+}
+
+function handleModalBackdrop(e) {
+  if (e.target === e.currentTarget) closeCamera();
+}
+
+function capturePhoto() {
+  const video = document.getElementById('camera-video');
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  canvas.toBlob(blob => {
+    setImageFile(new File([blob], 'capture.jpg', { type: 'image/jpeg' }));
+    closeCamera();
+  }, 'image/jpeg', 0.92);
+}
+
+document.addEventListener('paste', function(e) {
+  if (!e.clipboardData) return;
+  for (const item of e.clipboardData.items) {
+    if (item.type.startsWith('image/')) {
+      e.preventDefault();
+      setImageFile(item.getAsFile());
+      break;
+    }
+  }
+});
+
+// Owner approval warning
+(function() {
+  const ownerSelect = document.getElementById('{{ form.owner.id_for_label }}');
+  const warning = document.getElementById('owner-warning');
+  const currentUserId = '{{ request.user.pk }}';
+  if (ownerSelect && warning) {
+    function checkOwner() {
+      if (ownerSelect.value && ownerSelect.value !== currentUserId) {
+        warning.classList.remove('hidden');
+      } else {
+        warning.classList.add('hidden');
+      }
+    }
+    ownerSelect.addEventListener('change', checkOwner);
+    checkOwner();
+  }
+})();
 </script>
 {% endblock %}

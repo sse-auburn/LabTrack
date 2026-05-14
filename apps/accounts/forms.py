@@ -118,7 +118,13 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ('phone', 'department', 'student_id', 'bio', 'avatar', 'email_notifications')
+        fields = (
+            'phone', 'department', 'student_id', 'bio', 'avatar',
+            'in_app_notifications', 'email_notifications',
+            'notify_borrowing', 'notify_reservations', 'notify_incidents',
+            'notify_equipment', 'notify_kits', 'notify_consumables',
+            'notify_projects', 'notify_system',
+        )
         widgets = {
             'phone': forms.TextInput(attrs={
                 'class': 'form-input',

@@ -170,6 +170,30 @@
 
   </div>
 
+  <!-- ── My Pending Returns (submitted by user, awaiting owner confirmation) ── -->
+  {% if my_pending_returns %}
+  <div class="bg-white rounded-xl border border-blue-200 shadow-sm overflow-hidden">
+    <div class="px-5 py-4 border-b border-blue-100 flex items-center justify-between">
+      <h3 class="text-base font-semibold text-slate-800 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-blue-400 inline-block"></span>
+        My Pending Returns
+      </h3>
+      <a href="{% url 'borrowing:list' %}?status=RETURN_PENDING" class="text-xs text-brand-600 hover:underline font-medium">View all</a>
+    </div>
+    <div class="divide-y divide-slate-100">
+      {% for borrow in my_pending_returns %}
+      <div class="px-5 py-3 flex items-center justify-between gap-3">
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-medium text-slate-800 truncate">{{ borrow.item }}</p>
+          <p class="text-xs text-slate-500 mt-0.5">Submitted {{ borrow.returned_date|timesince }} ago &mdash; awaiting owner confirmation</p>
+        </div>
+        <a href="{% url 'borrowing:detail' borrow.pk %}" class="flex-shrink-0 text-xs text-brand-600 hover:underline font-medium">View</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
   <!-- ── Return Approvals (visible when user owns equipment being returned) ── -->
   {% if return_approvals or kit_item_approvals %}
   <div class="bg-white rounded-xl border border-orange-200 shadow-sm overflow-hidden">
@@ -334,6 +358,51 @@
     </div>
 
   </div>
+
+  <!-- ── Recent Activity ── -->
+  {% if recent_activity %}
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-base font-semibold text-slate-800 flex items-center gap-2">
+        <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        My Recent Activity
+      </h3>
+      <a href="{% url 'activity:feed' %}" class="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">View all</a>
+    </div>
+    <div class="divide-y divide-slate-100">
+      {% for log in recent_activity %}
+      <div class="px-5 py-3 flex items-start gap-3">
+        <div class="flex-shrink-0 mt-0.5">
+          <span class="flex items-center justify-center w-7 h-7 rounded-full
+            {% if 'CREATED' in log.action or 'REGISTERED' in log.action %}bg-green-100
+            {% elif 'DELETED' in log.action or 'OVERDUE' in log.action %}bg-red-100
+            {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action %}bg-blue-100
+            {% elif 'REJECTED' in log.action or 'CANCELLED' in log.action %}bg-orange-100
+            {% else %}bg-slate-100{% endif %}">
+            <svg class="w-3 h-3
+              {% if 'CREATED' in log.action or 'REGISTERED' in log.action %}text-green-600
+              {% elif 'DELETED' in log.action or 'OVERDUE' in log.action %}text-red-600
+              {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action %}text-blue-600
+              {% elif 'REJECTED' in log.action or 'CANCELLED' in log.action %}text-orange-600
+              {% else %}text-slate-500{% endif %}"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs text-slate-600 leading-snug line-clamp-2">{{ log.description }}</p>
+        </div>
+        <span class="flex-shrink-0 text-xs text-slate-400 whitespace-nowrap">{{ log.timestamp|timesince }} ago</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
 
 </div>
 {% endblock %}

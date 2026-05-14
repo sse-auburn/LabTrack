@@ -13,7 +13,7 @@ from apps.activity.utils import log_activity
 from apps.borrowing.forms import BorrowRequestForm, BulkBorrowForm, ReturnForm
 from apps.borrowing.models import BorrowRequest, KitItemReturnApproval
 from apps.equipment.models import Equipment
-from apps.notifications.utils import notify
+from apps.notifications.utils import notify, notify_admins
 from apps.reservations.models import WaitlistEntry
 
 
@@ -168,6 +168,23 @@ def borrow_bulk_create_view(request):
                 request,
                 f'Borrowed {len(created)} item(s): {", ".join(created)}. Due back by {due_date}.'
             )
+
+            notify(
+                recipient=request.user,
+                title='Items Borrowed',
+                message=f'You have borrowed {len(created)} item(s). Due back by {due_date}.',
+                level='success',
+                link=reverse('borrowing:list'),
+                category='borrowing',
+            )
+            notify_admins(
+                title='Bulk Borrow Created',
+                message=f'{request.user.full_name or request.user.username} borrowed {len(created)} item(s).',
+                level='info',
+                link=reverse('borrowing:list'),
+                category='borrowing',
+            )
+
             return redirect('borrowing:list')
 
         # Form invalid — re-show confirmation page with errors
@@ -279,6 +296,7 @@ def borrow_return_view(request, pk):
                         ),
                         level='info',
                         link=reverse('borrowing:return_queue'),
+                        category='borrowing',
                     )
             elif borrow.kit:
                 # Kit — create per-owner approval records and notify each distinct owner.
@@ -302,6 +320,7 @@ def borrow_return_view(request, pk):
                             ),
                             level='info',
                             link=reverse('borrowing:return_queue'),
+                            category='borrowing',
                         )
                         notified_owners.add(owner.pk)
 
@@ -346,6 +365,7 @@ def borrow_return_confirm_view(request, pk):
             message=f'Your return of {borrow.item} has been confirmed. Thank you!',
             level='success',
             link=reverse('borrowing:detail', args=[borrow.pk]),
+            category='borrowing',
         )
 
         waitlist_qs = WaitlistEntry.objects.filter(
@@ -359,6 +379,7 @@ def borrow_return_confirm_view(request, pk):
                 message=f'{borrow.item} is now available. You are next on the waitlist!',
                 level='success',
                 link=reverse('borrowing:create'),
+                category='borrowing',
             )
             next_entry.notified = True
             next_entry.save(update_fields=['notified'])
@@ -440,6 +461,7 @@ def kit_item_return_confirm_view(request, approval_pk):
                 message=f'Your return of kit "{borrow.kit}" has been fully confirmed. Thank you!',
                 level='success',
                 link=reverse('borrowing:detail', args=[borrow.pk]),
+                category='borrowing',
             )
 
             # Notify next on waitlist.
@@ -453,6 +475,7 @@ def kit_item_return_confirm_view(request, approval_pk):
                     message=f'Kit "{borrow.kit}" is now available. You are next on the waitlist!',
                     level='success',
                     link=reverse('kits:detail', args=[borrow.kit.pk]),
+                    category='borrowing',
                 )
                 next_entry.notified = True
                 next_entry.save(update_fields=['notified'])
@@ -542,6 +565,8 @@ def borrow_request_delete_view(request, pk):
                 if kit_item.equipment.status == 'BORROWED':
                     kit_item.equipment.status = 'AVAILABLE'
                     kit_item.equipment.save(update_fields=['status'])
+        # Clean up any pending kit item return approvals
+        borrow.kit_item_approvals.all().delete()
         borrow.delete()
         log_activity(
             actor=request.user,
@@ -552,6 +577,25 @@ def borrow_request_delete_view(request, pk):
             object_repr=item_name,
             request=request,
         )
+
+        borrower = borrow.borrower
+        if borrower:
+            notify(
+                recipient=borrower,
+                title='Borrow Request Deleted',
+                message=f'Your borrow request for "{item_name}" has been deleted.',
+                level='warning',
+                link=reverse('borrowing:list'),
+                category='borrowing',
+            )
+        notify_admins(
+            title='Borrow Request Deleted',
+            message=f'Borrow request for "{item_name}" by {borrow.borrower.full_name if borrow.borrower else "unknown"} was deleted.',
+            level='warning',
+            link=reverse('borrowing:list'),
+            category='borrowing',
+        )
+
         messages.success(request, f'Borrow request for "{item_name}" has been deleted.')
         return redirect('borrowing:list')
 

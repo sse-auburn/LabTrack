@@ -11,8 +11,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from apps.dashboard.views import admin_panel_view
+from apps.files.views import serve_db_file
 
 urlpatterns = [
+    # Database-stored file serving
+    path('media/dbfile/<int:file_id>/', serve_db_file, name='serve_db_file'),
     # Admin panel (functional management hub)
     path('admin/', admin_panel_view, name='admin_panel'),
 

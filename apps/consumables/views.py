@@ -10,6 +10,7 @@ from apps.accounts.decorators import admin_required
 from apps.activity.utils import log_activity
 from apps.consumables.forms import ConsumableForm, ConsumableUsageLogForm, RestockForm
 from apps.consumables.models import Consumable, ConsumableUsageLog
+from apps.notifications.utils import notify_admins
 
 
 @login_required
@@ -43,6 +44,7 @@ def consumable_detail_view(request, pk):
 
 
 @login_required
+@admin_required
 def consumable_create_view(request):
     """Admin only: create a new consumable."""
     if request.method == 'POST':
@@ -58,6 +60,15 @@ def consumable_create_view(request):
                 object_repr=str(consumable),
                 request=request,
             )
+
+            notify_admins(
+                title='Consumable Created',
+                message=f'Consumable "{consumable.name}" was created by {request.user.full_name}.',
+                level='info',
+                link=f'/consumables/{consumable.pk}/',
+                category='consumables',
+            )
+
             messages.success(request, f'Consumable "{consumable.name}" created successfully.')
             return redirect('consumables:detail', pk=consumable.pk)
     else:
@@ -71,6 +82,7 @@ def consumable_create_view(request):
 
 
 @login_required
+@admin_required
 def consumable_edit_view(request, pk):
     """Admin only: edit an existing consumable."""
     consumable = get_object_or_404(Consumable, pk=pk)
@@ -88,6 +100,15 @@ def consumable_edit_view(request, pk):
                 object_repr=str(consumable),
                 request=request,
             )
+
+            notify_admins(
+                title='Consumable Updated',
+                message=f'Consumable "{consumable.name}" was updated by {request.user.full_name}.',
+                level='info',
+                link=f'/consumables/{consumable.pk}/',
+                category='consumables',
+            )
+
             messages.success(request, f'Consumable "{consumable.name}" updated successfully.')
             return redirect('consumables:detail', pk=consumable.pk)
     else:
@@ -120,6 +141,15 @@ def consumable_delete_view(request, pk):
             object_repr=name,
             request=request,
         )
+
+        notify_admins(
+            title='Consumable Deactivated',
+            message=f'Consumable "{name}" was deactivated by {request.user.full_name}.',
+            level='warning',
+            link='/consumables/',
+            category='consumables',
+        )
+
         messages.success(request, f'Consumable "{name}" has been removed.')
         return redirect('consumables:list')
 
@@ -159,6 +189,17 @@ def log_usage_view(request, pk):
                 request=request,
             )
 
+            notify_admins(
+                title='Consumable Used',
+                message=(
+                    f'{request.user.full_name or request.user.username} used {usage_log.quantity_used} '
+                    f'{consumable.unit} of "{consumable.name}".'
+                ),
+                level='info',
+                link=f'/consumables/{consumable.pk}/',
+                category='consumables',
+            )
+
             messages.success(
                 request,
                 f'Usage logged: {usage_log.quantity_used} {consumable.unit} of "{consumable.name}".',
@@ -174,6 +215,7 @@ def log_usage_view(request, pk):
 
 
 @login_required
+@admin_required
 def restock_view(request, pk):
     """Admin only: add stock to a consumable."""
     consumable = get_object_or_404(Consumable, pk=pk)
@@ -199,6 +241,18 @@ def restock_view(request, pk):
                 object_repr=str(consumable),
                 request=request,
             )
+
+            notify_admins(
+                title='Consumable Restocked',
+                message=(
+                    f'{request.user.full_name or request.user.username} restocked '
+                    f'"{consumable.name}" by {qty} {consumable.unit}.'
+                ),
+                level='info',
+                link=f'/consumables/{consumable.pk}/',
+                category='consumables',
+            )
+
             messages.success(
                 request,
                 f'Added {qty} {consumable.unit} to "{consumable.name}". '
@@ -215,6 +269,7 @@ def restock_view(request, pk):
 
 
 @login_required
+@admin_required
 def low_stock_list_view(request):
     """Admin only: list all consumables that are at or below their low-stock threshold."""
     all_consumables = Consumable.objects.filter(is_active=True).select_related('category', 'location')

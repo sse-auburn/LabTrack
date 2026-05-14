@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from apps.accounts.decorators import admin_required
 from apps.activity.utils import log_activity
@@ -17,6 +18,7 @@ from apps.equipment.forms import (
     MovementLogForm,
 )
 from apps.equipment.models import Category, Equipment, LifecycleEvent, Location, MovementLog
+from apps.notifications.utils import notify, notify_admins
 
 
 # ---------------------------------------------------------------------------
@@ -28,8 +30,22 @@ def equipment_list_view(request):
     """
     List all active equipment with optional filtering by category, location,
     status, condition, and a free-text search query.
+    
+    Regular users see only APPROVED equipment. Creators can see their own
+    PENDING equipment. Admins can see all PENDING equipment.
     """
-    queryset = Equipment.objects.select_related('category', 'location', 'owner').filter(is_active=True)
+    user = request.user
+    is_admin = user.role == 'ADMIN'
+
+    base_qs = Equipment.objects.select_related('category', 'location', 'owner').filter(is_active=True)
+
+    # Visibility rules: approved for everyone, pending only for creator or admin
+    if is_admin:
+        queryset = base_qs
+    else:
+        queryset = base_qs.filter(
+            Q(approval_status='APPROVED') | Q(created_by=user)
+        )
 
     search = request.GET.get('q', '').strip()
     category_id = request.GET.get('category', '').strip()
@@ -73,9 +89,21 @@ def equipment_list_view(request):
 def equipment_detail_view(request, pk):
     """Show full details for a single piece of equipment."""
     equipment = get_object_or_404(
-        Equipment.objects.select_related('category', 'location', 'owner'),
+        Equipment.objects.select_related('category', 'location', 'owner', 'created_by'),
         pk=pk,
     )
+
+    # Visibility check for pending equipment
+    user = request.user
+    is_admin = user.role == 'ADMIN'
+    can_view_pending = (
+        is_admin
+        or equipment.created_by == user
+        or equipment.owner == user
+    )
+    if equipment.approval_status == 'PENDING' and not can_view_pending:
+        messages.error(request, 'This equipment is awaiting approval and is not yet visible.')
+        return redirect('equipment:list')
 
     # Borrow history (equipment-specific requests)
     borrow_history = equipment.borrow_requests.select_related(
@@ -99,6 +127,7 @@ def equipment_detail_view(request, pk):
         'lifecycle_events': lifecycle_events,
         'movement_logs': movement_logs,
         'lifecycle_form': lifecycle_form,
+        'can_approve': is_admin and equipment.approval_status == 'PENDING',
     })
 
 
@@ -109,9 +138,16 @@ def equipment_create_view(request):
         form = EquipmentForm(request.POST, request.FILES)
         if form.is_valid():
             equipment = form.save(commit=False)
-            # Set the owner to the current user if not specified
-            if not equipment.owner:
-                equipment.owner = request.user
+            equipment.created_by = request.user
+
+            # Approval logic
+            if equipment.owner == request.user:
+                equipment.approval_status = 'APPROVED'
+                equipment.approved_by = request.user
+                equipment.approved_at = timezone.now()
+            else:
+                equipment.approval_status = 'PENDING'
+
             equipment.save()
 
             # Record a PURCHASED lifecycle event automatically
@@ -132,7 +168,43 @@ def equipment_create_view(request):
                 request=request,
             )
 
-            messages.success(request, f'Equipment "{equipment.name}" has been added successfully.')
+            if equipment.approval_status == 'PENDING':
+                notify_admins(
+                    title='Equipment Pending Approval',
+                    message=(
+                        f'Equipment "{equipment.name}" was added by {request.user.full_name} '
+                        f'and assigned to {equipment.owner.full_name}. Awaiting your approval.'
+                    ),
+                    level='warning',
+                    link=f'/equipment/{equipment.pk}/',
+                    category='equipment',
+                )
+                if equipment.owner:
+                    notify(
+                        recipient=equipment.owner,
+                        title='Equipment Assigned to You',
+                        message=(
+                            f'"{equipment.name}" has been assigned to you by {request.user.full_name}. '
+                            f'It is awaiting admin approval before becoming active.'
+                        ),
+                        level='info',
+                        link=f'/equipment/{equipment.pk}/',
+                        category='equipment',
+                    )
+                messages.success(
+                    request,
+                    f'Equipment "{equipment.name}" has been submitted and is awaiting admin approval.'
+                )
+            else:
+                notify_admins(
+                    title='Equipment Created',
+                    message=f'Equipment "{equipment.name}" was added to the inventory by {request.user.full_name}.',
+                    level='info',
+                    link=f'/equipment/{equipment.pk}/',
+                    category='equipment',
+                )
+                messages.success(request, f'Equipment "{equipment.name}" has been added successfully.')
+
             return redirect('equipment:detail', pk=equipment.pk)
     else:
         form = EquipmentForm()
@@ -147,19 +219,33 @@ def equipment_create_view(request):
 def equipment_edit_view(request, pk):
     """
     Edit an existing piece of equipment.
-    Only the owner or an admin may edit.
+    Only the owner, creator, or an admin may edit.
     """
     equipment = get_object_or_404(Equipment, pk=pk)
 
-    # Permission check: owner or admin
-    if request.user != equipment.owner and request.user.role != 'ADMIN':
+    # Permission check: owner, creator, or admin
+    if request.user not in (equipment.owner, equipment.created_by) and request.user.role != 'ADMIN':
         messages.error(request, 'You do not have permission to edit this equipment.')
         return redirect('equipment:detail', pk=pk)
 
     if request.method == 'POST':
         form = EquipmentForm(request.POST, request.FILES, instance=equipment)
         if form.is_valid():
-            form.save()
+            updated = form.save(commit=False)
+            original_owner = equipment.owner
+
+            # Re-approval required if owner changed to someone else
+            if updated.owner != original_owner and updated.owner != request.user:
+                updated.approval_status = 'PENDING'
+                updated.approved_by = None
+                updated.approved_at = None
+            elif request.user.role == 'ADMIN' and updated.approval_status == 'PENDING':
+                # Admin can auto-approve during edit
+                updated.approval_status = 'APPROVED'
+                updated.approved_by = request.user
+                updated.approved_at = timezone.now()
+
+            updated.save()
 
             log_activity(
                 actor=request.user,
@@ -169,6 +255,14 @@ def equipment_edit_view(request, pk):
                 object_id=equipment.pk,
                 object_repr=str(equipment),
                 request=request,
+            )
+
+            notify_admins(
+                title='Equipment Updated',
+                message=f'Equipment "{equipment.name}" was updated by {request.user.full_name}.',
+                level='info',
+                link=f'/equipment/{equipment.pk}/',
+                category='equipment',
             )
 
             messages.success(request, f'Equipment "{equipment.name}" has been updated.')
@@ -185,11 +279,11 @@ def equipment_edit_view(request, pk):
 
 @login_required
 def equipment_delete_view(request, pk):
-    """Soft-delete (deactivate) a piece of equipment. Owner or admin only."""
+    """Soft-delete (deactivate) a piece of equipment. Owner, creator, or admin only."""
     equipment = get_object_or_404(Equipment, pk=pk)
 
-    if request.user != equipment.owner and request.user.role != 'ADMIN':
-        messages.error(request, 'Only the equipment owner or an admin can delete it.')
+    if request.user not in (equipment.owner, equipment.created_by) and request.user.role != 'ADMIN':
+        messages.error(request, 'Only the equipment owner, creator, or an admin can delete it.')
         return redirect('equipment:detail', pk=pk)
 
     if request.method == 'POST':
@@ -208,12 +302,127 @@ def equipment_delete_view(request, pk):
             request=request,
         )
 
+        notify_admins(
+            title='Equipment Retired',
+            message=f'Equipment "{equipment_name}" was retired/deleted by {request.user.full_name}.',
+            level='warning',
+            link='/equipment/',
+            category='equipment',
+        )
+
         messages.success(request, f'Equipment "{equipment_name}" has been retired.')
         return redirect('equipment:list')
 
     return render(request, 'equipment/equipment_confirm_delete.html', {
         'equipment': equipment,
     })
+
+
+# ---------------------------------------------------------------------------
+# Equipment approval views
+# ---------------------------------------------------------------------------
+
+@login_required
+def equipment_pending_list_view(request):
+    """List equipment pending approval. Admins see all; users see their own."""
+    user = request.user
+    if user.role == 'ADMIN':
+        queryset = Equipment.objects.filter(approval_status='PENDING', is_active=True)
+    else:
+        queryset = Equipment.objects.filter(created_by=user, approval_status='PENDING', is_active=True)
+
+    queryset = queryset.select_related('category', 'location', 'owner', 'created_by').order_by('-created_at')
+    paginator = Paginator(queryset, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'equipment/equipment_pending_list.html', {
+        'page_obj': page_obj,
+        'pending_list': page_obj,
+        'total_count': queryset.count(),
+    })
+
+
+@login_required
+@admin_required
+def equipment_approve_view(request, pk):
+    """Approve a pending piece of equipment. Admin only."""
+    equipment = get_object_or_404(Equipment, pk=pk, approval_status='PENDING', is_active=True)
+
+    equipment.approval_status = 'APPROVED'
+    equipment.approved_by = request.user
+    equipment.approved_at = timezone.now()
+    equipment.save(update_fields=['approval_status', 'approved_by', 'approved_at'])
+
+    log_activity(
+        actor=request.user,
+        action='EQUIPMENT_APPROVED',
+        description=f'Equipment "{equipment.name}" was approved by {request.user.full_name}.',
+        content_type_label='equipment',
+        object_id=equipment.pk,
+        object_repr=str(equipment),
+        request=request,
+    )
+
+    # Notify creator
+    if equipment.created_by:
+        notify(
+            recipient=equipment.created_by,
+            title='Equipment Approved',
+            message=f'Your equipment "{equipment.name}" has been approved by {request.user.full_name}.',
+            level='success',
+            link=f'/equipment/{equipment.pk}/',
+            category='equipment',
+        )
+
+    # Notify assigned owner
+    if equipment.owner and equipment.owner != equipment.created_by:
+        notify(
+            recipient=equipment.owner,
+            title='Equipment Assigned to You',
+            message=f'"{equipment.name}" has been approved and is now assigned to you.',
+            level='info',
+            link=f'/equipment/{equipment.pk}/',
+            category='equipment',
+        )
+
+    messages.success(request, f'Equipment "{equipment.name}" has been approved.')
+    return redirect('equipment:detail', pk=equipment.pk)
+
+
+@login_required
+@admin_required
+def equipment_reject_view(request, pk):
+    """Reject a pending piece of equipment. Admin only. Soft-deletes it."""
+    equipment = get_object_or_404(Equipment, pk=pk, approval_status='PENDING', is_active=True)
+
+    equipment.approval_status = 'REJECTED'
+    equipment.is_active = False
+    equipment.status = 'RETIRED'
+    equipment.save(update_fields=['approval_status', 'is_active', 'status'])
+
+    log_activity(
+        actor=request.user,
+        action='EQUIPMENT_REJECTED',
+        description=f'Equipment "{equipment.name}" was rejected by {request.user.full_name}.',
+        content_type_label='equipment',
+        object_id=equipment.pk,
+        object_repr=str(equipment),
+        request=request,
+    )
+
+    # Notify creator
+    if equipment.created_by:
+        notify(
+            recipient=equipment.created_by,
+            title='Equipment Rejected',
+            message=f'Your equipment "{equipment.name}" was rejected by {request.user.full_name}.',
+            level='error',
+            link='/equipment/',
+            category='equipment',
+        )
+
+    messages.success(request, f'Equipment "{equipment.name}" has been rejected.')
+    return redirect('equipment:pending_list')
 
 
 # ---------------------------------------------------------------------------
@@ -289,6 +498,18 @@ def equipment_move_view(request, pk):
                 request=request,
             )
 
+            notify_admins(
+                title='Equipment Moved',
+                message=(
+                    f'Equipment "{equipment.name}" moved from '
+                    f'"{movement.from_location}" to "{movement.to_location}" '
+                    f'by {request.user.full_name}.'
+                ),
+                level='info',
+                link=f'/equipment/{equipment.pk}/',
+                category='equipment',
+            )
+
             messages.success(request, f'Movement of "{equipment.name}" has been logged.')
             return redirect('equipment:detail', pk=pk)
     else:
@@ -325,6 +546,25 @@ def category_create_view(request):
         form = CategoryForm(request.POST)
         if form.is_valid():
             category = form.save()
+
+            log_activity(
+                actor=request.user,
+                action='OTHER',
+                description=f'Category "{category.name}" created by {request.user.full_name}.',
+                content_type_label='category',
+                object_id=category.pk,
+                object_repr=str(category),
+                request=request,
+            )
+
+            notify_admins(
+                title='Category Created',
+                message=f'Category "{category.name}" was created by {request.user.full_name}.',
+                level='info',
+                link='/equipment/categories/',
+                category='equipment',
+            )
+
             messages.success(request, f'Category "{category.name}" has been created.')
             return redirect('equipment:category_list')
     else:
@@ -344,6 +584,25 @@ def category_edit_view(request, pk):
         form = CategoryForm(request.POST, instance=category)
         if form.is_valid():
             form.save()
+
+            log_activity(
+                actor=request.user,
+                action='OTHER',
+                description=f'Category "{category.name}" updated by {request.user.full_name}.',
+                content_type_label='category',
+                object_id=category.pk,
+                object_repr=str(category),
+                request=request,
+            )
+
+            notify_admins(
+                title='Category Updated',
+                message=f'Category "{category.name}" was updated by {request.user.full_name}.',
+                level='info',
+                link='/equipment/categories/',
+                category='equipment',
+            )
+
             messages.success(request, f'Category "{category.name}" has been updated.')
             return redirect('equipment:category_list')
     else:
@@ -364,6 +623,25 @@ def category_delete_view(request, pk):
     if request.method == 'POST':
         name = category.name
         category.delete()
+
+        log_activity(
+            actor=request.user,
+            action='OTHER',
+            description=f'Category "{name}" deleted by {request.user.full_name}.',
+            content_type_label='category',
+            object_id=pk,
+            object_repr=name,
+            request=request,
+        )
+
+        notify_admins(
+            title='Category Deleted',
+            message=f'Category "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='/equipment/categories/',
+            category='equipment',
+        )
+
         messages.success(request, f'Category "{name}" has been deleted.')
         return redirect('equipment:category_list')
 
@@ -396,6 +674,25 @@ def location_create_view(request):
         form = LocationForm(request.POST)
         if form.is_valid():
             location = form.save()
+
+            log_activity(
+                actor=request.user,
+                action='OTHER',
+                description=f'Location "{location.name}" created by {request.user.full_name}.',
+                content_type_label='location',
+                object_id=location.pk,
+                object_repr=str(location),
+                request=request,
+            )
+
+            notify_admins(
+                title='Location Created',
+                message=f'Location "{location.name}" was created by {request.user.full_name}.',
+                level='info',
+                link='/equipment/locations/',
+                category='equipment',
+            )
+
             messages.success(request, f'Location "{location.name}" has been created.')
             return redirect('equipment:location_list')
     else:
@@ -415,6 +712,25 @@ def location_edit_view(request, pk):
         form = LocationForm(request.POST, instance=location)
         if form.is_valid():
             form.save()
+
+            log_activity(
+                actor=request.user,
+                action='OTHER',
+                description=f'Location "{location.name}" updated by {request.user.full_name}.',
+                content_type_label='location',
+                object_id=location.pk,
+                object_repr=str(location),
+                request=request,
+            )
+
+            notify_admins(
+                title='Location Updated',
+                message=f'Location "{location.name}" was updated by {request.user.full_name}.',
+                level='info',
+                link='/equipment/locations/',
+                category='equipment',
+            )
+
             messages.success(request, f'Location "{location.name}" has been updated.')
             return redirect('equipment:location_list')
     else:
@@ -435,6 +751,25 @@ def location_delete_view(request, pk):
     if request.method == 'POST':
         name = location.name
         location.delete()
+
+        log_activity(
+            actor=request.user,
+            action='OTHER',
+            description=f'Location "{name}" deleted by {request.user.full_name}.',
+            content_type_label='location',
+            object_id=pk,
+            object_repr=name,
+            request=request,
+        )
+
+        notify_admins(
+            title='Location Deleted',
+            message=f'Location "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='/equipment/locations/',
+            category='equipment',
+        )
+
         messages.success(request, f'Location "{name}" has been deleted.')
         return redirect('equipment:location_list')
 

@@ -16,7 +16,7 @@
   </div>
 
   <!-- ── Stats Overview (4 cards) ── -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
 
     <!-- Total Equipment -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4">
@@ -46,10 +46,24 @@
       </div>
     </div>
 
-    <!-- Kit Returns Pending -->
+    <!-- Pending Equipment Approvals -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4">
       <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center">
         <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-2xl font-bold text-slate-800">{{ pending_equipment }}</p>
+        <p class="text-sm text-slate-500 font-medium">Equipment Pending</p>
+      </div>
+    </div>
+
+    <!-- Kit Returns Pending -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4">
+      <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+        <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
@@ -77,10 +91,30 @@
   </div>
 
   <!-- ── Alert Cards Row ── -->
-  {% if overdue_borrows or low_stock_consumables %}
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  {% if overdue_borrows or low_stock_consumables or pending_equipment %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+    <!-- Pending Equipment Alert -->
+    {% if pending_equipment %}
+    <div class="flex items-center gap-4 bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-4">
+      <div class="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-sm font-bold text-yellow-800">{{ pending_equipment }} Equipment Pending Approval</p>
+        <p class="text-xs text-yellow-600">New equipment awaiting review</p>
+      </div>
+      <a href="{% url 'equipment:pending_list' %}" class="ml-auto text-xs font-semibold text-yellow-700 hover:text-yellow-900 hover:underline">
+        Review &rarr;
+      </a>
+    </div>
+    {% endif %}
 
     <!-- Overdue Alert -->
+    {% if overdue_borrows %}
     <div class="flex items-center gap-4 bg-red-50 border border-red-200 rounded-xl px-5 py-4">
       <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,9 +130,11 @@
         View &darr;
       </a>
     </div>
+    {% endif %}
 
     <!-- Low Stock Alert -->
-    <div class="flex items-center gap-4 bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-4">
+    {% if low_stock_consumables %}
+    <div class="flex items-center gap-4 bg-amber-50 border border-amber-200 rounded-xl px-5 py-4">
       <div class="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
         <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -113,6 +149,7 @@
         View &darr;
       </a>
     </div>
+    {% endif %}
 
   </div>
   {% endif %}
@@ -130,13 +167,13 @@
     </div>
     <div class="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
 
-      <a href="{% url 'borrowing:list' %}?status=PENDING"
+      <a href="{% url 'borrowing:return_queue' %}"
          class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-yellow-400 hover:bg-yellow-50 text-slate-600 hover:text-yellow-700 transition-all group">
         <svg class="w-6 h-6 text-slate-400 group-hover:text-yellow-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
-        <span class="text-xs font-semibold text-center leading-tight">Approve Borrows</span>
+        <span class="text-xs font-semibold text-center leading-tight">Return Queue</span>
       </a>
 
       <a href="{% url 'equipment:list' %}"

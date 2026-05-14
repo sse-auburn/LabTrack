@@ -128,8 +128,16 @@ class EquipmentForm(forms.ModelForm):
                 'rows': 3,
                 'placeholder': 'Additional notes…',
             }),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].required = True
+        self.fields['location'].required = True
+        self.fields['owner'].required = True
+        # Image is required only when creating or when no image exists yet
+        if not self.instance or not self.instance.pk or not self.instance.image:
+            self.fields['image'].required = True
 
 
 class LifecycleEventForm(forms.ModelForm):

@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from apps.activity.utils import log_activity
 from apps.borrowing.forms import ReturnForm
-from apps.notifications.utils import notify
+from apps.notifications.utils import notify, notify_admins
 from apps.reservations.forms import ReservationForm, WaitlistEntryForm
 from apps.reservations.models import Reservation, WaitlistEntry
 
@@ -81,7 +81,7 @@ def reservation_create_view(request):
         if form.is_valid():
             reservation = form.save(commit=False)
             reservation.requester = request.user
-            reservation.status = 'CONFIRMED'
+            reservation.status = 'PENDING'
             reservation.save()
 
             log_activity(
@@ -98,7 +98,57 @@ def reservation_create_view(request):
                 request=request,
             )
 
-            messages.success(request, 'Reservation created successfully.')
+            # Notify requester
+            notify(
+                recipient=reservation.requester,
+                title='Reservation Submitted',
+                message=(
+                    f'Your reservation for "{reservation.equipment or reservation.kit}" '
+                    f'({reservation.start_date} – {reservation.end_date}) is pending approval.'
+                ),
+                level='info',
+                link=f'/reservations/{reservation.pk}/',
+                category='reservations',
+            )
+
+            # Notify owner / admins to confirm
+            if reservation.equipment and reservation.equipment.owner:
+                notify(
+                    recipient=reservation.equipment.owner,
+                    title='Reservation Awaiting Confirmation',
+                    message=(
+                        f'{request.user.full_name or request.user.username} requested to reserve '
+                        f'"{reservation.equipment.name}" ({reservation.start_date} – {reservation.end_date}).'
+                    ),
+                    level='info',
+                    link=f'/reservations/{reservation.pk}/',
+                    category='reservations',
+                )
+            elif reservation.kit and reservation.kit.created_by:
+                notify(
+                    recipient=reservation.kit.created_by,
+                    title='Reservation Awaiting Confirmation',
+                    message=(
+                        f'{request.user.full_name or request.user.username} requested to reserve '
+                        f'"{reservation.kit.name}" ({reservation.start_date} – {reservation.end_date}).'
+                    ),
+                    level='info',
+                    link=f'/reservations/{reservation.pk}/',
+                    category='reservations',
+                )
+            else:
+                notify_admins(
+                    title='New Reservation Pending',
+                    message=(
+                        f'{request.user.full_name or request.user.username} created a reservation for '
+                        f'"{reservation.equipment or reservation.kit}". Please review.'
+                    ),
+                    level='info',
+                    link=f'/reservations/{reservation.pk}/',
+                    category='reservations',
+                )
+
+            messages.success(request, 'Reservation submitted and is awaiting confirmation.')
             return redirect('reservations:detail', pk=reservation.pk)
     else:
         form = ReservationForm()
@@ -152,6 +202,16 @@ def reservation_cancel_view(request, pk):
         return redirect('reservations:detail', pk=reservation.pk)
 
     if request.method == 'POST':
+        # Free up equipment/kit if reserved
+        if reservation.equipment and reservation.equipment.status == 'RESERVED':
+            reservation.equipment.status = 'AVAILABLE'
+            reservation.equipment.save(update_fields=['status'])
+        if reservation.kit:
+            for kit_item in reservation.kit.items.select_related('equipment'):
+                if kit_item.equipment.status == 'RESERVED':
+                    kit_item.equipment.status = 'AVAILABLE'
+                    kit_item.equipment.save(update_fields=['status'])
+
         reservation.status = 'CANCELLED'
         reservation.save()
 
@@ -192,6 +252,7 @@ def reservation_cancel_view(request, pk):
                     ),
                     level='info',
                     link=reverse('reservations:create'),
+                    category='reservations',
                 )
                 next_entry.notified = True
                 next_entry.save(update_fields=['notified'])
@@ -232,6 +293,15 @@ def reservation_confirm_view(request, pk):
         reservation.status = 'CONFIRMED'
         reservation.save()
 
+        # Mark equipment/kit as RESERVED
+        if reservation.equipment:
+            reservation.equipment.status = 'RESERVED'
+            reservation.equipment.save(update_fields=['status'])
+        if reservation.kit:
+            for kit_item in reservation.kit.items.select_related('equipment'):
+                kit_item.equipment.status = 'RESERVED'
+                kit_item.equipment.save(update_fields=['status'])
+
         log_activity(
             actor=request.user,
             action='RESERVATION_CONFIRMED',
@@ -254,6 +324,7 @@ def reservation_confirm_view(request, pk):
             ),
             level='success',
             link=f'/reservations/{reservation.pk}/',
+            category='reservations',
         )
 
         messages.success(request, 'Reservation confirmed.')
@@ -319,6 +390,7 @@ def reservation_return_view(request, pk):
                     ),
                     level='info',
                     link=f'/reservations/{reservation.pk}/',
+                    category='reservations',
                 )
 
             messages.success(request, 'Return submitted. Waiting for owner confirmation.')
@@ -354,6 +426,16 @@ def reservation_return_confirm_view(request, pk):
         reservation.status = 'RETURNED'
         reservation.save()
 
+        # Free up equipment/kit
+        if reservation.equipment and reservation.equipment.status == 'RESERVED':
+            reservation.equipment.status = 'AVAILABLE'
+            reservation.equipment.save(update_fields=['status'])
+        if reservation.kit:
+            for kit_item in reservation.kit.items.select_related('equipment'):
+                if kit_item.equipment.status == 'RESERVED':
+                    kit_item.equipment.status = 'AVAILABLE'
+                    kit_item.equipment.save(update_fields=['status'])
+
         notify(
             recipient=reservation.requester,
             title='Reservation Return Confirmed',
@@ -363,6 +445,7 @@ def reservation_return_confirm_view(request, pk):
             ),
             level='success',
             link=f'/reservations/{reservation.pk}/',
+            category='reservations',
         )
 
         log_activity(
@@ -502,6 +585,25 @@ def reservation_delete_view(request, pk):
             object_repr=item_name,
             request=request,
         )
+
+        requester = reservation.requester
+        if requester:
+            notify(
+                recipient=requester,
+                title='Reservation Deleted',
+                message=f'Your reservation for "{item_name}" has been deleted.',
+                level='warning',
+                link=reverse('reservations:list'),
+                category='reservations',
+            )
+        notify_admins(
+            title='Reservation Deleted',
+            message=f'Reservation for "{item_name}" by {reservation.requester.full_name if reservation.requester else "unknown"} was deleted.',
+            level='warning',
+            link=reverse('reservations:list'),
+            category='reservations',
+        )
+
         messages.success(request, f'Reservation for "{item_name}" has been deleted.')
         return redirect('reservations:list')
 

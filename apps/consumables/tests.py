@@ -71,20 +71,21 @@ class ConsumableListViewTest(TestCase):
 
 
 class ConsumableCreateViewTest(TestCase):
-    """Tests for consumable_create_view."""
+    """Tests for consumable_create_view (admin-only)."""
 
     def setUp(self):
         self.user = CustomUser.objects.create_user(
-            email='member@lab.test',
-            username='member',
+            email='admin@lab.test',
+            username='admin',
             password='testpass123',
+            role='ADMIN',
         )
         UserProfile.objects.get_or_create(user=self.user)
         self.client.force_login(self.user)
         self.url = reverse('consumables:create')
 
-    def test_any_member_can_create_consumable(self):
-        """Any logged-in member should be able to POST and create a consumable."""
+    def test_admin_can_create_consumable(self):
+        """An admin should be able to POST and create a consumable."""
         response = self.client.post(self.url, {
             'name': 'Latex Gloves',
             'description': 'Disposable latex gloves, size M.',
@@ -141,13 +142,14 @@ class ConsumableUseViewTest(TestCase):
 
 
 class ConsumableRestockViewTest(TestCase):
-    """Tests for restock_view."""
+    """Tests for restock_view (admin-only)."""
 
     def setUp(self):
         self.user = CustomUser.objects.create_user(
-            email='member@lab.test',
-            username='member',
+            email='admin@lab.test',
+            username='admin',
             password='testpass123',
+            role='ADMIN',
         )
         UserProfile.objects.get_or_create(user=self.user)
         self.consumable = Consumable.objects.create(
@@ -171,13 +173,14 @@ class ConsumableRestockViewTest(TestCase):
 
 
 class LowStockListViewTest(TestCase):
-    """Tests for low_stock_list_view."""
+    """Tests for low_stock_list_view (admin-only)."""
 
     def setUp(self):
         self.user = CustomUser.objects.create_user(
-            email='member@lab.test',
-            username='member',
+            email='admin@lab.test',
+            username='admin',
             password='testpass123',
+            role='ADMIN',
         )
         UserProfile.objects.get_or_create(user=self.user)
 

@@ -1,5 +1,6 @@
 """
 Utility helpers for creating in-app notifications and sending email alerts.
+Respects per-user notification preferences (global + per-category toggles).
 """
 
 import logging
@@ -12,18 +13,53 @@ logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
+# Category names must match UserProfile field names (notify_<category>)
+CATEGORY_BORROWING = 'borrowing'
+CATEGORY_RESERVATIONS = 'reservations'
+CATEGORY_INCIDENTS = 'incidents'
+CATEGORY_EQUIPMENT = 'equipment'
+CATEGORY_KITS = 'kits'
+CATEGORY_CONSUMABLES = 'consumables'
+CATEGORY_PROJECTS = 'projects'
+CATEGORY_SYSTEM = 'system'
 
-def _send_email(recipient, title, message, link=''):
+_ALL_CATEGORIES = {
+    CATEGORY_BORROWING,
+    CATEGORY_RESERVATIONS,
+    CATEGORY_INCIDENTS,
+    CATEGORY_EQUIPMENT,
+    CATEGORY_KITS,
+    CATEGORY_CONSUMABLES,
+    CATEGORY_PROJECTS,
+    CATEGORY_SYSTEM,
+}
+
+
+def _profile_allows(profile, category):
+    """Return True if the user's profile permits notifications for *category*."""
+    if not profile:
+        return True  # No profile yet — permissive default.
+    field_name = f'notify_{category}'
+    return getattr(profile, field_name, True)
+
+
+def _send_email(recipient, title, message, link='', category='system'):
     """Send a plain-text notification email. Silently skips if email is not configured."""
     if not recipient.email:
         return
 
-    # Check opt-out preference (UserProfile.email_notifications).
     try:
-        if not recipient.profile.email_notifications:
-            return
+        profile = recipient.profile
     except Exception:
-        pass  # No profile yet — fall through and send.
+        profile = None
+
+    # Global email opt-out
+    if profile and not profile.email_notifications:
+        return
+
+    # Per-category email opt-out
+    if category not in _ALL_CATEGORIES or not _profile_allows(profile, category):
+        return
 
     body_parts = [message]
     if link:
@@ -43,26 +79,50 @@ def _send_email(recipient, title, message, link=''):
         logger.warning('Failed to send notification email to %s: %s', recipient.email, exc)
 
 
-def notify(recipient, title, message, level='info', link=''):
-    """Create an in-app notification and send an email for a single user."""
+def notify(recipient, title, message, level='info', link='', category='system'):
+    """Create an in-app notification and send an email for a single user.
+
+    Parameters
+    ----------
+    recipient : CustomUser
+        The user to notify.
+    title, message, level, link : str
+        Notification content.
+    category : str
+        One of the CATEGORY_* constants. Used to check per-user preferences.
+    """
     from apps.notifications.models import Notification
 
     if not (recipient and recipient.is_active):
         return
 
-    Notification.objects.create(
-        recipient=recipient,
-        title=title,
-        message=message,
-        level=level,
-        link=link,
-    )
+    try:
+        profile = recipient.profile
+    except Exception:
+        profile = None
 
-    _send_email(recipient, title, message, link)
+    # In-app notification (respect global + per-category prefs)
+    if (not profile or profile.in_app_notifications) and _profile_allows(profile, category):
+        Notification.objects.create(
+            recipient=recipient,
+            title=title,
+            message=message,
+            level=level,
+            link=link,
+        )
+
+    # Email notification (handled inside _send_email with its own checks)
+    _send_email(recipient, title, message, link, category)
 
 
-def notify_admins(title, message, level='info', link=''):
-    """Notify all active admin users (in-app + email)."""
+def notify_admins(title, message, level='info', link='', category='system'):
+    """Notify all active admin users (in-app + email), respecting their preferences."""
     admins = User.objects.filter(role='ADMIN', is_active=True)
     for admin in admins:
-        notify(admin, title, message, level, link)
+        notify(admin, title, message, level, link, category)
+
+
+def notify_users(users, title, message, level='info', link='', category='system'):
+    """Notify a specific queryset or list of users."""
+    for user in users:
+        notify(user, title, message, level, link, category)

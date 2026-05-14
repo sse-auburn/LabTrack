@@ -61,6 +61,7 @@ LOCAL_APPS = [
     'apps.incidents',
     'apps.notifications',
     'apps.activity',
+    'apps.files',
     'apps.dashboard',
 ]
 
@@ -199,7 +200,14 @@ STATICFILES_DIRS = [_STATIC_SRC] if _STATIC_SRC.exists() else []
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGES = {
+    'default': {
+        'BACKEND': 'apps.files.storage.DatabaseStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 
 # ---------------------------------------------------------------------------
@@ -208,6 +216,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
 
 
 # ---------------------------------------------------------------------------

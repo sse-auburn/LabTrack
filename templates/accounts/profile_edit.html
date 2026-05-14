@@ -70,7 +70,15 @@
                         file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0
                         file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700
                         hover:file:bg-brand-100 file:cursor-pointer cursor-pointer transition-colors" />
-          <p class="text-xs text-slate-400 mt-1.5">JPG, PNG or GIF. Max 5 MB.</p>
+          <button type="button" onclick="openAvatarCamera()"
+                  class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            Use Camera
+          </button>
+          <p class="text-xs text-slate-400 mt-1.5">JPG, PNG or GIF. Max 5 MB. · or paste (Ctrl+V)</p>
           {% for error in profile_form.avatar.errors %}
           <p class="mt-1 text-xs text-red-600">{{ error }}</p>
           {% endfor %}
@@ -240,22 +248,140 @@
         </svg>
         Notification Preferences
       </h3>
-      <div class="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
-        <input type="checkbox"
-               name="{{ profile_form.email_notifications.html_name }}"
-               id="{{ profile_form.email_notifications.id_for_label }}"
-               {% if profile_form.email_notifications.value %}checked{% endif %}
-               class="mt-0.5 w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-        <div>
-          <label for="{{ profile_form.email_notifications.id_for_label }}"
-                 class="text-sm font-semibold text-slate-700 cursor-pointer">
-            Email notifications
-          </label>
-          <p class="text-xs text-slate-500 mt-0.5">
-            Receive an email when a borrow is approved/rejected, a return is confirmed,
-            an incident is assigned to you, or a reservation changes.
-          </p>
-        </div>
+
+      <!-- Global switches -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <label class="flex items-start gap-3 p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+          <input type="checkbox"
+                 name="{{ profile_form.in_app_notifications.html_name }}"
+                 id="{{ profile_form.in_app_notifications.id_for_label }}"
+                 {% if profile_form.in_app_notifications.value %}checked{% endif %}
+                 class="mt-0.5 w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
+          <div>
+            <span class="text-sm font-semibold text-slate-700">In-app notifications</span>
+            <p class="text-xs text-slate-500 mt-0.5">Show notifications inside the dashboard.</p>
+          </div>
+        </label>
+        <label class="flex items-start gap-3 p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+          <input type="checkbox"
+                 name="{{ profile_form.email_notifications.html_name }}"
+                 id="{{ profile_form.email_notifications.id_for_label }}"
+                 {% if profile_form.email_notifications.value %}checked{% endif %}
+                 class="mt-0.5 w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
+          <div>
+            <span class="text-sm font-semibold text-slate-700">Email notifications</span>
+            <p class="text-xs text-slate-500 mt-0.5">Master switch for all email alerts.</p>
+          </div>
+        </label>
+      </div>
+
+      <!-- Per-category toggles -->
+      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Notify me about</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+        <!-- Borrowing -->
+        <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition">
+          <input type="checkbox"
+                 name="{{ profile_form.notify_borrowing.html_name }}"
+                 id="{{ profile_form.notify_borrowing.id_for_label }}"
+                 {% if profile_form.notify_borrowing.value %}checked{% endif %}
+                 class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
+          <div>
+            <span class="text-sm font-semibold text-slate-700">Borrowing</span>
+            <p class="text-xs text-slate-500">Loan requests, approvals, returns</p>
+          </div>
+        </label>
+
+        <!-- Reservations -->
+        <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition">
+          <input type="checkbox"
+                 name="{{ profile_form.notify_reservations.html_name }}"
+                 id="{{ profile_form.notify_reservations.id_for_label }}"
+                 {% if profile_form.notify_reservations.value %}checked{% endif %}
+                 class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
+          <div>
+            <span class="text-sm font-semibold text-slate-700">Reservations</span>
+            <p class="text-xs text-slate-500">Booking confirmations &amp; cancellations</p>
+          </div>
+        </label>
+
+        <!-- Equipment -->
+        <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition">
+          <input type="checkbox"
+                 name="{{ profile_form.notify_equipment.html_name }}"
+                 id="{{ profile_form.notify_equipment.id_for_label }}"
+                 {% if profile_form.notify_equipment.value %}checked{% endif %}
+                 class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
+          <div>
+            <span class="text-sm font-semibold text-slate-700">Equipment</span>
+            <p class="text-xs text-slate-500">New items, updates, availability</p>
+          </div>
+        </label>
+
+        <!-- Kits -->
+        <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition">
+          <input type="checkbox"
+                 name="{{ profile_form.notify_kits.html_name }}"
+                 id="{{ profile_form.notify_kits.id_for_label }}"
+                 {% if profile_form.notify_kits.value %}checked{% endif %}
+                 class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
+          <div>
+            <span class="text-sm font-semibold text-slate-700">Kits</span>
+            <p class="text-xs text-slate-500">Kit changes &amp; component updates</p>
+          </div>
+        </label>
+
+        <!-- Consumables -->
+        <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition">
+          <input type="checkbox"
+                 name="{{ profile_form.notify_consumables.html_name }}"
+                 id="{{ profile_form.notify_consumables.id_for_label }}"
+                 {% if profile_form.notify_consumables.value %}checked{% endif %}
+                 class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
+          <div>
+            <span class="text-sm font-semibold text-slate-700">Consumables</span>
+            <p class="text-xs text-slate-500">Stock alerts &amp; restocking</p>
+          </div>
+        </label>
+
+        <!-- Incidents -->
+        <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition">
+          <input type="checkbox"
+                 name="{{ profile_form.notify_incidents.html_name }}"
+                 id="{{ profile_form.notify_incidents.id_for_label }}"
+                 {% if profile_form.notify_incidents.value %}checked{% endif %}
+                 class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
+          <div>
+            <span class="text-sm font-semibold text-slate-700">Incidents</span>
+            <p class="text-xs text-slate-500">Reports, assignments, resolutions</p>
+          </div>
+        </label>
+
+        <!-- Projects -->
+        <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition">
+          <input type="checkbox"
+                 name="{{ profile_form.notify_projects.html_name }}"
+                 id="{{ profile_form.notify_projects.id_for_label }}"
+                 {% if profile_form.notify_projects.value %}checked{% endif %}
+                 class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
+          <div>
+            <span class="text-sm font-semibold text-slate-700">Projects</span>
+            <p class="text-xs text-slate-500">Project updates &amp; assignments</p>
+          </div>
+        </label>
+
+        <!-- System -->
+        <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition">
+          <input type="checkbox"
+                 name="{{ profile_form.notify_system.html_name }}"
+                 id="{{ profile_form.notify_system.id_for_label }}"
+                 {% if profile_form.notify_system.value %}checked{% endif %}
+                 class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
+          <div>
+            <span class="text-sm font-semibold text-slate-700">System</span>
+            <p class="text-xs text-slate-500">User registrations, admin alerts</p>
+          </div>
+        </label>
       </div>
     </div>
 
@@ -277,19 +403,44 @@
 
   </form>
 </div>
+
+<!-- Camera Modal -->
+<div id="avatar-camera-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+     onclick="handleAvatarModalBackdrop(event)">
+  <div class="bg-white rounded-2xl shadow-xl p-4 w-full max-w-lg mx-4">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-base font-semibold text-slate-800">Take Photo</h3>
+      <button type="button" onclick="closeAvatarCamera()" class="text-slate-400 hover:text-slate-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <video id="avatar-camera-video" autoplay playsinline class="w-full rounded-xl bg-black aspect-video"></video>
+    <div class="flex gap-2 mt-3">
+      <button type="button" onclick="closeAvatarCamera()"
+              class="flex-1 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg border border-slate-300">
+        Cancel
+      </button>
+      <button type="button" onclick="captureAvatarPhoto()"
+              class="flex-1 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg">
+        Capture
+      </button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  function previewAvatar(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+  let avatarCameraStream = null;
 
+  function showAvatarPreview(file) {
     const reader = new FileReader();
     reader.onload = function(e) {
       const preview = document.getElementById('avatar-preview');
       const initials = document.getElementById('avatar-initials');
-
       preview.src = e.target.result;
       preview.classList.remove('hidden');
       preview.classList.add('block');
@@ -297,5 +448,57 @@
     };
     reader.readAsDataURL(file);
   }
+
+  function setAvatarFile(file) {
+    const input = document.getElementById('{{ profile_form.avatar.id_for_label }}');
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    showAvatarPreview(file);
+  }
+
+  function previewAvatar(event) {
+    const file = event.target.files[0];
+    if (file) showAvatarPreview(file);
+  }
+
+  function openAvatarCamera() {
+    document.getElementById('avatar-camera-modal').classList.remove('hidden');
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+      .then(stream => { avatarCameraStream = stream; document.getElementById('avatar-camera-video').srcObject = stream; })
+      .catch(err => { alert('Camera not available: ' + err.message); closeAvatarCamera(); });
+  }
+
+  function closeAvatarCamera() {
+    if (avatarCameraStream) { avatarCameraStream.getTracks().forEach(t => t.stop()); avatarCameraStream = null; }
+    document.getElementById('avatar-camera-modal').classList.add('hidden');
+  }
+
+  function handleAvatarModalBackdrop(e) {
+    if (e.target === e.currentTarget) closeAvatarCamera();
+  }
+
+  function captureAvatarPhoto() {
+    const video = document.getElementById('avatar-camera-video');
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    canvas.toBlob(blob => {
+      setAvatarFile(new File([blob], 'avatar.jpg', { type: 'image/jpeg' }));
+      closeAvatarCamera();
+    }, 'image/jpeg', 0.92);
+  }
+
+  document.addEventListener('paste', function(e) {
+    if (!e.clipboardData) return;
+    for (const item of e.clipboardData.items) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        setAvatarFile(item.getAsFile());
+        break;
+      }
+    }
+  });
 </script>
 {% endblock %}
