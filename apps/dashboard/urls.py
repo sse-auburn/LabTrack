@@ -14,4 +14,5 @@ urlpatterns = [
     path('', views.dashboard_redirect_view, name='index'),
     path('member/', views.member_dashboard_view, name='member'),
     path('admin/', views.admin_dashboard_view, name='admin'),
+    path('admin-panel/', views.admin_panel_view, name='admin_panel'),
 ]

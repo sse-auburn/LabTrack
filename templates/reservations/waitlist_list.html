@@ -138,7 +138,7 @@
             </td>
             {% if request.user.is_staff %}
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-              <form method="post" action="{% url 'reservations:waitlist_remove' entry.pk %}"
+              <form method="post" action="{% url 'reservations:waitlist_leave' entry.pk %}"
                     onsubmit="return confirm('Remove this waitlist entry?')" class="inline">
                 {% csrf_token %}
                 <button type="submit"

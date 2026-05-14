@@ -97,7 +97,9 @@ def incident_create_view(request):
             messages.success(request, 'Incident reported successfully.')
             return redirect('incidents:detail', pk=incident.pk)
     else:
-        form = IncidentReportForm()
+        equipment_id = request.GET.get('equipment')
+        initial = {'equipment': equipment_id} if equipment_id else {}
+        form = IncidentReportForm(initial=initial)
 
     return render(request, 'incidents/form.html', {
         'form': form,
@@ -352,7 +354,9 @@ def maintenance_create_view(request):
             messages.success(request, 'Maintenance log created successfully.')
             return redirect('incidents:maintenance_detail', pk=log.pk)
     else:
-        form = MaintenanceLogForm()
+        equipment_id = request.GET.get('equipment')
+        initial = {'equipment': equipment_id} if equipment_id else {}
+        form = MaintenanceLogForm(initial=initial)
 
     return render(request, 'incidents/maintenance_form.html', {
         'form': form,

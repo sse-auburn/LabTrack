@@ -98,6 +98,11 @@
         <button class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">Confirm Return</button>
       </form>
     {% endif %}
+    {% if borrow.equipment and borrow.equipment.owner == user %}
+      {% if borrow.status == 'APPROVED' or borrow.status == 'ACTIVE' or borrow.status == 'RETURN_PENDING' %}
+        <a href="{% url 'borrowing:reclaim' borrow.pk %}" class="px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700">Reclaim</a>
+      {% endif %}
+    {% endif %}
     {% if user.is_admin or borrow.borrower == user %}
     <a href="{% url 'borrowing:delete' borrow.pk %}" class="px-4 py-2 bg-red-50 border border-red-300 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100">Delete Request</a>
     {% endif %}

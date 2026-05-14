@@ -3,7 +3,8 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import OuterRef, Q, Subquery, Value
+from django.db.models.functions import Concat
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
@@ -70,7 +71,28 @@ def equipment_list_view(request):
     if condition:
         queryset = queryset.filter(condition=condition)
 
-    queryset = queryset.order_by('name')
+    from apps.borrowing.models import BorrowRequest
+
+    # Annotate each item with the current user's active borrow PK (for Return button)
+    user_borrow_qs = BorrowRequest.objects.filter(
+        equipment=OuterRef('pk'),
+        borrower=user,
+        status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING'],
+    ).values('pk')[:1]
+
+    # Annotate with the name of whoever currently has it borrowed
+    active_borrow_qs = BorrowRequest.objects.filter(
+        equipment=OuterRef('pk'),
+        status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING'],
+    ).annotate(
+        borrower_name=Concat('borrower__first_name', Value(' '), 'borrower__last_name'),
+    ).values('borrower_name')[:1]
+
+    queryset = queryset.annotate(
+        user_active_borrow_pk=Subquery(user_borrow_qs),
+        current_borrower_name=Subquery(active_borrow_qs),
+    ).order_by('name')
+
     total_count = queryset.count()
     paginator = Paginator(queryset, 10)
     page_number = request.GET.get('page')
@@ -127,7 +149,7 @@ def equipment_detail_view(request, pk):
         'lifecycle_events': lifecycle_events,
         'movement_logs': movement_logs,
         'lifecycle_form': lifecycle_form,
-        'can_approve': is_admin and equipment.approval_status == 'PENDING',
+        'can_approve': (is_admin or request.user == equipment.owner) and equipment.approval_status == 'PENDING',
     })
 
 
@@ -169,31 +191,21 @@ def equipment_create_view(request):
             )
 
             if equipment.approval_status == 'PENDING':
-                notify_admins(
-                    title='Equipment Pending Approval',
-                    message=(
-                        f'Equipment "{equipment.name}" was added by {request.user.full_name} '
-                        f'and assigned to {equipment.owner.full_name}. Awaiting your approval.'
-                    ),
-                    level='warning',
-                    link=f'/equipment/{equipment.pk}/',
-                    category='equipment',
-                )
                 if equipment.owner:
                     notify(
                         recipient=equipment.owner,
-                        title='Equipment Assigned to You',
+                        title='Equipment Assigned — Your Approval Required',
                         message=(
                             f'"{equipment.name}" has been assigned to you by {request.user.full_name}. '
-                            f'It is awaiting admin approval before becoming active.'
+                            f'Please review and approve or reject it.'
                         ),
-                        level='info',
-                        link=f'/equipment/{equipment.pk}/',
+                        level='warning',
+                        link=f'/equipment/pending/',
                         category='equipment',
                     )
                 messages.success(
                     request,
-                    f'Equipment "{equipment.name}" has been submitted and is awaiting admin approval.'
+                    f'Equipment "{equipment.name}" has been submitted and is awaiting approval from the assigned owner.'
                 )
             else:
                 notify_admins(
@@ -318,18 +330,75 @@ def equipment_delete_view(request, pk):
     })
 
 
+@login_required
+@admin_required
+def equipment_bulk_delete_view(request):
+    """Soft-delete (deactivate) multiple equipment items at once. Admin only."""
+    if request.method == 'POST':
+        equipment_ids = request.POST.getlist('equipment_ids')
+        if not equipment_ids:
+            messages.error(request, 'No items selected.')
+            return redirect('equipment:list')
+
+        items = Equipment.objects.filter(pk__in=equipment_ids, is_active=True)
+        if not items.exists():
+            messages.error(request, 'None of the selected items were found.')
+            return redirect('equipment:list')
+
+        count = 0
+        for item in items:
+            item.is_active = False
+            item.status = 'RETIRED'
+            item.save(update_fields=['is_active', 'status'])
+            log_activity(
+                actor=request.user,
+                action='EQUIPMENT_DELETED',
+                description=f'Equipment "{item.name}" was retired/deleted by {request.user.full_name}.',
+                content_type_label='equipment',
+                object_id=item.pk,
+                object_repr=item.name,
+                request=request,
+            )
+            count += 1
+
+        notify_admins(
+            title='Equipment Bulk Retired',
+            message=f'{request.user.full_name} retired {count} equipment item(s).',
+            level='warning',
+            link='/equipment/',
+            category='equipment',
+        )
+        messages.success(request, f'{count} equipment item(s) have been retired.')
+        return redirect('equipment:list')
+
+    else:
+        equipment_ids = request.GET.getlist('ids')
+        if not equipment_ids:
+            messages.error(request, 'No items selected.')
+            return redirect('equipment:list')
+
+        items = Equipment.objects.filter(pk__in=equipment_ids, is_active=True)
+        return render(request, 'equipment/equipment_bulk_delete.html', {
+            'items': items,
+            'equipment_ids': equipment_ids,
+        })
+
+
 # ---------------------------------------------------------------------------
 # Equipment approval views
 # ---------------------------------------------------------------------------
 
 @login_required
 def equipment_pending_list_view(request):
-    """List equipment pending approval. Admins see all; users see their own."""
+    """List equipment pending approval. Admins see all; owners see equipment assigned to them."""
     user = request.user
     if user.role == 'ADMIN':
         queryset = Equipment.objects.filter(approval_status='PENDING', is_active=True)
     else:
-        queryset = Equipment.objects.filter(created_by=user, approval_status='PENDING', is_active=True)
+        # Owners see equipment assigned to them needing approval; creators see what they submitted
+        queryset = Equipment.objects.filter(
+            approval_status='PENDING', is_active=True
+        ).filter(Q(owner=user) | Q(created_by=user))
 
     queryset = queryset.select_related('category', 'location', 'owner', 'created_by').order_by('-created_at')
     paginator = Paginator(queryset, 10)
@@ -343,10 +412,13 @@ def equipment_pending_list_view(request):
 
 
 @login_required
-@admin_required
 def equipment_approve_view(request, pk):
-    """Approve a pending piece of equipment. Admin only."""
+    """Approve a pending piece of equipment. The assigned owner or an admin may approve."""
     equipment = get_object_or_404(Equipment, pk=pk, approval_status='PENDING', is_active=True)
+
+    if request.user != equipment.owner and request.user.role != 'ADMIN':
+        messages.error(request, 'Only the assigned owner or an admin can approve this equipment.')
+        return redirect('equipment:detail', pk=pk)
 
     equipment.approval_status = 'APPROVED'
     equipment.approved_by = request.user
@@ -363,24 +435,13 @@ def equipment_approve_view(request, pk):
         request=request,
     )
 
-    # Notify creator
-    if equipment.created_by:
+    # Notify creator if they are not the approver
+    if equipment.created_by and equipment.created_by != request.user:
         notify(
             recipient=equipment.created_by,
             title='Equipment Approved',
-            message=f'Your equipment "{equipment.name}" has been approved by {request.user.full_name}.',
+            message=f'"{equipment.name}" has been approved by {request.user.full_name}.',
             level='success',
-            link=f'/equipment/{equipment.pk}/',
-            category='equipment',
-        )
-
-    # Notify assigned owner
-    if equipment.owner and equipment.owner != equipment.created_by:
-        notify(
-            recipient=equipment.owner,
-            title='Equipment Assigned to You',
-            message=f'"{equipment.name}" has been approved and is now assigned to you.',
-            level='info',
             link=f'/equipment/{equipment.pk}/',
             category='equipment',
         )
@@ -390,10 +451,13 @@ def equipment_approve_view(request, pk):
 
 
 @login_required
-@admin_required
 def equipment_reject_view(request, pk):
-    """Reject a pending piece of equipment. Admin only. Soft-deletes it."""
+    """Reject a pending piece of equipment. The assigned owner or an admin may reject."""
     equipment = get_object_or_404(Equipment, pk=pk, approval_status='PENDING', is_active=True)
+
+    if request.user != equipment.owner and request.user.role != 'ADMIN':
+        messages.error(request, 'Only the assigned owner or an admin can reject this equipment.')
+        return redirect('equipment:detail', pk=pk)
 
     equipment.approval_status = 'REJECTED'
     equipment.is_active = False
@@ -410,12 +474,12 @@ def equipment_reject_view(request, pk):
         request=request,
     )
 
-    # Notify creator
-    if equipment.created_by:
+    # Notify creator if they are not the rejector
+    if equipment.created_by and equipment.created_by != request.user:
         notify(
             recipient=equipment.created_by,
             title='Equipment Rejected',
-            message=f'Your equipment "{equipment.name}" was rejected by {request.user.full_name}.',
+            message=f'"{equipment.name}" was rejected by {request.user.full_name}.',
             level='error',
             link='/equipment/',
             category='equipment',

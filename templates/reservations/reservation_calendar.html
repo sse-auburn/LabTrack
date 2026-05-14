@@ -42,11 +42,13 @@
 
     <!-- Day Headers -->
     <div class="grid grid-cols-7 border-b border-gray-200">
-      {% for day in "Mon,Tue,Wed,Thu,Fri,Sat,Sun"|split:"," %}
-      <div class="px-2 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">
-        {{ day }}
-      </div>
-      {% endfor %}
+      <div class="px-2 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">Mon</div>
+      <div class="px-2 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">Tue</div>
+      <div class="px-2 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">Wed</div>
+      <div class="px-2 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">Thu</div>
+      <div class="px-2 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">Fri</div>
+      <div class="px-2 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">Sat</div>
+      <div class="px-2 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">Sun</div>
     </div>
 
     <!-- Calendar Grid -->
@@ -78,8 +80,8 @@
                     {% elif res.status == 'CANCELLED' %}bg-red-100 text-red-400 line-through
                     {% elif res.status == 'COMPLETED' %}bg-blue-100 text-blue-700 border-l-2 border-blue-500
                     {% else %}bg-gray-100 text-gray-500{% endif %}"
-             title="{{ res.equipment.name|default:res.kit.name }} — {{ res.requester.get_full_name|default:res.requester.username }}">
-            {{ res.equipment.name|default:res.kit.name|truncatechars:18 }}
+             title="{% if res.equipment %}{{ res.equipment.name }}{% elif res.kit %}{{ res.kit.name }}{% endif %} — {{ res.requester.get_full_name|default:res.requester.username }}">
+            {% if res.equipment %}{{ res.equipment.name|truncatechars:18 }}{% elif res.kit %}{{ res.kit.name|truncatechars:18 }}{% endif %}
           </a>
           {% endfor %}
         </div>

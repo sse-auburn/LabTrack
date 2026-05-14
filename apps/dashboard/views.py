@@ -10,7 +10,7 @@ from apps.accounts.decorators import admin_required
 from apps.activity.models import ActivityLog
 from apps.borrowing.models import BorrowRequest, KitItemReturnApproval
 from apps.consumables.models import Consumable
-from apps.equipment.models import Equipment
+from apps.equipment.models import Category, Equipment, Location
 from apps.incidents.models import IncidentReport
 from apps.notifications.models import Notification
 from apps.reservations.models import Reservation
@@ -71,6 +71,11 @@ def member_dashboard_view(request):
         actor=user,
     ).order_by('-timestamp')[:10]
 
+    # Equipment assigned to this user that needs their approval
+    pending_owned_equipment = Equipment.objects.filter(
+        approval_status='PENDING', is_active=True, owner=user
+    )
+
     return render(request, 'dashboard/member.html', {
         'active_borrows': active_borrows,
         'my_pending_returns': my_pending_returns,
@@ -79,6 +84,7 @@ def member_dashboard_view(request):
         'upcoming_reservations': upcoming_reservations,
         'recent_notifications': recent_notifications,
         'recent_activity': recent_activity,
+        'pending_owned_equipment': pending_owned_equipment,
     })
 
 

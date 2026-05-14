@@ -75,14 +75,6 @@ class PcardDeletionRequest(models.Model):
         ordering = ['-created_at']
         verbose_name = 'P-Card Deletion Request'
         verbose_name_plural = 'P-Card Deletion Requests'
-        # Prevent duplicate pending requests for the same transaction by the same user
-        constraints = [
-            models.UniqueConstraint(
-                fields=['transaction', 'requested_by'],
-                condition=models.Q(status='PENDING'),
-                name='unique_pending_deletion_request',
-            ),
-        ]
 
     def __str__(self):
         return f"Delete request for #{self.transaction.pk} by {self.requested_by.full_name} ({self.status})"

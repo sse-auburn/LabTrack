@@ -85,6 +85,36 @@ class ReservationForm(forms.ModelForm):
         return cleaned_data
 
 
+class BulkReservationForm(forms.Form):
+    """Shared date range and purpose when reserving multiple equipment items at once."""
+
+    start_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        help_text='Start date for all reservations.',
+    )
+    end_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        help_text='End date for all reservations.',
+    )
+    purpose = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3}),
+        help_text='Purpose for reserving these items.',
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get('start_date')
+        end_date = cleaned_data.get('end_date')
+
+        if start_date and end_date:
+            if end_date < start_date:
+                raise forms.ValidationError('End date must be on or after the start date.')
+            if start_date < timezone.now().date():
+                raise forms.ValidationError('Start date must be today or a future date.')
+
+        return cleaned_data
+
+
 class WaitlistEntryForm(forms.ModelForm):
     """Form for joining the waitlist for a piece of equipment or a kit."""
 

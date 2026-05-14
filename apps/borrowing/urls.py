@@ -14,6 +14,7 @@ urlpatterns = [
     path('<int:pk>/', views.borrow_detail_view, name='detail'),
     path('<int:pk>/return/', views.borrow_return_view, name='return'),
     path('<int:pk>/return/confirm/', views.borrow_return_confirm_view, name='return_confirm'),
+    path('<int:pk>/reclaim/', views.borrow_owner_reclaim_view, name='reclaim'),
     path('kit-item/<int:approval_pk>/confirm/', views.kit_item_return_confirm_view, name='kit_item_confirm'),
     path('<int:pk>/delete/', views.borrow_request_delete_view, name='delete'),
     path('overdue/', views.overdue_list_view, name='overdue'),

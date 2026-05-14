@@ -81,7 +81,7 @@
                      class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium rounded-lg border border-gray-300 transition-colors">
                     View
                   </a>
-                  {% if user.is_admin %}
+                  {% if user.is_admin or item.owner == user %}
                   <a href="{% url 'equipment:approve' item.pk %}"
                      class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition-colors">
                     Approve

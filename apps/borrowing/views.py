@@ -522,8 +522,8 @@ def overdue_list_view(request):
 
 @login_required
 def return_queue_view(request):
-    """List pending returns the current user needs to confirm as equipment owner."""
-    # Single-equipment returns owned by this user
+    """List pending returns and active borrows the current user can act on as equipment owner."""
+    # Single-equipment returns owned by this user (borrower submitted return)
     equipment_returns = BorrowRequest.objects.filter(
         status='RETURN_PENDING',
         equipment__owner=request.user,
@@ -536,10 +536,72 @@ def return_queue_view(request):
         borrow_request__status='RETURN_PENDING',
     ).select_related('borrow_request__borrower', 'borrow_request__kit', 'equipment')
 
+    # Active borrows of this user's equipment (owner can reclaim without waiting for borrower)
+    active_owned_borrows = BorrowRequest.objects.filter(
+        status__in=['APPROVED', 'ACTIVE'],
+        equipment__owner=request.user,
+    ).select_related('borrower', 'equipment').order_by('due_date')
+
     return render(request, 'borrowing/return_queue.html', {
         'equipment_returns': equipment_returns,
         'kit_approvals': kit_approvals,
+        'active_owned_borrows': active_owned_borrows,
     })
+
+
+@login_required
+def borrow_owner_reclaim_view(request, pk):
+    """Equipment owner reclaims their equipment without requiring the borrower to initiate a return."""
+    borrow = get_object_or_404(
+        BorrowRequest.objects.select_related('borrower', 'equipment'),
+        pk=pk,
+    )
+
+    if not borrow.equipment or request.user != borrow.equipment.owner:
+        messages.error(request, 'Only the equipment owner can reclaim it.')
+        return redirect('borrowing:detail', pk=pk)
+
+    if borrow.status not in ('APPROVED', 'ACTIVE', 'RETURN_PENDING'):
+        messages.error(request, 'This item cannot be reclaimed in its current state.')
+        return redirect('borrowing:detail', pk=pk)
+
+    if request.method == 'POST':
+        borrow.status = 'RETURNED'
+        borrow.returned_date = timezone.now()
+        borrow.save()
+
+        borrow.equipment.status = 'AVAILABLE'
+        borrow.equipment.save(update_fields=['status'])
+
+        notify(
+            recipient=borrow.borrower,
+            title='Equipment Reclaimed by Owner',
+            message=(
+                f'"{borrow.equipment.name}" has been reclaimed by '
+                f'{request.user.full_name or request.user.username}.'
+            ),
+            level='warning',
+            link=reverse('borrowing:detail', args=[borrow.pk]),
+            category='borrowing',
+        )
+
+        log_activity(
+            actor=request.user,
+            action='BORROW_RETURNED',
+            description=(
+                f'{request.user.username} reclaimed "{borrow.equipment.name}" '
+                f'from {borrow.borrower.username}'
+            ),
+            content_type_label='borrowrequest',
+            object_id=borrow.pk,
+            object_repr=str(borrow),
+            request=request,
+        )
+
+        messages.success(request, f'"{borrow.equipment.name}" has been reclaimed.')
+        return redirect('borrowing:detail', pk=pk)
+
+    return render(request, 'borrowing/borrow_confirm_reclaim.html', {'borrow': borrow})
 
 
 @login_required

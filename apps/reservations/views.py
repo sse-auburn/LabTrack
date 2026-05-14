@@ -10,7 +10,7 @@ from django.utils import timezone
 from apps.activity.utils import log_activity
 from apps.borrowing.forms import ReturnForm
 from apps.notifications.utils import notify, notify_admins
-from apps.reservations.forms import ReservationForm, WaitlistEntryForm
+from apps.reservations.forms import BulkReservationForm, ReservationForm, WaitlistEntryForm
 from apps.reservations.models import Reservation, WaitlistEntry
 
 
@@ -50,27 +50,79 @@ def reservation_list_view(request):
 
 @login_required
 def reservation_calendar_view(request):
-    """Return calendar event data as JSON, or render the calendar template."""
-    if request.headers.get('Accept') == 'application/json' or request.GET.get('format') == 'json':
-        reservations = Reservation.objects.filter(
-            status__in=['PENDING', 'CONFIRMED']
-        ).select_related('equipment', 'kit', 'requester')
+    """Render a month-grid calendar of reservations."""
+    import calendar
+    from datetime import date
+    from apps.equipment.models import Equipment
 
-        events = []
-        for reservation in reservations:
-            item_name = str(reservation.equipment or reservation.kit or 'Unknown')
-            events.append({
-                'id': reservation.pk,
-                'title': f'{item_name} — {reservation.requester.username}',
-                'start': reservation.start_date.isoformat(),
-                'end': reservation.end_date.isoformat(),
-                'status': reservation.status,
-                'url': f'/reservations/{reservation.pk}/',
-            })
+    today = date.today()
+    try:
+        year = int(request.GET.get('year', today.year))
+        month = int(request.GET.get('month', today.month))
+        if month < 1 or month > 12:
+            raise ValueError
+    except (ValueError, TypeError):
+        year, month = today.year, today.month
 
-        return JsonResponse({'events': events})
+    equipment_id = request.GET.get('equipment_id', '').strip()
 
-    return render(request, 'reservations/reservation_calendar.html')
+    qs = Reservation.objects.filter(
+        status__in=['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'EXPIRED'],
+    ).select_related('equipment', 'kit', 'requester')
+
+    if equipment_id:
+        qs = qs.filter(equipment_id=equipment_id)
+
+    # Index reservations by day they fall on
+    from collections import defaultdict
+    reservations_by_day = defaultdict(list)
+    for res in qs:
+        d = res.start_date
+        if d.year == year and d.month == month:
+            reservations_by_day[d.day].append(res)
+
+    # Build week grid (Monday-first)
+    cal = calendar.monthcalendar(year, month)
+    calendar_weeks = []
+    for week in cal:
+        week_days = []
+        for day_num in week:
+            if day_num == 0:
+                week_days.append({'day': '', 'current_month': False, 'is_today': False, 'reservations': []})
+            else:
+                d = date(year, month, day_num)
+                week_days.append({
+                    'day': day_num,
+                    'current_month': True,
+                    'is_today': d == today,
+                    'reservations': reservations_by_day.get(day_num, []),
+                })
+        calendar_weeks.append(week_days)
+
+    # Navigation months
+    if month == 1:
+        prev_year, prev_month = year - 1, 12
+    else:
+        prev_year, prev_month = year, month - 1
+
+    if month == 12:
+        next_year, next_month = year + 1, 1
+    else:
+        next_year, next_month = year, month + 1
+
+    month_name = date(year, month, 1).strftime('%B')
+
+    return render(request, 'reservations/reservation_calendar.html', {
+        'calendar_weeks': calendar_weeks,
+        'current_year': year,
+        'current_month': month,
+        'current_month_name': month_name,
+        'prev_year': prev_year,
+        'prev_month': prev_month,
+        'next_year': next_year,
+        'next_month': next_month,
+        'equipment_list': Equipment.objects.filter(is_active=True, approval_status='APPROVED').order_by('name'),
+    })
 
 
 @login_required
@@ -81,14 +133,23 @@ def reservation_create_view(request):
         if form.is_valid():
             reservation = form.save(commit=False)
             reservation.requester = request.user
-            reservation.status = 'PENDING'
+            reservation.status = 'CONFIRMED'
             reservation.save()
+
+            # Mark equipment/kit as RESERVED immediately
+            if reservation.equipment:
+                reservation.equipment.status = 'RESERVED'
+                reservation.equipment.save(update_fields=['status'])
+            if reservation.kit:
+                for kit_item in reservation.kit.items.select_related('equipment'):
+                    kit_item.equipment.status = 'RESERVED'
+                    kit_item.equipment.save(update_fields=['status'])
 
             log_activity(
                 actor=request.user,
                 action='RESERVATION_CREATED',
                 description=(
-                    f'{request.user.username} created a reservation for '
+                    f'{request.user.username} reserved '
                     f'{reservation.equipment or reservation.kit} '
                     f'({reservation.start_date} – {reservation.end_date})'
                 ),
@@ -98,62 +159,145 @@ def reservation_create_view(request):
                 request=request,
             )
 
-            # Notify requester
-            notify(
-                recipient=reservation.requester,
-                title='Reservation Submitted',
-                message=(
-                    f'Your reservation for "{reservation.equipment or reservation.kit}" '
-                    f'({reservation.start_date} – {reservation.end_date}) is pending approval.'
-                ),
-                level='info',
-                link=f'/reservations/{reservation.pk}/',
-                category='reservations',
-            )
-
-            # Notify owner / admins to confirm
-            if reservation.equipment and reservation.equipment.owner:
+            # Notify the equipment/kit owner informally
+            if reservation.equipment and reservation.equipment.owner and reservation.equipment.owner != request.user:
                 notify(
                     recipient=reservation.equipment.owner,
-                    title='Reservation Awaiting Confirmation',
+                    title='Your Equipment Was Reserved',
                     message=(
-                        f'{request.user.full_name or request.user.username} requested to reserve '
+                        f'{request.user.full_name or request.user.username} has reserved '
                         f'"{reservation.equipment.name}" ({reservation.start_date} – {reservation.end_date}).'
                     ),
                     level='info',
                     link=f'/reservations/{reservation.pk}/',
                     category='reservations',
                 )
-            elif reservation.kit and reservation.kit.created_by:
+            elif reservation.kit and reservation.kit.created_by and reservation.kit.created_by != request.user:
                 notify(
                     recipient=reservation.kit.created_by,
-                    title='Reservation Awaiting Confirmation',
+                    title='Your Kit Was Reserved',
                     message=(
-                        f'{request.user.full_name or request.user.username} requested to reserve '
+                        f'{request.user.full_name or request.user.username} has reserved '
                         f'"{reservation.kit.name}" ({reservation.start_date} – {reservation.end_date}).'
                     ),
                     level='info',
                     link=f'/reservations/{reservation.pk}/',
                     category='reservations',
                 )
-            else:
-                notify_admins(
-                    title='New Reservation Pending',
-                    message=(
-                        f'{request.user.full_name or request.user.username} created a reservation for '
-                        f'"{reservation.equipment or reservation.kit}". Please review.'
-                    ),
-                    level='info',
-                    link=f'/reservations/{reservation.pk}/',
-                    category='reservations',
-                )
 
-            messages.success(request, 'Reservation submitted and is awaiting confirmation.')
+            messages.success(request, 'Reservation confirmed.')
             return redirect('reservations:detail', pk=reservation.pk)
     else:
-        form = ReservationForm()
+        equipment_id = request.GET.get('equipment')
+        initial = {'equipment': equipment_id} if equipment_id else {}
+        form = ReservationForm(initial=initial)
 
     return render(request, 'reservations/reservation_form.html', {'form': form})
+
+
+@login_required
+def reservation_bulk_create_view(request):
+    """Reserve multiple equipment items at once."""
+    if request.method == 'POST':
+        equipment_ids = request.POST.getlist('equipment_ids')
+        if not equipment_ids:
+            messages.error(request, 'No items selected.')
+            return redirect('equipment:list')
+
+        items = Equipment.objects.filter(
+            pk__in=equipment_ids, is_active=True
+        ).exclude(status__in=['BORROWED', 'RETIRED'])
+        if not items.exists():
+            messages.error(request, 'None of the selected items are available for reservation.')
+            return redirect('equipment:list')
+
+        form = BulkReservationForm(request.POST)
+        if form.is_valid():
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
+            purpose = form.cleaned_data['purpose']
+
+            created = []
+            for item in items:
+                # Check for overlapping confirmed reservations
+                overlap = Reservation.objects.filter(
+                    status='CONFIRMED',
+                    equipment=item,
+                    start_date__lte=end_date,
+                    end_date__gte=start_date,
+                ).exists()
+                if overlap:
+                    continue
+
+                reservation = Reservation.objects.create(
+                    requester=request.user,
+                    equipment=item,
+                    start_date=start_date,
+                    end_date=end_date,
+                    purpose=purpose,
+                    status='CONFIRMED',
+                )
+                item.status = 'RESERVED'
+                item.save(update_fields=['status'])
+                log_activity(
+                    actor=request.user,
+                    action='RESERVATION_CREATED',
+                    description=f'{request.user.username} reserved {item} ({start_date} – {end_date})',
+                    content_type_label='reservation',
+                    object_id=reservation.pk,
+                    object_repr=str(reservation),
+                    request=request,
+                )
+                created.append(item.name)
+
+            if created:
+                messages.success(
+                    request,
+                    f'Reserved {len(created)} item(s): {", ".join(created)}.'
+                )
+                notify(
+                    recipient=request.user,
+                    title='Items Reserved',
+                    message=f'You have reserved {len(created)} item(s).',
+                    level='success',
+                    link=reverse('reservations:list'),
+                    category='reservations',
+                )
+            skipped = len(items) - len(created)
+            if skipped:
+                messages.warning(request, f'{skipped} item(s) were skipped due to overlapping reservations.')
+
+            return redirect('reservations:list')
+
+        items = Equipment.objects.filter(
+            pk__in=equipment_ids, is_active=True
+        ).exclude(status__in=['BORROWED', 'RETIRED'])
+        return render(request, 'reservations/reservation_bulk_form.html', {
+            'form': form,
+            'items': items,
+            'equipment_ids': equipment_ids,
+        })
+
+    else:
+        equipment_ids = request.GET.getlist('ids')
+        if not equipment_ids:
+            messages.error(request, 'No items selected.')
+            return redirect('equipment:list')
+
+        items = Equipment.objects.filter(
+            pk__in=equipment_ids, is_active=True
+        ).exclude(status__in=['BORROWED', 'RETIRED'])
+        unavailable = Equipment.objects.filter(
+            pk__in=equipment_ids
+        ).filter(status__in=['BORROWED', 'RETIRED'])
+
+        form = BulkReservationForm()
+        return render(request, 'reservations/reservation_bulk_form.html', {
+            'form': form,
+            'items': items,
+            'unavailable': unavailable,
+            'equipment_ids': equipment_ids,
+        })
 
 
 @login_required
