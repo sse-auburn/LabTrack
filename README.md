@@ -29,15 +29,17 @@ LabTrack is a Django-based lab inventory management system. It tracks every piec
 
 | Module | Summary |
 |---|---|
-| **Equipment** | Register, edit, and deactivate equipment; attach categories and locations; track status and condition; photo uploads; full lifecycle history; movement logs |
+| **Equipment** | Register, edit, and deactivate equipment; attach categories and locations; track status and condition; photo uploads; full lifecycle history; movement logs; bulk borrow, reserve, and delete (admin) |
 | **Borrowing** | Borrow individual items or kits; automatic approval on submission; member submits return with condition report; equipment owner confirms receipt; overdue detection |
 | **Reservations** | Time-bound reservations with start/end dates; pending → confirmed workflow; calendar view; waitlist with automatic notification on cancellation |
 | **Kits** | Bundles of equipment items; personal or shared with all members; per-owner return confirmation flow |
 | **Consumables** | Stock tracking with units; usage logging; restock; low-stock alerts |
 | **Incidents** | Report damage or faults against equipment; assign investigators; track through Open → Investigating → Resolved → Closed; maintenance scheduling; calibration logs |
 | **Projects** | Create projects, add members with Lead / Member / Observer roles |
+| **P-Card** | Track purchase transactions with itemized line items, receipt upload (DB blob storage), date filtering, Excel/PDF export, and admin-approved deletion requests |
+| **Files** | Custom database-backed file storage (no filesystem dependency); receipts and photos stored as binary blobs |
 | **Notifications** | In-app and email notifications for every significant event; per-user opt-out by category |
-| **Activity Log** | Immutable audit trail of every action across all modules |
+| **Activity Log** | Immutable audit trail of every action across all modules (admins see all; members see their own) |
 | **Accounts** | Custom user model (email login); admin-assigned roles; profile editing; per-category notification preferences |
 
 ---
@@ -304,7 +306,12 @@ The `.env.example` file documents every variable with its default.
 | `/incidents/` | Incident list |
 | `/projects/` | Project list |
 | `/notifications/` | Notification inbox |
-| `/activity/` | Activity log (admin only) |
+| `/activity/` | Activity log (admins see all; members see their own) |
+| `/pcard/` | P-Card transaction list |
+| `/pcard/create/` | Record a new purchase |
+| `/pcard/export/excel/` | Export transactions to Excel |
+| `/pcard/export/pdf/` | Export receipt images/PDFs compiled to a single PDF |
+| `/pcard/deletion-requests/` | Deletion request queue (admin only) |
 
 ---
 

@@ -25,7 +25,7 @@ This manual documents every feature and workflow in LabTrack for both members an
    - [Editing Equipment](#35-editing-equipment)
    - [Moving Equipment Between Locations](#36-moving-equipment-between-locations)
    - [Recording Lifecycle Events](#37-recording-lifecycle-events)
-   - [Deactivating Equipment](#38-deactivating-equipment)
+   - [Deactivating and Retiring Equipment](#38-deactivating-and-retiring-equipment)
    - [Categories and Locations](#39-categories-and-locations)
 4. [Borrowing](#4-borrowing)
    - [Submitting a Borrow Request](#41-submitting-a-borrow-request)
@@ -84,6 +84,12 @@ This manual documents every feature and workflow in LabTrack for both members an
     - [Return Queue](#127-return-queue)
     - [Overdue Borrow Detection](#128-overdue-borrow-detection)
     - [Django Back-Office](#129-django-back-office)
+13. [P-Card Purchase Tracking](#13-p-card-purchase-tracking)
+    - [Recording a Transaction](#131-recording-a-transaction)
+    - [Viewing Transactions](#132-viewing-transactions)
+    - [Editing a Transaction](#133-editing-a-transaction)
+    - [Deleting a Transaction](#134-deleting-a-transaction)
+    - [Exporting Data](#135-exporting-data)
 
 ---
 
@@ -226,6 +232,11 @@ Navigate to **Equipment** (`/equipment/`) to see all active, approved equipment.
 
 Results are paginated at 10 per page. Each card shows the equipment name, status badge, condition, category, location, and owner.
 
+**Bulk actions:** Select multiple items with the checkboxes on each card to perform bulk actions from the floating bar:
+- **Borrow** — check out all selected available items at once
+- **Reserve** — reserve all selected items for a future date range
+- **Delete** (admin only) — retire all selected items in one operation
+
 > Members see only **Approved** equipment plus any **Pending** equipment they registered themselves. Admins see all equipment including Pending approval items.
 
 ### 3.2 Viewing Equipment Details
@@ -322,15 +333,21 @@ To add an event:
 3. Choose the event type and enter a description.
 4. Click **Save**.
 
-### 3.8 Deactivating Equipment
+### 3.8 Deactivating and Retiring Equipment
 
-Admins can deactivate equipment that should no longer appear in the inventory (retired, lost, or scrapped). Deactivation hides the item from all lists without deleting its history.
+Admins can retire equipment that should no longer appear in the inventory (retired, lost, or scrapped). Retiring hides the item from all lists without deleting its history.
 
-This is done from the Django back-office (`/backoffice/`) by setting `is_active = False` on the equipment record.
+**From the equipment list:**
+1. Select one or more items using the checkboxes on each card.
+2. Click **Delete Selected** in the floating action bar.
+3. Confirm the action. The equipment status is set to **Retired** and `is_active` is set to `False`.
+
+**From the Django back-office (`/backoffice/`):**
+Admins can also set `is_active = False` directly on the equipment record for fine-grained control.
 
 ### 3.9 Categories and Locations
 
-Categories and locations are shared across equipment and consumables.
+Categories and locations are shared across equipment and consumables. All authenticated users can browse the category and location lists from the sidebar.
 
 **Creating a category:**
 1. Go to `/equipment/categories/create/`.
@@ -365,7 +382,7 @@ Borrowing allows you to check out a specific piece of equipment or a kit for a d
 - The due date cannot be in the past.
 - You cannot borrow equipment that has a confirmed reservation overlapping with your due date.
 
-**Auto-approval:** Borrow requests are automatically set to **APPROVED** on submission. There is no separate approval step for single-item borrows. The equipment status is not automatically changed to "Borrowed" at this point — that is a manual status update by the owner if needed.
+**Auto-approval:** Borrow requests are automatically set to **APPROVED** on submission. There is no separate approval step for single-item borrows. The equipment status is immediately changed to **Borrowed** so other members cannot simultaneously request it.
 
 ### 4.2 Borrow Request Status Reference
 
@@ -465,9 +482,9 @@ Reservations let you book equipment or a kit for a future time window without im
    - **Purpose** — describe the planned use
 4. Click **Submit**.
 
-The reservation is created with status **PENDING**. The equipment owner receives a notification and must confirm the reservation before it becomes **CONFIRMED**.
+The reservation is created with status **CONFIRMED** immediately. The equipment owner receives a notification for awareness. If the reservation starts today or earlier, the equipment status is set to **Reserved**.
 
-> **Note:** Reservations that overlap a confirmed reservation for the same item will be blocked during the borrow request form validation. Check the calendar before creating a reservation to avoid conflicts.
+> **Note:** Reservations that overlap a confirmed reservation for the same item will be blocked. Check the calendar before creating a reservation to avoid conflicts.
 
 ### 5.2 Reservation Status Reference
 
@@ -847,8 +864,9 @@ Each notification shows:
 - A read / unread indicator
 
 **Marking notifications as read:**
-- Click a notification to open the linked page — the notification is marked read automatically.
+- Open the notification inbox page (`/notifications/`) — all unread notifications are automatically marked as read when the page loads.
 - Click **Mark All Read** to clear all unread indicators at once.
+- Click an individual **Mark as read** button to clear a single notification without leaving the page.
 
 ### 10.2 Email Notifications
 
@@ -870,7 +888,7 @@ Email links use the absolute `SITE_URL` configured in the server environment so 
 | Return confirmed (single item) | Borrower |
 | Kit item return submitted | Each equipment owner in the kit |
 | Kit item confirmed (all done) | Borrower |
-| Reservation created (pending) | Equipment / kit owner |
+| Reservation created (confirmed) | Equipment / kit owner |
 | Reservation confirmed | Requester |
 | Reservation cancelled | Requester; next person on waitlist (if any) |
 | Reservation return submitted | Equipment / kit owner |
@@ -879,6 +897,10 @@ Email links use the absolute `SITE_URL` configured in the server environment so 
 | Incident assigned to you | Assignee |
 | Incident resolved | Reporter |
 | Incident status updated | Reporter |
+| P-Card transaction recorded | All admins |
+| P-Card deletion requested | All admins |
+| P-Card deletion approved | Requester |
+| P-Card deletion rejected | Requester |
 
 ---
 
@@ -888,11 +910,15 @@ The activity log at `/activity/` is an immutable audit trail of every significan
 
 Each entry records:
 - **Actor** — the user who performed the action
-- **Action type** — e.g., CREATE, UPDATE, STATUS_CHANGE, LOGIN, LOGOUT
+- **Action type** — e.g., BORROW_CREATED, EQUIPMENT_UPDATED, INCIDENT_REPORTED
 - **Description** — human-readable summary of what happened
 - **Timestamp** — exact date and time
 
-The activity log is accessible to **admins only**. It is read-only — entries cannot be edited or deleted.
+**Access:**
+- **Admins** see the full system-wide activity feed at `/activity/`.
+- **Members** see only their own actions at `/activity/mine/`.
+
+The activity log is read-only — entries cannot be edited. Admins can delete individual entries if needed.
 
 Use the activity log to:
 - Investigate who changed a piece of equipment's status
@@ -1021,3 +1047,78 @@ Use the back-office for:
 Access is restricted to superusers (accounts created with `createsuperuser` or manually set `is_staff=True` and `is_superuser=True` in the database).
 
 > The back-office bypasses all application-level validation and signals. Use it carefully. Any status change made through the back-office does not fire notifications or activity log entries unless triggered via the Django admin's `save_model` hook.
+
+---
+
+## 13. P-Card Purchase Tracking
+
+The P-Card module tracks lab purchase transactions made with a procurement card. Each transaction records the date, total amount, itemized line items, notes, and an uploaded receipt.
+
+### 13.1 Recording a Transaction
+
+1. Navigate to **P-Card** (`/pcard/`) and click **Record Purchase**.
+2. Fill in:
+   - **Transaction date** — date the purchase was made
+   - **Total price** — overall amount (the sum of line items should match)
+   - **Notes** (optional) — vendor name, justification, etc.
+   - **Receipt** — upload a receipt image (JPEG/PNG) or PDF. The file is stored in the database as a binary blob.
+3. Add itemized lines:
+   - Click **Add Item** to create a line.
+   - Enter **Name**, **Description**, **Quantity**, and **Unit Price** for each item.
+   - Click **Remove** to delete a line if needed.
+4. Click **Save Transaction**.
+
+The transaction is saved immediately and visible to all members.
+
+### 13.2 Viewing Transactions
+
+The P-Card list page (`/pcard/`) shows all transactions in reverse chronological order.
+
+**Filtering:**
+- **Date range** — filter from/to specific dates
+- **Search** — search across notes and item names/descriptions
+
+Each row shows the transaction date, total price, item count, and creator. Click any row to view the full detail page, including the itemized breakdown and receipt preview.
+
+### 13.3 Editing a Transaction
+
+Only the creator of a transaction or an admin can edit it.
+
+1. Open the transaction detail page.
+2. Click **Edit**.
+3. Update any fields or add/remove item lines.
+4. Click **Save Changes**.
+
+If you upload a new receipt, it replaces the previous one. The old receipt is permanently deleted.
+
+### 13.4 Deleting a Transaction
+
+**Admins** can delete a transaction immediately.
+
+**Members** must request deletion, which requires admin approval:
+
+1. Open the transaction detail page.
+2. Click **Request Deletion**.
+3. Enter an optional reason.
+4. Click **Submit Request**.
+
+The request goes into a pending queue. An admin reviews it at **P-Card → Deletion Requests** (`/pcard/deletion-requests/`):
+- **Approve** — the transaction is deleted and the requester is notified.
+- **Reject** — the transaction is preserved and the requester is notified with the reason.
+
+Deletion request history is preserved for audit purposes even after the transaction is removed.
+
+### 13.5 Exporting Data
+
+Two export formats are available from the P-Card list page. Both respect the current active filters (date range and search).
+
+**Excel Export (`/pcard/export/excel/`):**
+- **Transactions sheet** — one row per transaction with ID, date, total, item count, notes, creator, and created timestamp.
+- **Items sheet** — one row per item line with transaction ID, date, item name, description, quantity, unit price, and line total.
+
+**PDF Receipt Export (`/pcard/export/pdf/`):**
+- Compiles all receipt images and PDFs from the filtered transactions into a single multi-page PDF.
+- Each receipt is fitted to a full letter-sized page.
+- If no receipts are found, a single-page placeholder PDF is returned.
+
+---

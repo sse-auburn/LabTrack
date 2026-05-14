@@ -6,11 +6,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# System deps needed to build mysqlclient
+# System deps needed to build mysqlclient and Pillow
 RUN apt-get update && apt-get install -y --no-install-recommends \
         default-libmysqlclient-dev \
         pkg-config \
         gcc \
+        libjpeg-dev \
+        zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -48,9 +50,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Runtime system deps (MySQL client library)
+# Runtime system deps (MySQL client library + Pillow image libs)
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libmariadb3 \
+        libjpeg62-turbo \
+        zlib1g \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy installed packages from builder
@@ -68,5 +72,8 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/')" || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
