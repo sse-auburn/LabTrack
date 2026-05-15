@@ -18,6 +18,13 @@
       Manage lab members and their access roles.
     </p>
   </div>
+  {% if pending_count > 0 %}
+  <a href="?status=pending"
+     class="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-800 text-sm font-semibold rounded-lg hover:bg-amber-200 transition-colors">
+    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block"></span>
+    {{ pending_count }} pending approval{{ pending_count|pluralize }}
+  </a>
+  {% endif %}
   <div class="flex items-center gap-2">
     <a href="{% url 'accounts:user_create' %}"
        class="inline-flex items-center px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors">
@@ -79,13 +86,14 @@
     <div class="flex items-center gap-2">
       <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.role %}role={{ request.GET.role }}&{% endif %}status=active"
          class="px-3 py-2 rounded-lg text-sm font-medium transition-colors
-           {% if request.GET.status == 'active' %}bg-green-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
+           {% if status == 'active' %}bg-green-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
         Active
       </a>
-      <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.role %}role={{ request.GET.role }}&{% endif %}status=inactive"
+      <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.role %}role={{ request.GET.role }}&{% endif %}status=pending"
          class="px-3 py-2 rounded-lg text-sm font-medium transition-colors
-           {% if request.GET.status == 'inactive' %}bg-red-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
-        Inactive
+           {% if status == 'pending' %}bg-amber-500 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
+        Pending
+        {% if pending_count > 0 %}<span class="ml-1 px-1.5 py-0.5 rounded-full text-xs {% if status == 'pending' %}bg-white text-amber-700{% else %}bg-amber-100 text-amber-700{% endif %}">{{ pending_count }}</span>{% endif %}
       </a>
     </div>
 
@@ -163,9 +171,9 @@
               Active
             </span>
             {% else %}
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500">
-              <span class="w-1.5 h-1.5 rounded-full bg-slate-400 inline-block"></span>
-              Inactive
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse inline-block"></span>
+              Pending Approval
             </span>
             {% endif %}
           </td>
@@ -178,6 +186,19 @@
           <!-- Actions -->
           <td class="px-6 py-4">
             <div class="flex items-center justify-end gap-2">
+              {% if not member.is_active and request.user != member %}
+              <form method="post" action="{% url 'accounts:toggle_active' member.pk %}">
+                {% csrf_token %}
+                <button type="submit"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  Approve
+                </button>
+              </form>
+              {% endif %}
               <a href="{% url 'accounts:profile_view' member.pk %}"
                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors"
                  title="View profile">

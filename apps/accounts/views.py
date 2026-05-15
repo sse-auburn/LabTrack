@@ -40,35 +40,33 @@ def register_view(request):
             # Ensure a profile exists (signal may have already created one)
             UserProfile.objects.get_or_create(user=user)
 
+            user.is_active = False
+            user.save(update_fields=['is_active'])
+
             log_activity(
                 actor=user,
                 action='USER_REGISTERED',
-                description=f'New user registered: {user.email}',
+                description=f'New user registered (pending approval): {user.email}',
                 content_type_label='customuser',
                 object_id=user.pk,
                 object_repr=str(user),
                 request=request,
             )
 
-            notify(
-                recipient=user,
-                title='Welcome to LabTrack',
-                message=f'Your account has been created successfully. Welcome, {user.full_name}!',
-                level='success',
-                link='/',
-                category='system',
-            )
             notify_admins(
-                title='New User Registered',
-                message=f'New user registered: {user.full_name} ({user.email}).',
+                title='New User Pending Approval',
+                message=f'{user.full_name} ({user.email}) registered and is awaiting account approval.',
                 level='info',
-                link='/accounts/users/',
+                link='/accounts/users/?status=pending',
                 category='system',
             )
 
-            login(request, user)
-            messages.success(request, f'Welcome, {user.full_name}! Your account has been created.')
-            return redirect('dashboard:index')
+            messages.success(
+                request,
+                'Your account has been created and is pending admin approval. '
+                'You will be notified once your account is activated.',
+            )
+            return redirect('accounts:login')
     else:
         form = CustomUserCreationForm()
 
@@ -98,7 +96,7 @@ def login_view(request):
                     next_url = request.GET.get('next', 'dashboard:index')
                     return redirect(next_url)
                 else:
-                    messages.error(request, 'Your account has been disabled. Please contact an administrator.')
+                    messages.error(request, 'Your account is pending admin approval. You will be notified once your account is activated.')
             else:
                 messages.error(request, 'Invalid email address or password. Please try again.')
     else:
@@ -288,6 +286,15 @@ def user_list_view(request):
     if role in ('ADMIN', 'MEMBER'):
         queryset = queryset.filter(role=role)
 
+    # Optional status filter
+    status = request.GET.get('status', '').strip()
+    if status == 'active':
+        queryset = queryset.filter(is_active=True)
+    elif status in ('inactive', 'pending'):
+        queryset = queryset.filter(is_active=False)
+
+    pending_count = CustomUser.objects.filter(is_active=False).count()
+
     paginator = Paginator(queryset, 20)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -296,6 +303,8 @@ def user_list_view(request):
         'page_obj': page_obj,
         'query': query,
         'role': role,
+        'status': status,
+        'pending_count': pending_count,
     })
 
 
@@ -391,18 +400,28 @@ def toggle_active_view(request, pk):
             request=request,
         )
 
-        notify(
-            recipient=target_user,
-            title='Account Status Changed',
-            message=f'Your account has been {status} by {request.user.full_name}.',
-            level='warning',
-            link='/accounts/profile/',
-            category='system',
-        )
+        if target_user.is_active:
+            notify(
+                recipient=target_user,
+                title='Account Approved',
+                message=f'Your account has been approved by {request.user.full_name}. You can now log in.',
+                level='success',
+                link='/',
+                category='system',
+            )
+        else:
+            notify(
+                recipient=target_user,
+                title='Account Deactivated',
+                message=f'Your account has been deactivated by {request.user.full_name}. Contact an administrator for help.',
+                level='warning',
+                link='/accounts/profile/',
+                category='system',
+            )
         notify_admins(
             title='User Status Changed',
             message=f'User {target_user.full_name} ({target_user.email}) has been {status} by {request.user.full_name}.',
-            level='warning',
+            level='info',
             link='/accounts/users/',
             category='system',
         )
