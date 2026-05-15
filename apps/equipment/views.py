@@ -726,13 +726,9 @@ def category_delete_view(request, pk):
 def location_list_view(request):
     """List all lab locations."""
     locations = Location.objects.order_by('name')
-    paginator = Paginator(locations, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
 
     return render(request, 'equipment/location_list.html', {
-        'page_obj': page_obj,
-        'locations': page_obj,
+        'locations': locations,
     })
 
 
