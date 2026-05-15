@@ -13,6 +13,28 @@
         {% endif %}
       </div>
       <div class="flex items-center gap-2 flex-wrap">
+        <!-- View toggle -->
+        <div class="inline-flex rounded-lg border border-gray-300 overflow-hidden">
+          <a href="?{{ query_string }}&view=grid"
+             class="inline-flex items-center px-3 py-2 text-sm transition-colors
+               {% if view_mode == 'grid' %}bg-indigo-600 text-white{% else %}bg-white text-gray-600 hover:bg-gray-50{% endif %}"
+             title="Grid view">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+            </svg>
+          </a>
+          <a href="?{{ query_string }}&view=list"
+             class="inline-flex items-center px-3 py-2 text-sm border-l border-gray-300 transition-colors
+               {% if view_mode == 'list' %}bg-indigo-600 text-white{% else %}bg-white text-gray-600 hover:bg-gray-50{% endif %}"
+             title="List view">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+            </svg>
+          </a>
+        </div>
+
         <a href="{% url 'equipment:create' %}"
            class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,6 +57,7 @@
 
     <!-- Filter Bar -->
     <form method="get" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+      <input type="hidden" name="view" value="{{ view_mode }}">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <!-- Search -->
         <div class="lg:col-span-1">
@@ -115,8 +138,114 @@
       </div>
     </form>
 
-    <!-- Equipment Grid -->
+    <!-- Equipment Grid / List -->
     {% if equipment_list %}
+    {% if view_mode == 'list' %}
+    <!-- ===== List View ===== -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-200">
+              {% if user.is_authenticated %}
+              <th class="px-4 py-3 w-10"></th>
+              {% endif %}
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Equipment</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Category</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Location</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Condition</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Owner</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {% for item in equipment_list %}
+            <tr class="hover:bg-gray-50 transition-colors" data-id="{{ item.pk }}" data-name="{{ item.name }}">
+              {% if user.is_authenticated %}
+              <td class="px-4 py-3">
+                <input type="checkbox" class="equipment-checkbox w-4 h-4 rounded border-gray-300 text-indigo-600 cursor-pointer"
+                       data-id="{{ item.pk }}" data-name="{{ item.name }}">
+              </td>
+              {% endif %}
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  {% if item.image %}
+                  <img src="{{ item.image.url }}" alt="{{ item.name }}"
+                       class="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-gray-200">
+                  {% else %}
+                  <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                  {% endif %}
+                  <div class="min-w-0">
+                    <p class="font-semibold text-gray-900 truncate">{{ item.name }}</p>
+                    {% if item.serial_number %}<p class="text-xs text-gray-400 truncate">S/N: {{ item.serial_number }}</p>{% endif %}
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                {% if item.category %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white"
+                      style="background-color: {{ item.category.color }};">{{ item.category.name }}</span>
+                {% else %}<span class="text-gray-400">—</span>{% endif %}
+              </td>
+              <td class="px-4 py-3 text-gray-600 text-xs">{{ item.location.name|default:"—" }}</td>
+              <td class="px-4 py-3">
+                {% if item.approval_status == 'PENDING' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
+                {% elif item.status == 'AVAILABLE' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">Available</span>
+                {% elif item.status == 'BORROWED' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Borrowed</span>
+                {% elif item.status == 'RESERVED' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Reserved</span>
+                {% elif item.status == 'MAINTENANCE' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">Maintenance</span>
+                {% elif item.status == 'DAMAGED' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">Damaged</span>
+                {% else %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">{{ item.get_status_display }}</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-gray-600 text-xs">{{ item.get_condition_display }}</td>
+              <td class="px-4 py-3 text-gray-600 text-xs truncate max-w-[120px]">{{ item.owner.full_name|default:"—" }}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-end gap-1.5">
+                  <a href="{% url 'equipment:detail' item.pk %}"
+                     class="inline-flex items-center px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-lg transition-colors">View</a>
+                  {% if item.status == 'AVAILABLE' and item.approval_status == 'APPROVED' and user.is_authenticated %}
+                  <a href="{% url 'borrowing:create' %}?equipment={{ item.pk }}"
+                     class="inline-flex items-center px-2.5 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs font-medium rounded-lg transition-colors">Borrow</a>
+                  <a href="{% url 'reservations:create' %}?equipment={{ item.pk }}"
+                     class="inline-flex items-center px-2.5 py-1.5 bg-violet-100 hover:bg-violet-200 text-violet-700 text-xs font-medium rounded-lg transition-colors">Reserve</a>
+                  {% endif %}
+                  {% if item.user_active_borrow_pk %}
+                  <a href="{% url 'borrowing:return' item.user_active_borrow_pk %}"
+                     class="inline-flex items-center px-2.5 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-lg transition-colors">Return</a>
+                  {% endif %}
+                  {% if user.is_admin or item.owner == user %}
+                  <a href="{% url 'equipment:delete' item.pk %}"
+                     class="inline-flex items-center px-2.5 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-medium rounded-lg transition-colors" title="Delete">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <!-- ===== Grid View ===== -->
     <div id="equipment-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
       {% for item in equipment_list %}
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col relative
@@ -252,57 +381,54 @@
       </div>
       {% endfor %}
     </div>
+    {% endif %}{# end view_mode #}
 
     <!-- Pagination -->
     {% if page_obj.has_other_pages %}
     <div class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 rounded-xl shadow-sm">
       <div class="flex flex-1 justify-between sm:hidden">
         {% if page_obj.has_previous %}
-        <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}"
+        <a href="?{{ query_string }}&page={{ page_obj.previous_page_number }}"
            class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
         {% endif %}
         {% if page_obj.has_next %}
-        <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}"
+        <a href="?{{ query_string }}&page={{ page_obj.next_page_number }}"
            class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
         {% endif %}
       </div>
       <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-        <div>
-          <p class="text-sm text-gray-700">
-            Showing <span class="font-medium">{{ page_obj.start_index }}</span> to
-            <span class="font-medium">{{ page_obj.end_index }}</span> of
-            <span class="font-medium">{{ page_obj.paginator.count }}</span> results
-          </p>
-        </div>
-        <div>
-          <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-            {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}"
-               class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd"/>
-              </svg>
-            </a>
+        <p class="text-sm text-gray-700">
+          Showing <span class="font-medium">{{ page_obj.start_index }}</span> to
+          <span class="font-medium">{{ page_obj.end_index }}</span> of
+          <span class="font-medium">{{ page_obj.paginator.count }}</span> results
+        </p>
+        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+          {% if page_obj.has_previous %}
+          <a href="?{{ query_string }}&page={{ page_obj.previous_page_number }}"
+             class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd"/>
+            </svg>
+          </a>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <a href="?{{ query_string }}&page={{ num }}" aria-current="page"
+               class="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">{{ num }}</a>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?{{ query_string }}&page={{ num }}"
+               class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">{{ num }}</a>
             {% endif %}
-            {% for num in page_obj.paginator.page_range %}
-              {% if page_obj.number == num %}
-              <a href="?page={{ num }}" aria-current="page"
-                 class="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{{ num }}</a>
-              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-              <a href="?page={{ num }}"
-                 class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">{{ num }}</a>
-              {% endif %}
-            {% endfor %}
-            {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}"
-               class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
-              </svg>
-            </a>
-            {% endif %}
-          </nav>
-        </div>
+          {% endfor %}
+          {% if page_obj.has_next %}
+          <a href="?{{ query_string }}&page={{ page_obj.next_page_number }}"
+             class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
+            </svg>
+          </a>
+          {% endif %}
+        </nav>
       </div>
     </div>
     {% endif %}

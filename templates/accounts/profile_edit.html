@@ -70,7 +70,7 @@
                         file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0
                         file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700
                         hover:file:bg-brand-100 file:cursor-pointer cursor-pointer transition-colors" />
-          <button type="button" onclick="openAvatarCamera()"
+          <button type="button" id="avatar-camera-btn" onclick="openAvatarCamera()"
                   class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
@@ -463,11 +463,22 @@
   }
 
   function openAvatarCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert('Camera access requires a secure connection (HTTPS). Please contact your administrator.');
+      return;
+    }
     document.getElementById('avatar-camera-modal').classList.remove('hidden');
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
       .then(stream => { avatarCameraStream = stream; document.getElementById('avatar-camera-video').srcObject = stream; })
       .catch(err => { alert('Camera not available: ' + err.message); closeAvatarCamera(); });
   }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      const btn = document.getElementById('avatar-camera-btn');
+      if (btn) btn.style.display = 'none';
+    }
+  });
 
   function closeAvatarCamera() {
     if (avatarCameraStream) { avatarCameraStream.getTracks().forEach(t => t.stop()); avatarCameraStream = null; }

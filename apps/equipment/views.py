@@ -94,10 +94,18 @@ def equipment_list_view(request):
         current_borrower_name=Subquery(active_borrow_qs),
     ).order_by('name')
 
+    view_mode = request.GET.get('view', 'grid')
+    per_page = 12 if view_mode == 'grid' else 20
+
     total_count = queryset.count()
-    paginator = Paginator(queryset, 10)
+    paginator = Paginator(queryset, per_page)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+
+    # Query string without 'page' so pagination links can append &page=N cleanly
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    query_string = query_params.urlencode()
 
     return render(request, 'equipment/equipment_list.html', {
         'page_obj': page_obj,
@@ -105,6 +113,8 @@ def equipment_list_view(request):
         'total_count': total_count,
         'categories': Category.objects.all().order_by('name'),
         'locations': Location.objects.all().order_by('name'),
+        'view_mode': view_mode,
+        'query_string': query_string,
     })
 
 
