@@ -11,6 +11,7 @@ LabTrack is a Django-based lab inventory management system. It tracks every piec
 - [Quick Start — Docker with Self-Contained MySQL](#quick-start--docker-with-self-contained-mysql)
 - [Quick Start — Docker with External MySQL](#quick-start--docker-with-external-mysql)
 - [Raspberry Pi Deployment](#raspberry-pi-deployment)
+- [Updating a Docker Deployment](#updating-a-docker-deployment)
 - [Local Development (no Docker)](#local-development-no-docker)
 - [Development with Docker (hot-reload)](#development-with-docker-hot-reload)
 - [Running Tests](#running-tests)
@@ -209,6 +210,49 @@ Access the app at **http://<pi-ip-address>**.
 
 > **Note:** The Pi compose file forces `DB_HOST=""` regardless of what is in `.env`,
 > so the MySQL credentials are ignored even if present.
+
+---
+
+## Updating a Docker Deployment
+
+You can change application code and rebuild containers without losing your MySQL
+database data, as long as you avoid a few destructive commands.
+
+### Why your data is safe
+
+| Action | Result |
+|---|---|
+| Rebuild the `web` container (`--build`) | **Data is safe.** Only the application image is rebuilt; the `mysql_data` volume is untouched. |
+| Add new Django migrations | **Data is safe.** `migrate` runs automatically on every container start and only applies *new* schema changes. Existing rows are never deleted. |
+| Restart containers (`down` / `up`) | **Data is safe.** The `mysql_data` named volume remains on the host and is re-attached automatically. |
+
+### What WILL delete or isolate your data
+
+| Action | Result |
+|---|---|
+| `docker compose [...] down -v` | **All data is permanently deleted.** The `-v` flag destroys the `mysql_data` volume. |
+| `docker volume rm <project>_mysql_data` | **All data is permanently deleted.** |
+| Changing `DB_NAME` or `MYSQL_DATABASE` | A **new empty database** is created inside the same MySQL server. Your old database still exists in the volume but is ignored. |
+
+### Safe update workflow
+
+```bash
+# Pull latest code (or edit files locally)
+git pull
+
+# Rebuild and restart — database is preserved
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml up -d --build
+```
+
+### Back up before major changes
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml exec db \
+    mysqldump -u${DB_USER:-labtrack} -p${DB_PASSWORD:-labtrack} ${DB_NAME:-labtrack} \
+    > backup_$(date +%Y%m%d_%H%M%S).sql
+```
+
+See [Database Backups](#database-backups) for the full backup/restore reference.
 
 ---
 
