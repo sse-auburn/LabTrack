@@ -94,7 +94,7 @@ def equipment_list_view(request):
         current_borrower_name=Subquery(active_borrow_qs),
     ).order_by('name')
 
-    view_mode = request.GET.get('view', 'grid')
+    view_mode = request.GET.get('view', 'list')
     per_page = 12 if view_mode == 'grid' else 20
 
     total_count = queryset.count()
