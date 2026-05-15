@@ -1,8 +1,9 @@
 """Views for the P-Card app."""
 
+import calendar
 import io
 import mimetypes
-from datetime import date
+from datetime import date, timedelta
 
 from django import forms
 from django.contrib import messages
@@ -50,6 +51,16 @@ def _get_filtered_queryset(request):
 @login_required
 def transaction_list_view(request):
     """List all P-Card transactions with optional date filtering."""
+    # Default to current month when no date range has been explicitly set
+    if 'date_from' not in request.GET and 'date_to' not in request.GET:
+        today = date.today()
+        first_day = today.replace(day=1)
+        last_day = today.replace(day=calendar.monthrange(today.year, today.month)[1])
+        params = request.GET.copy()
+        params['date_from'] = first_day.isoformat()
+        params['date_to'] = last_day.isoformat()
+        return redirect(f"{request.path}?{params.urlencode()}")
+
     queryset = _get_filtered_queryset(request)
     total_spent = queryset.aggregate(total=Sum('total_price'))['total']
 
