@@ -70,6 +70,7 @@ def reservation_calendar_view(request):
         year, month = today.year, today.month
 
     equipment_id = request.GET.get('equipment_id', '').strip()
+    kit_id = request.GET.get('kit_id', '').strip()
 
     month_start = date(year, month, 1)
     month_end = date(year, month, calendar.monthrange(year, month)[1])
@@ -88,6 +89,8 @@ def reservation_calendar_view(request):
         qs = qs.filter(
             Q(equipment_id=equipment_id) | Q(kit_id__in=kit_ids)
         )
+    elif kit_id:
+        qs = qs.filter(kit_id=kit_id)
 
     # Index reservations across every day they span within the visible month
     reservations_by_day = defaultdict(list)
@@ -130,6 +133,7 @@ def reservation_calendar_view(request):
 
     month_name = date(year, month, 1).strftime('%B')
 
+    from apps.kits.models import Kit
     return render(request, 'reservations/reservation_calendar.html', {
         'calendar_weeks': calendar_weeks,
         'current_year': year,
@@ -140,6 +144,9 @@ def reservation_calendar_view(request):
         'next_year': next_year,
         'next_month': next_month,
         'equipment_list': Equipment.objects.filter(is_active=True, approval_status='APPROVED').order_by('name'),
+        'kit_list': Kit.objects.filter(is_active=True).order_by('name'),
+        'selected_equipment_id': equipment_id,
+        'selected_kit_id': kit_id,
     })
 
 
