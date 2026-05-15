@@ -2,23 +2,6 @@ version: "3.9"
 
 services:
 
-  # ── MySQL ─────────────────────────────────────────────────────────────────────
-  db:
-    image: mysql:8.0
-    restart: unless-stopped
-    volumes:
-      - mysql_data:/var/lib/mysql
-    environment:
-      MYSQL_DATABASE: ${DB_NAME:-labtrack}
-      MYSQL_USER: ${DB_USER:-labtrack}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-labtrack}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-labtrack}
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   # ── Redis ─────────────────────────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
@@ -45,8 +28,6 @@ services:
     expose:
       - "8000"
     depends_on:
-      db:
-        condition: service_healthy
       redis:
         condition: service_healthy
 
@@ -64,7 +45,6 @@ services:
       - web
 
 volumes:
-  mysql_data:
   redis_data:
   media_data:
   static_data:
