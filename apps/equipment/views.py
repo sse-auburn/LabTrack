@@ -869,10 +869,10 @@ def equipment_availability_json(request):
     from apps.kits.models import Kit
     from apps.reservations.models import Reservation
 
-    equipment_pk = request.GET.get('equipment')
+    equipment_pks = request.GET.getlist('equipment')
     kit_pk = request.GET.get('kit')
 
-    if not equipment_pk and not kit_pk:
+    if not equipment_pks and not kit_pk:
         return JsonResponse({'busy': []})
 
     busy = []
@@ -891,18 +891,17 @@ def equipment_availability_json(request):
         end = mlog.completed_date or start
         busy.append({'start': str(start), 'end': str(end), 'reason': 'maintenance'})
 
-    if equipment_pk:
-        try:
-            Equipment.objects.get(pk=equipment_pk, is_active=True)
-        except Equipment.DoesNotExist:
-            return JsonResponse({'busy': []})
-
-        for br in BorrowRequest.objects.filter(equipment_id=equipment_pk, status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING']):
-            add_borrow(br)
-        for res in Reservation.objects.filter(equipment_id=equipment_pk, status__in=['CONFIRMED', 'PENDING']):
-            add_reservation(res)
-        for mlog in MaintenanceLog.objects.filter(equipment_id=equipment_pk, status__in=['SCHEDULED', 'IN_PROGRESS']):
-            add_maintenance(mlog)
+    if equipment_pks:
+        valid_pks = list(
+            Equipment.objects.filter(pk__in=equipment_pks, is_active=True).values_list('pk', flat=True)
+        )
+        for equipment_pk in valid_pks:
+            for br in BorrowRequest.objects.filter(equipment_id=equipment_pk, status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING']):
+                add_borrow(br)
+            for res in Reservation.objects.filter(equipment_id=equipment_pk, status__in=['CONFIRMED', 'PENDING']):
+                add_reservation(res)
+            for mlog in MaintenanceLog.objects.filter(equipment_id=equipment_pk, status__in=['SCHEDULED', 'IN_PROGRESS']):
+                add_maintenance(mlog)
 
     else:
         try:
