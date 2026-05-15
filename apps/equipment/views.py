@@ -601,13 +601,9 @@ def equipment_move_view(request, pk):
 def category_list_view(request):
     """List all equipment categories."""
     categories = Category.objects.order_by('name')
-    paginator = Paginator(categories, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
 
     return render(request, 'equipment/category_list.html', {
-        'page_obj': page_obj,
-        'categories': page_obj,
+        'categories': categories,
     })
 
 
