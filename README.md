@@ -10,7 +10,8 @@ LabTrack is a Django-based lab inventory management system. It tracks every piec
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
-- [Quick Start — Docker (Production)](#quick-start--docker-production)
+- [Quick Start — Docker with Self-Contained MySQL](#quick-start--docker-with-self-contained-mysql)
+- [Quick Start — Docker with External MySQL](#quick-start--docker-with-external-mysql)
 - [Raspberry Pi Deployment](#raspberry-pi-deployment)
 - [Local Development (no Docker)](#local-development-no-docker)
 - [Development with Docker (hot-reload)](#development-with-docker-hot-reload)
@@ -58,7 +59,10 @@ LabTrack is a Django-based lab inventory management system. It tracks every piec
 
 ---
 
-## Quick Start — Docker (Production)
+## Quick Start — Docker with Self-Contained MySQL
+
+The easiest way to get the full stack running locally. MySQL runs as its own
+container alongside the app — no external database required.
 
 ### Prerequisites
 
@@ -82,7 +86,9 @@ Edit `.env` and set at minimum:
 
 ```env
 SECRET_KEY=<run: python -c "import secrets; print(secrets.token_urlsafe(50))">
+DB_HOST=db
 DB_PASSWORD=a-strong-database-password
+MYSQL_ROOT_PASSWORD=a-strong-root-password
 SITE_URL=http://localhost        # or your public domain
 ```
 
@@ -91,7 +97,7 @@ See [Environment Variables](#environment-variables) for the full reference.
 ### 3. Build and start
 
 ```bash
-docker compose up --build -d
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml up --build -d
 ```
 
 Four containers start:
@@ -109,7 +115,7 @@ Migrations and `collectstatic` run automatically on every start.
 ### 4. Create the first admin account
 
 ```bash
-docker compose exec web python manage.py createsuperuser
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml exec web python manage.py createsuperuser
 ```
 
 ### 5. Open the app
@@ -121,20 +127,67 @@ docker compose exec web python manage.py createsuperuser
 
 ```bash
 # Follow logs from the web container
-docker compose logs -f web
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml logs -f web
 
 # Run any management command
-docker compose exec web python manage.py <command>
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml exec web python manage.py <command>
 
 # Open a Django shell
-docker compose exec web python manage.py shell
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml exec web python manage.py shell
 
 # Stop all containers
-docker compose down
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml down
 
 # Stop and delete all data (full reset, irreversible)
-docker compose down -v
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml down -v
 ```
+
+---
+
+## Quick Start — Docker with External MySQL
+
+Use this when you already have a MySQL server running outside of Docker (e.g.
+a managed cloud database or an existing on-premise server).
+
+### 1–2. Clone and configure (same as above)
+
+Follow steps 1 and 2 from the section above, but set `DB_HOST` to your external
+MySQL host instead of `db`:
+
+```env
+SECRET_KEY=<long-random-string>
+DB_HOST=your-mysql-host-or-ip
+DB_PORT=3306
+DB_NAME=labtrack
+DB_USER=labtrack
+DB_PASSWORD=a-strong-database-password
+SITE_URL=http://localhost
+```
+
+### 3. Build and start
+
+```bash
+docker compose up --build -d
+```
+
+Three containers start (`db` is not included):
+
+| Container | Role |
+|---|---|
+| `redis` | Redis 7, persisted in the `redis_data` volume |
+| `web` | Django + Gunicorn on port 8000 (internal only) |
+| `nginx` | Reverse proxy, port 80 (public) |
+
+### 4. Create the first admin account
+
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
+### 5. Open the app
+
+- Application: **http://localhost**
+- Django back-office: **http://localhost/backoffice/**
 
 ---
 
@@ -255,11 +308,12 @@ The `.env.example` file documents every variable with its default.
 | `DEBUG` | `True` | Set to `False` in production. |
 | `ALLOWED_HOSTS` | `localhost,127.0.0.1` | Comma-separated list of allowed hostnames. |
 | **Database** | | |
-| `DB_HOST` | _(empty)_ | MySQL host. Leave blank to use SQLite. |
+| `DB_HOST` | _(empty)_ | MySQL host. Leave blank to use SQLite. Set to `db` when using `docker-compose.mysql.yml`. |
 | `DB_PORT` | `3306` | MySQL port. |
 | `DB_NAME` | `labtrack` | MySQL database name. |
 | `DB_USER` | `labtrack` | MySQL username. |
 | `DB_PASSWORD` | _(empty)_ | MySQL password. |
+| `MYSQL_ROOT_PASSWORD` | _(empty)_ | MySQL root password. Required only when using `docker-compose.mysql.yml` (containerised MySQL). |
 | **Redis / Celery** | | |
 | `REDIS_URL` | `redis://localhost:6379/0` | Redis connection URL. |
 | **Email** | | |
@@ -360,13 +414,19 @@ docker compose exec web python manage.py mark_overdue_borrows
 
 ## Database Backups
 
+If you are using the self-contained MySQL setup (`docker-compose.mysql.yml`), include
+both `-f` flags in every command below. If you are using an external MySQL server,
+run `mysqldump` / `mysql` directly against that host instead.
+
 ```bash
 # Create a mysqldump backup from the running container
-docker compose exec db mysqldump -u${DB_USER:-labtrack} -p${DB_PASSWORD:-labtrack} ${DB_NAME:-labtrack} \
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml exec db \
+    mysqldump -u${DB_USER:-labtrack} -p${DB_PASSWORD:-labtrack} ${DB_NAME:-labtrack} \
     > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Restore from backup
-docker compose exec -T db mysql -u${DB_USER:-labtrack} -p${DB_PASSWORD:-labtrack} ${DB_NAME:-labtrack} \
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml exec -T db \
+    mysql -u${DB_USER:-labtrack} -p${DB_PASSWORD:-labtrack} ${DB_NAME:-labtrack} \
     < backup_20250101_120000.sql
 ```
 
@@ -425,12 +485,17 @@ print('Sent OK')
 ### Web container exits immediately or migrations fail
 
 ```bash
+# Self-contained MySQL setup
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml logs web
+
+# External MySQL setup
 docker compose logs web
 ```
 
 Common causes:
-- `DB_HOST` is set but MySQL hasn't finished starting — run `docker compose restart web` after a few seconds.
-- Mismatched `DB_PASSWORD` between `.env` and the `db` service.
+- `DB_HOST` is set but MySQL hasn't finished starting — wait a few seconds and restart: `docker compose [-f ...] restart web`.
+- Mismatched `DB_PASSWORD` (or `MYSQL_ROOT_PASSWORD`) between `.env` and the `db` service.
+- When using `docker-compose.mysql.yml`, the `db` healthcheck must pass before `web` starts — check `docker compose [...] ps` to confirm `db` is healthy.
 
 ### Static files return 404
 
@@ -479,8 +544,14 @@ is forwarded correctly from Nginx. The provided `nginx/nginx.conf` already sets
 ### Full development reset
 
 ```bash
-docker compose down -v          # deletes all volumes including the database
-docker compose up -d            # fresh start; migrations run automatically
+# Self-contained MySQL setup
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml down -v
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml exec web python manage.py createsuperuser
+
+# External MySQL setup
+docker compose down -v
+docker compose up -d
 docker compose exec web python manage.py createsuperuser
 ```
 

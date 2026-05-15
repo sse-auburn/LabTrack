@@ -1,0 +1,44 @@
+version: "3.9"
+
+# Adds a containerised MySQL 8 service so the full stack runs without an
+# external database.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.mysql.yml up --build
+#
+# Make sure your .env contains:
+#   DB_HOST=db
+#   DB_NAME=labtrack       (or whatever you want)
+#   DB_USER=labtrack
+#   DB_PASSWORD=<password>
+#   MYSQL_ROOT_PASSWORD=<root-password>
+
+services:
+
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-labtrack}
+      MYSQL_USER: ${DB_USER:-labtrack}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "--password=${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  web:
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
