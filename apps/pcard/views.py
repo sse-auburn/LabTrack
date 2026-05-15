@@ -410,14 +410,14 @@ def export_excel_view(request):
 def _make_receipt_image_page(image_bytes):
     """Return a single-page PDF (bytes) with just the receipt image fitted to the page."""
     from PIL import Image as PILImage
+    from reportlab.lib.utils import ImageReader
 
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=letter)
     width, height = letter
     margin = 0.5 * inch
 
-    img_buf = io.BytesIO(image_bytes)
-    pil_img = PILImage.open(img_buf)
+    pil_img = PILImage.open(io.BytesIO(image_bytes))
     img_w, img_h = pil_img.size
 
     # Fit inside page while keeping aspect ratio
@@ -429,7 +429,9 @@ def _make_receipt_image_page(image_bytes):
     x = (width - draw_w) / 2
     y = (height - draw_h) / 2
 
-    c.drawImage(img_buf, x, y, width=draw_w, height=draw_h)
+    # Use ImageReader so reportlab reads from the PIL object directly,
+    # avoiding a seek issue on a previously-consumed BytesIO.
+    c.drawImage(ImageReader(pil_img), x, y, width=draw_w, height=draw_h)
     c.showPage()
     c.save()
     buf.seek(0)
@@ -439,35 +441,22 @@ def _make_receipt_image_page(image_bytes):
 @login_required
 def export_pdf_view(request):
     """Export a compiled PDF containing only the receipt images/PDFs."""
-    queryset = _get_filtered_queryset(request)
-    transactions = list(queryset)
+    from apps.files.models import StoredFile
 
+    queryset = _get_filtered_queryset(request)
     writer = PdfWriter()
 
-    for tx in transactions:
+    for tx in queryset:
         if not tx.receipt_file:
             continue
 
-        receipt_name = tx.receipt_file.name
-        receipt_mime = None
         try:
-            stored_pk = int(receipt_name)
-            from apps.files.models import StoredFile
-            stored = StoredFile.objects.filter(pk=stored_pk).first()
-            if stored and stored.mimetype:
-                receipt_mime = stored.mimetype
-        except (ValueError, TypeError):
-            pass
-        if not receipt_mime:
-            receipt_mime, _ = mimetypes.guess_type(receipt_name)
-        if not receipt_mime:
-            receipt_mime = 'application/octet-stream'
-
-        try:
-            tx.receipt_file.seek(0)
-            receipt_data = tx.receipt_file.read()
-        except Exception:
+            stored = StoredFile.objects.get(pk=int(tx.receipt_file.name))
+        except (ValueError, TypeError, StoredFile.DoesNotExist):
             continue
+
+        receipt_data = bytes(stored.data)
+        receipt_mime = stored.mimetype or mimetypes.guess_type(stored.filename)[0] or ''
 
         if receipt_mime.startswith('image/'):
             try:

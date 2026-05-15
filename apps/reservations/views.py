@@ -55,7 +55,10 @@ def reservation_list_view(request):
 def reservation_calendar_view(request):
     """Render a month-grid calendar of reservations."""
     import calendar
-    from datetime import date
+    from collections import defaultdict
+    from datetime import date, timedelta
+
+    from django.db.models import Q
 
     today = date.today()
     try:
@@ -68,20 +71,33 @@ def reservation_calendar_view(request):
 
     equipment_id = request.GET.get('equipment_id', '').strip()
 
+    month_start = date(year, month, 1)
+    month_end = date(year, month, calendar.monthrange(year, month)[1])
+
     qs = Reservation.objects.filter(
         status__in=['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'EXPIRED'],
+        start_date__lte=month_end,
+        end_date__gte=month_start,
     ).select_related('equipment', 'kit', 'requester')
 
     if equipment_id:
-        qs = qs.filter(equipment_id=equipment_id)
+        from apps.kits.models import KitItem
+        kit_ids = KitItem.objects.filter(
+            equipment_id=equipment_id
+        ).values_list('kit_id', flat=True)
+        qs = qs.filter(
+            Q(equipment_id=equipment_id) | Q(kit_id__in=kit_ids)
+        )
 
-    # Index reservations by day they fall on
-    from collections import defaultdict
+    # Index reservations across every day they span within the visible month
     reservations_by_day = defaultdict(list)
     for res in qs:
-        d = res.start_date
-        if d.year == year and d.month == month:
-            reservations_by_day[d.day].append(res)
+        span_start = max(res.start_date, month_start)
+        span_end = min(res.end_date, month_end)
+        current = span_start
+        while current <= span_end:
+            reservations_by_day[current.day].append(res)
+            current += timedelta(days=1)
 
     # Build week grid (Monday-first)
     cal = calendar.monthcalendar(year, month)
