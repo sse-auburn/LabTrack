@@ -3,14 +3,16 @@
 from datetime import date, timedelta
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.shortcuts import redirect, render
 
 from apps.activity.models import ActivityLog
 from apps.borrowing.models import BorrowRequest, KitItemReturnApproval
 from apps.equipment.models import Equipment
 from apps.incidents.models import IncidentReport
+from apps.kits.models import Kit
 from apps.notifications.models import Notification
+from apps.projects.models import Project
 from apps.reservations.models import Reservation
 
 
@@ -94,6 +96,11 @@ def dashboard_home_view(request):
             status__in=['OPEN', 'INVESTIGATING']
         ).count()
 
+        total_kits = Kit.objects.filter(is_active=True).count()
+        shared_kits = Kit.objects.filter(is_active=True, is_shared=True).count()
+        total_projects = Project.objects.count()
+        active_projects = Project.objects.filter(status='ACTIVE').count()
+
         overdue_borrows = BorrowRequest.objects.filter(
             due_date__lt=today,
             status__in=['APPROVED', 'ACTIVE'],
@@ -101,52 +108,18 @@ def dashboard_home_view(request):
 
         system_activity = ActivityLog.objects.select_related('actor').order_by('-timestamp')[:15]
 
-        most_borrowed = (
-            BorrowRequest.objects
-            .exclude(equipment__isnull=True)
-            .values('equipment__name')
-            .annotate(count=Count('id'))
-            .order_by('-count')[:5]
-        )
-
-        category_usage = (
-            BorrowRequest.objects
-            .exclude(equipment__isnull=True)
-            .exclude(equipment__category__isnull=True)
-            .values('equipment__category__name')
-            .annotate(count=Count('id'))
-            .order_by('-count')[:5]
-        )
-
-        monthly_borrows = []
-        for i in range(5, -1, -1):
-            month_offset = today.month - i
-            year_offset = today.year
-            while month_offset <= 0:
-                month_offset += 12
-                year_offset -= 1
-            month_start = date(year_offset, month_offset, 1)
-            if month_offset == 12:
-                month_end = date(year_offset + 1, 1, 1) - timedelta(days=1)
-            else:
-                month_end = date(year_offset, month_offset + 1, 1) - timedelta(days=1)
-            count = BorrowRequest.objects.filter(
-                requested_date__date__gte=month_start,
-                requested_date__date__lte=month_end,
-            ).count()
-            monthly_borrows.append({'month': month_start.strftime('%b %Y'), 'count': count})
-
         context.update({
             'total_equipment': total_equipment,
             'available_equipment': available_equipment,
             'pending_equipment': pending_equipment,
             'pending_approvals': pending_approvals,
             'open_incidents': open_incidents,
+            'total_kits': total_kits,
+            'shared_kits': shared_kits,
+            'total_projects': total_projects,
+            'active_projects': active_projects,
             'overdue_borrows': overdue_borrows,
             'system_activity': system_activity,
-            'most_borrowed': most_borrowed,
-            'category_usage': category_usage,
-            'monthly_borrows': monthly_borrows,
         })
 
     return render(request, 'dashboard/home.html', context)
