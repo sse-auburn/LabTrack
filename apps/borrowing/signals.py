@@ -42,7 +42,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
         notify_admins(
             title='New Borrow Request',
             message=(
-                f"{instance.borrower.username} has requested to borrow "
+                f"{instance.borrower.full_name} has requested to borrow "
                 f"'{item_name}'. Please review."
             ),
             level='info',
@@ -52,7 +52,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
         log_activity(
             actor=instance.borrower,
             action='BORROW_REQUESTED',
-            description=f"{instance.borrower.username} requested to borrow '{item_name}'.",
+            description=f"{instance.borrower.full_name} requested to borrow '{item_name}'.",
             content_type_label='borrowrequest',
             object_id=instance.pk,
             object_repr=str(instance),
@@ -77,7 +77,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
             action='BORROW_APPROVED',
             description=(
                 f"Borrow request for '{item_name}' by "
-                f"{instance.borrower.username} was approved."
+                f"{instance.borrower.full_name} was approved."
             ),
             content_type_label='borrowrequest',
             object_id=instance.pk,
@@ -98,7 +98,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
             action='BORROW_REJECTED',
             description=(
                 f"Borrow request for '{item_name}' by "
-                f"{instance.borrower.username} was rejected."
+                f"{instance.borrower.full_name} was rejected."
             ),
             content_type_label='borrowrequest',
             object_id=instance.pk,
@@ -117,7 +117,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
         log_activity(
             actor=instance.borrower,
             action='BORROW_RETURNED',
-            description=f"'{item_name}' returned by {instance.borrower.username}.",
+            description=f"'{item_name}' returned by {instance.borrower.full_name}.",
             content_type_label='borrowrequest',
             object_id=instance.pk,
             object_repr=str(instance),
@@ -138,7 +138,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
         notify_admins(
             title='Overdue Borrow Alert',
             message=(
-                f"{instance.borrower.username}'s borrow of '{item_name}' "
+                f"{instance.borrower.full_name}'s borrow of '{item_name}' "
                 f"is now overdue (due: {instance.due_date})."
             ),
             level='warning',
@@ -149,7 +149,7 @@ def handle_borrow_request_status_change(sender, instance, created, **kwargs):
             actor=instance.borrower,
             action='BORROW_OVERDUE',
             description=(
-                f"Borrow of '{item_name}' by {instance.borrower.username} "
+                f"Borrow of '{item_name}' by {instance.borrower.full_name} "
                 f"is overdue (due: {instance.due_date})."
             ),
             content_type_label='borrowrequest',

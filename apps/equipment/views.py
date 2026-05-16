@@ -5,8 +5,7 @@ import json
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import OuterRef, Q, Subquery, Value
-from django.db.models.functions import Concat
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -77,27 +76,7 @@ def equipment_list_view(request):
     if condition:
         queryset = queryset.filter(condition=condition)
 
-    from apps.borrowing.models import BorrowRequest
-
-    # Annotate each item with the current user's active borrow PK (for Return button)
-    user_borrow_qs = BorrowRequest.objects.filter(
-        equipment=OuterRef('pk'),
-        borrower=user,
-        status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING'],
-    ).values('pk')[:1]
-
-    # Annotate with the name of whoever currently has it borrowed
-    active_borrow_qs = BorrowRequest.objects.filter(
-        equipment=OuterRef('pk'),
-        status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING'],
-    ).annotate(
-        borrower_name=Concat('borrower__first_name', Value(' '), 'borrower__last_name'),
-    ).values('borrower_name')[:1]
-
-    queryset = queryset.annotate(
-        user_active_borrow_pk=Subquery(user_borrow_qs),
-        current_borrower_name=Subquery(active_borrow_qs),
-    ).order_by('name')
+    queryset = queryset.order_by('name')
 
     view_mode = request.GET.get('view', 'list')
     per_page = 12 if view_mode == 'grid' else 20
@@ -143,10 +122,11 @@ def equipment_detail_view(request, pk):
         messages.error(request, 'This equipment is awaiting approval and is not yet visible.')
         return redirect('equipment:list')
 
-    # Borrow history (equipment-specific requests)
-    borrow_history = equipment.borrow_requests.select_related(
-        'borrower', 'approved_by'
-    ).order_by('-requested_date')[:10]
+    # Reservation history for this equipment
+    from apps.reservations.models import Reservation
+    reservation_history = Reservation.objects.filter(
+        equipment=equipment
+    ).select_related('requester').order_by('-start_date')[:10]
 
     # Lifecycle timeline (latest first)
     lifecycle_events = equipment.lifecycle_events.select_related('performed_by').order_by('-timestamp')[:10]
@@ -163,21 +143,11 @@ def equipment_detail_view(request, pk):
     # Form for adding a lifecycle note inline
     lifecycle_form = LifecycleEventForm(initial={'equipment': equipment})
 
-    # Calendar events (borrows + reservations)
-    from apps.reservations.models import Reservation
+    # Calendar events (reservations only)
     cal_events = []
-    for b in equipment.borrow_requests.filter(
-        status__in=['PENDING', 'APPROVED', 'ACTIVE', 'RETURN_PENDING']
-    ).select_related('borrower'):
-        cal_events.append({
-            'start': b.requested_date.date().isoformat(),
-            'end': b.due_date.isoformat(),
-            'type': 'borrow',
-            'status': b.status,
-            'label': b.borrower.full_name if b.borrower else '',
-        })
     for r in Reservation.objects.filter(
-        equipment=equipment, status__in=['PENDING', 'CONFIRMED']
+        equipment=equipment,
+        status__in=['PENDING', 'CONFIRMED', 'ACTIVE', 'RETURN_PENDING'],
     ).select_related('requester'):
         cal_events.append({
             'start': r.start_date.isoformat(),
@@ -189,7 +159,7 @@ def equipment_detail_view(request, pk):
 
     return render(request, 'equipment/equipment_detail.html', {
         'equipment': equipment,
-        'borrow_history': borrow_history,
+        'reservation_history': reservation_history,
         'lifecycle_events': lifecycle_events,
         'movement_logs': movement_logs,
         'incidents': incidents,
@@ -894,7 +864,6 @@ def equipment_availability_json(request):
     Query params: ?equipment=<pk>  OR  ?kit=<pk>
     Response: {"busy": [{"start": "YYYY-MM-DD", "end": "YYYY-MM-DD", "reason": "..."}]}
     """
-    from apps.borrowing.models import BorrowRequest
     from apps.incidents.models import MaintenanceLog
     from apps.kits.models import Kit
     from apps.reservations.models import Reservation
@@ -907,11 +876,6 @@ def equipment_availability_json(request):
 
     busy = []
     today = timezone.now().date()
-
-    def add_borrow(br):
-        start = br.requested_date.date() if br.requested_date else today
-        end = br.due_date or start
-        busy.append({'start': str(start), 'end': str(end), 'reason': 'borrowed'})
 
     def add_reservation(res):
         busy.append({'start': str(res.start_date), 'end': str(res.end_date), 'reason': 'reserved'})
@@ -926,9 +890,7 @@ def equipment_availability_json(request):
             Equipment.objects.filter(pk__in=equipment_pks, is_active=True).values_list('pk', flat=True)
         )
         for equipment_pk in valid_pks:
-            for br in BorrowRequest.objects.filter(equipment_id=equipment_pk, status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING']):
-                add_borrow(br)
-            for res in Reservation.objects.filter(equipment_id=equipment_pk, status__in=['CONFIRMED', 'PENDING']):
+            for res in Reservation.objects.filter(equipment_id=equipment_pk, status__in=['CONFIRMED', 'ACTIVE', 'PENDING', 'RETURN_PENDING']):
                 add_reservation(res)
             for mlog in MaintenanceLog.objects.filter(equipment_id=equipment_pk, status__in=['SCHEDULED', 'IN_PROGRESS']):
                 add_maintenance(mlog)
@@ -939,18 +901,12 @@ def equipment_availability_json(request):
         except Kit.DoesNotExist:
             return JsonResponse({'busy': []})
 
-        # Kit-level borrows and reservations
-        for br in BorrowRequest.objects.filter(kit_id=kit_pk, status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING']):
-            add_borrow(br)
-        for res in Reservation.objects.filter(kit_id=kit_pk, status__in=['CONFIRMED', 'PENDING']):
+        for res in Reservation.objects.filter(kit_id=kit_pk, status__in=['CONFIRMED', 'ACTIVE', 'PENDING', 'RETURN_PENDING']):
             add_reservation(res)
 
-        # Per-item equipment borrows, reservations, maintenance
         eq_pks = list(kit_obj.items.values_list('equipment__pk', flat=True))
         for eq_pk in eq_pks:
-            for br in BorrowRequest.objects.filter(equipment_id=eq_pk, status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING']):
-                add_borrow(br)
-            for res in Reservation.objects.filter(equipment_id=eq_pk, status__in=['CONFIRMED', 'PENDING']):
+            for res in Reservation.objects.filter(equipment_id=eq_pk, status__in=['CONFIRMED', 'ACTIVE', 'PENDING', 'RETURN_PENDING']):
                 add_reservation(res)
             for mlog in MaintenanceLog.objects.filter(equipment_id=eq_pk, status__in=['SCHEDULED', 'IN_PROGRESS']):
                 add_maintenance(mlog)

@@ -53,7 +53,7 @@ class BorrowRequest(models.Model):
 
     def __str__(self):
         item = self.equipment or self.kit
-        return f"{self.borrower.username} borrowed {item} ({self.status})"
+        return f"{self.borrower.full_name} borrowed {item} ({self.status})"
 
     @property
     def is_overdue(self):

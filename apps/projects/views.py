@@ -108,7 +108,7 @@ def project_create_view(request):
             log_activity(
                 actor=request.user,
                 action='PROJECT_CREATED',
-                description=f'{request.user.username} created project "{project.name}"',
+                description=f'{request.user.full_name or request.user.username} created project "{project.name}"',
                 content_type_label='project',
                 object_id=project.pk,
                 object_repr=str(project),
@@ -166,7 +166,7 @@ def project_edit_view(request, pk):
             log_activity(
                 actor=request.user,
                 action='PROJECT_UPDATED',
-                description=f'{request.user.username} updated project "{project.name}"',
+                description=f'{request.user.full_name or request.user.username} updated project "{project.name}"',
                 content_type_label='project',
                 object_id=project.pk,
                 object_repr=str(project),
@@ -216,7 +216,7 @@ def project_delete_view(request, pk):
         log_activity(
             actor=request.user,
             action='PROJECT_DELETED',
-            description=f'{request.user.username} deleted project "{project_name}"',
+            description=f'{request.user.full_name or request.user.username} deleted project "{project_name}"',
             content_type_label='project',
             object_id=pk,
             object_repr=project_name,
@@ -261,7 +261,7 @@ def project_member_add_view(request, pk):
                 actor=request.user,
                 action='PROJECT_UPDATED',
                 description=(
-                    f'{request.user.username} added {membership.user.username} '
+                    f'{request.user.full_name or request.user.username} added {membership.user.full_name} '
                     f'to project "{project.name}" as {membership.get_role_display()}'
                 ),
                 content_type_label='project',
@@ -274,7 +274,7 @@ def project_member_add_view(request, pk):
                 title='Project Member Added',
                 message=(
                     f'{request.user.full_name or request.user.username} added '
-                    f'{membership.user.username} to project "{project.name}".'
+                    f'{membership.user.full_name} to project "{project.name}".'
                 ),
                 level='info',
                 link=f'/projects/{project.pk}/',
@@ -283,7 +283,7 @@ def project_member_add_view(request, pk):
 
             messages.success(
                 request,
-                f'{membership.user.username} added to project "{project.name}".'
+                f'{membership.user.full_name} added to project "{project.name}".'
             )
             return redirect('projects:detail', pk=project.pk)
     else:
@@ -321,14 +321,14 @@ def project_member_remove_view(request, pk, mem_pk):
             return redirect('projects:detail', pk=project.pk)
 
     if request.method == 'POST':
-        username = membership.user.username
+        username = membership.user.full_name
         membership.delete()
 
         log_activity(
             actor=request.user,
             action='PROJECT_UPDATED',
             description=(
-                f'{request.user.username} removed {username} '
+                f'{request.user.full_name or request.user.username} removed {username} '
                 f'from project "{project.name}"'
             ),
             content_type_label='project',

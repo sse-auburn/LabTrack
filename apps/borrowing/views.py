@@ -292,7 +292,7 @@ def borrow_return_view(request, pk):
                 actor=request.user,
                 action='BORROW_RETURN_SUBMITTED',
                 description=(
-                    f'{request.user.username} submitted return for {borrow.item} '
+                    f'{request.user.full_name or request.user.username} submitted return for {borrow.item} '
                     f'(condition: {borrow.return_condition})'
                 ),
                 content_type_label='borrowrequest',
@@ -404,7 +404,7 @@ def borrow_return_confirm_view(request, pk):
         log_activity(
             actor=request.user,
             action='BORROW_RETURNED',
-            description=f'{request.user.username} confirmed return of {borrow.item}',
+            description=f'{request.user.full_name or request.user.username} confirmed return of {borrow.item}',
             content_type_label='borrowrequest',
             object_id=borrow.pk,
             object_repr=str(borrow),
@@ -458,7 +458,7 @@ def kit_item_return_confirm_view(request, approval_pk):
             actor=request.user,
             action='BORROW_RETURNED',
             description=(
-                f'{request.user.username} confirmed return of '
+                f'{request.user.full_name or request.user.username} confirmed return of '
                 f'"{approval.equipment.name}" from kit "{borrow.kit}"'
             ),
             content_type_label='borrowrequest',
@@ -606,8 +606,8 @@ def borrow_owner_reclaim_view(request, pk):
             actor=request.user,
             action='BORROW_RETURNED',
             description=(
-                f'{request.user.username} reclaimed "{borrow.equipment.name}" '
-                f'from {borrow.borrower.username}'
+                f'{request.user.full_name or request.user.username} reclaimed "{borrow.equipment.name}" '
+                f'from {borrow.borrower.full_name}'
             ),
             content_type_label='borrowrequest',
             object_id=borrow.pk,
@@ -650,7 +650,7 @@ def borrow_request_delete_view(request, pk):
         log_activity(
             actor=request.user,
             action='BORROW_DELETED',
-            description=f'{request.user.username} deleted borrow request for {item_name}',
+            description=f'{request.user.full_name or request.user.username} deleted borrow request for {item_name}',
             content_type_label='borrowrequest',
             object_id=pk,
             object_repr=item_name,

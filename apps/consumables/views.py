@@ -180,7 +180,7 @@ def log_usage_view(request, pk):
                 actor=request.user,
                 action='CONSUMABLE_USED',
                 description=(
-                    f'{request.user.username} used {usage_log.quantity_used} '
+                    f'{request.user.full_name or request.user.username} used {usage_log.quantity_used} '
                     f'{consumable.unit} of "{consumable.name}".'
                 ),
                 content_type_label='consumableusagelog',
@@ -233,7 +233,7 @@ def restock_view(request, pk):
                 actor=request.user,
                 action='CONSUMABLE_RESTOCKED',
                 description=(
-                    f'{request.user.username} restocked "{consumable.name}" '
+                    f'{request.user.full_name or request.user.username} restocked "{consumable.name}" '
                     f'by {qty} {consumable.unit}. Notes: {notes}'
                 ),
                 content_type_label='consumable',

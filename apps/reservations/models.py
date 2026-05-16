@@ -10,6 +10,7 @@ class Reservation(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
         ('CONFIRMED', 'Confirmed'),
+        ('ACTIVE', 'Active'),
         ('RETURN_PENDING', 'Return Pending'),
         ('RETURNED', 'Returned'),
         ('CANCELLED', 'Cancelled'),
@@ -43,13 +44,23 @@ class Reservation(models.Model):
     returned_date = models.DateTimeField(null=True, blank=True)
     return_condition = models.CharField(max_length=20, blank=True)
     return_notes = models.TextField(blank=True)
+    return_approved_by = models.ForeignKey(
+        'accounts.CustomUser',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='approved_returns',
+    )
+    return_approved_at = models.DateTimeField(null=True, blank=True)
+    start_notified = models.BooleanField(default=False)
+    end_notified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         item = self.equipment or self.kit
         return (
-            f"{self.requester.username} reserved {item} "
+            f"{self.requester.full_name} reserved {item} "
             f"({self.start_date} to {self.end_date})"
         )
 
@@ -89,7 +100,7 @@ class WaitlistEntry(models.Model):
 
     def __str__(self):
         item = self.equipment or self.kit
-        return f"{self.user.username} on waitlist for {item} (position {self.position})"
+        return f"{self.user.full_name} on waitlist for {item} (position {self.position})"
 
     class Meta:
         ordering = ['created_at']

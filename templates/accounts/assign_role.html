@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Assign Role – {{ target_user.username }} – SSELabTrack{% endblock %}
+{% block title %}Assign Role – {{ target_user.full_name }} – SSELabTrack{% endblock %}
 {% block content %}
 <div class="max-w-md mx-auto">
   <div class="mb-6">
@@ -9,7 +9,7 @@
   <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
     <div class="mb-4 p-4 bg-gray-50 rounded-lg flex items-center gap-3">
       <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
-        {{ target_user.username|first|upper }}
+        {{ target_user.get_initials }}
       </div>
       <div>
         <p class="text-sm font-medium text-gray-900">{{ target_user.full_name }}</p>

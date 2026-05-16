@@ -75,7 +75,7 @@ def incident_create_view(request):
                 actor=request.user,
                 action='INCIDENT_REPORTED',
                 description=(
-                    f'{request.user.username} reported incident "{incident.title}" '
+                    f'{request.user.full_name or request.user.username} reported incident "{incident.title}" '
                     f'on {incident.equipment.name} (severity: {incident.severity}).'
                 ),
                 content_type_label='incidentreport',
@@ -87,7 +87,7 @@ def incident_create_view(request):
             notify_admins(
                 title=f'New Incident Reported: {incident.title}',
                 message=(
-                    f'{request.user.username} reported a {incident.get_severity_display()} '
+                    f'{request.user.full_name or request.user.username} reported a {incident.get_severity_display()} '
                     f'incident on "{incident.equipment.name}": {incident.title}.'
                 ),
                 level='warning' if incident.severity in ('HIGH', 'CRITICAL') else 'info',
@@ -135,7 +135,7 @@ def incident_edit_view(request, pk):
             log_activity(
                 actor=request.user,
                 action='INCIDENT_REPORTED',
-                description=f'Incident "{incident.title}" updated by {request.user.username}.',
+                description=f'Incident "{incident.title}" updated by {request.user.full_name or request.user.username}.',
                 content_type_label='incidentreport',
                 object_id=incident.pk,
                 object_repr=str(incident),
@@ -192,7 +192,7 @@ def incident_resolve_view(request, pk):
                 action='INCIDENT_RESOLVED',
                 description=(
                     f'Incident "{incident.title}" marked as {incident.get_status_display()} '
-                    f'by {request.user.username}.'
+                    f'by {request.user.full_name or request.user.username}.'
                 ),
                 content_type_label='incidentreport',
                 object_id=incident.pk,
@@ -245,7 +245,7 @@ def incident_assign_view(request, pk):
                 description=(
                     f'Incident "{incident.title}" assigned to '
                     f'{incident.assigned_to.full_name if incident.assigned_to else "nobody"} '
-                    f'by {request.user.username}.'
+                    f'by {request.user.full_name or request.user.username}.'
                 ),
                 content_type_label='incidentreport',
                 object_id=incident.pk,
@@ -394,7 +394,7 @@ def maintenance_complete_view(request, pk):
                 action='MAINTENANCE_COMPLETED',
                 description=(
                     f'Maintenance for "{log.equipment.name}" marked as '
-                    f'{log.get_status_display()} by {request.user.username}.'
+                    f'{log.get_status_display()} by {request.user.full_name or request.user.username}.'
                 ),
                 content_type_label='maintenancelog',
                 object_id=log.pk,
@@ -512,7 +512,7 @@ def incident_delete_view(request, pk):
         log_activity(
             actor=request.user,
             action='INCIDENT_DELETED',
-            description=f'{request.user.username} deleted incident "{title}"',
+            description=f'{request.user.full_name or request.user.username} deleted incident "{title}"',
             content_type_label='incidentreport',
             object_id=pk,
             object_repr=title,
@@ -553,7 +553,7 @@ def maintenance_delete_view(request, pk):
         log_activity(
             actor=request.user,
             action='MAINTENANCE_DELETED',
-            description=f'{request.user.username} deleted maintenance log for "{equipment_name}"',
+            description=f'{request.user.full_name or request.user.username} deleted maintenance log for "{equipment_name}"',
             content_type_label='maintenancelog',
             object_id=pk,
             object_repr=equipment_name,
@@ -589,7 +589,7 @@ def calibration_delete_view(request, pk):
         log_activity(
             actor=request.user,
             action='OTHER',
-            description=f'{request.user.username} deleted calibration log for "{equipment_name}"',
+            description=f'{request.user.full_name or request.user.username} deleted calibration log for "{equipment_name}"',
             content_type_label='calibrationlog',
             object_id=pk,
             object_repr=equipment_name,

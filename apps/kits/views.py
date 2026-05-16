@@ -35,30 +35,21 @@ def kit_list_view(request):
 
 @login_required
 def kit_detail_view(request, pk):
-    """Show kit details including its items and borrow history."""
+    """Show kit details including its items and reservation history."""
     kit = get_object_or_404(
         Kit.objects.prefetch_related('items__equipment').select_related('created_by'),
         pk=pk,
     )
-    borrow_history = kit.borrow_requests.select_related(
-        'borrower', 'approved_by'
-    ).order_by('-requested_date')[:20]
-
-    # Calendar events — kit-level borrows/reservations + per-item equipment borrows/reservations
-    from apps.borrowing.models import BorrowRequest as _BR
     from apps.reservations.models import Reservation as _Res
-    cal_events = []
-    borrow_statuses = ['APPROVED', 'ACTIVE', 'RETURN_PENDING', 'OVERDUE']
+    reservation_history = kit.reservations.select_related(
+        'requester'
+    ).order_by('-start_date')[:20]
 
-    for b in kit.borrow_requests.filter(status__in=borrow_statuses).select_related('borrower'):
-        cal_events.append({
-            'start': b.requested_date.date().isoformat(),
-            'end': b.due_date.isoformat(),
-            'type': 'borrow',
-            'status': b.status,
-            'label': b.borrower.full_name if b.borrower else '',
-        })
-    for r in kit.reservations.filter(status__in=['PENDING', 'CONFIRMED']).select_related('requester'):
+    # Calendar events — kit-level reservations + per-item equipment reservations
+    cal_events = []
+    res_statuses = ['PENDING', 'CONFIRMED', 'ACTIVE', 'RETURN_PENDING']
+
+    for r in kit.reservations.filter(status__in=res_statuses).select_related('requester'):
         cal_events.append({
             'start': r.start_date.isoformat(),
             'end': r.end_date.isoformat(),
@@ -67,18 +58,10 @@ def kit_detail_view(request, pk):
             'label': r.requester.full_name if r.requester else '',
         })
 
-    # Include individual equipment borrows/reservations so items borrowed outside
-    # of this kit still appear as busy (they block the kit from being borrowed).
+    # Also include individual equipment reservations so items reserved outside
+    # of this kit still appear as busy.
     eq_pks = list(kit.items.values_list('equipment__pk', flat=True))
-    for b in _BR.objects.filter(equipment_id__in=eq_pks, status__in=borrow_statuses).select_related('borrower'):
-        cal_events.append({
-            'start': b.requested_date.date().isoformat(),
-            'end': b.due_date.isoformat(),
-            'type': 'borrow',
-            'status': b.status,
-            'label': b.borrower.full_name if b.borrower else '',
-        })
-    for r in _Res.objects.filter(equipment_id__in=eq_pks, status__in=['PENDING', 'CONFIRMED']).select_related('requester'):
+    for r in _Res.objects.filter(equipment_id__in=eq_pks, status__in=res_statuses).select_related('requester'):
         cal_events.append({
             'start': r.start_date.isoformat(),
             'end': r.end_date.isoformat(),
@@ -89,7 +72,7 @@ def kit_detail_view(request, pk):
 
     return render(request, 'kits/kit_detail.html', {
         'kit': kit,
-        'borrow_history': borrow_history,
+        'reservation_history': reservation_history,
         'calendar_events_json': json.dumps(cal_events),
     })
 
@@ -122,7 +105,7 @@ def kit_create_view(request):
             log_activity(
                 actor=request.user,
                 action='KIT_CREATED',
-                description=f'{request.user.username} created kit "{kit.name}"',
+                description=f'{request.user.full_name or request.user.username} created kit "{kit.name}"',
                 content_type_label='kit',
                 object_id=kit.pk,
                 object_repr=str(kit),
@@ -179,7 +162,7 @@ def kit_edit_view(request, pk):
             log_activity(
                 actor=request.user,
                 action='KIT_UPDATED',
-                description=f'{request.user.username} updated kit "{kit.name}"',
+                description=f'{request.user.full_name or request.user.username} updated kit "{kit.name}"',
                 content_type_label='kit',
                 object_id=kit.pk,
                 object_repr=str(kit),
@@ -228,7 +211,7 @@ def kit_delete_view(request, pk):
         log_activity(
             actor=request.user,
             action='KIT_DELETED',
-            description=f'{request.user.username} deleted kit "{kit_name}"',
+            description=f'{request.user.full_name or request.user.username} deleted kit "{kit_name}"',
             content_type_label='kit',
             object_id=pk,
             object_repr=kit_name,
@@ -282,7 +265,7 @@ def kit_item_add_view(request, pk):
             log_activity(
                 actor=request.user,
                 action='KIT_UPDATED',
-                description=f'{request.user.username} added {names} to kit "{kit.name}"',
+                description=f'{request.user.full_name or request.user.username} added {names} to kit "{kit.name}"',
                 content_type_label='kit',
                 object_id=kit.pk,
                 object_repr=str(kit),
@@ -327,7 +310,7 @@ def kit_item_remove_view(request, pk, item_pk):
             actor=request.user,
             action='KIT_UPDATED',
             description=(
-                f'{request.user.username} removed "{equipment_name}" from kit "{kit.name}"'
+                f'{request.user.full_name or request.user.username} removed "{equipment_name}" from kit "{kit.name}"'
             ),
             content_type_label='kit',
             object_id=kit.pk,

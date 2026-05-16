@@ -56,22 +56,44 @@
   </div>
 
   <p class="text-sm text-gray-600 mb-6">
-    Please confirm that you have received the item back in the reported condition.
+    Please confirm you have received the item back and record its condition.
   </p>
 
-  <form method="post" class="flex items-center gap-3">
+  <form method="post" class="space-y-4">
     {% csrf_token %}
-    <button type="submit"
-            class="inline-flex items-center px-5 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition">
-      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-      </svg>
-      Confirm Return
-    </button>
-    <a href="{% url 'reservations:detail' reservation.pk %}"
-       class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50 transition">
-      Back
-    </a>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Return Condition</label>
+      <select name="return_condition"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="EXCELLENT" {% if form.return_condition.value == 'EXCELLENT' %}selected{% endif %}>Excellent</option>
+        <option value="GOOD" {% if form.return_condition.value == 'GOOD' or not form.return_condition.value %}selected{% endif %}>Good</option>
+        <option value="FAIR" {% if form.return_condition.value == 'FAIR' %}selected{% endif %}>Fair</option>
+        <option value="POOR" {% if form.return_condition.value == 'POOR' %}selected{% endif %}>Poor</option>
+        <option value="DAMAGED" {% if form.return_condition.value == 'DAMAGED' %}selected{% endif %}>Damaged</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Notes <span class="text-gray-400 font-normal">(optional)</span></label>
+      <textarea name="notes" rows="3"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Any damage, issues, or notes about the return…">{{ form.notes.value|default:'' }}</textarea>
+    </div>
+    {% if form.errors %}
+    <div class="text-sm text-red-600">{{ form.errors }}</div>
+    {% endif %}
+    <div class="flex items-center gap-3 pt-2">
+      <button type="submit"
+              class="inline-flex items-center px-5 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        Confirm Return
+      </button>
+      <a href="{% url 'reservations:detail' reservation.pk %}"
+         class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50 transition">
+        Back
+      </a>
+    </div>
   </form>
 
 </div>

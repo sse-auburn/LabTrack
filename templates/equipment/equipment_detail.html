@@ -252,10 +252,10 @@
       <!-- Tab Nav -->
       <div class="border-b border-gray-200">
         <nav class="flex overflow-x-auto -mb-px" aria-label="Tabs">
-          <button @click="activeTab = 'borrow-history'"
-                  :class="activeTab === 'borrow-history' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          <button @click="activeTab = 'reservation-history'"
+                  :class="activeTab === 'reservation-history' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
-            Borrow History
+            Reservation History
           </button>
           <button @click="activeTab = 'lifecycle'"
                   :class="activeTab === 'lifecycle' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
@@ -288,45 +288,36 @@
       <!-- Tab Panels -->
       <div class="p-6">
 
-        <!-- Borrow History Tab (default visible without JS) -->
-        <div id="tab-borrow-history" x-show="activeTab === 'borrow-history'">
-          <h3 class="text-base font-semibold text-gray-900 mb-4">Borrow History</h3>
-          {% if borrow_history %}
+        <!-- Reservation History Tab -->
+        <div id="tab-reservation-history" x-show="activeTab === 'reservation-history'">
+          <h3 class="text-base font-semibold text-gray-900 mb-4">Reservation History</h3>
+          {% if reservation_history %}
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Borrower</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Reserved By</th>
                   <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Purpose</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Requested</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Due Date</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Returned</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Start</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">End</th>
                   <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-100">
-                {% for borrow in borrow_history %}
+                {% for res in reservation_history %}
                 <tr class="hover:bg-gray-50">
-                  <td class="px-4 py-3 text-sm text-gray-900">{{ borrow.borrower.full_name }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">{{ borrow.purpose }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ borrow.requested_date|date:"M d, Y" }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ borrow.due_date|date:"M d, Y" }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ borrow.returned_date|date:"M d, Y"|default:"—" }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">{{ res.requester.full_name }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">{{ res.purpose|default:"—" }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-600">{{ res.start_date|date:"M d, Y" }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-600">{{ res.end_date|date:"M d, Y" }}</td>
                   <td class="px-4 py-3">
-                    {% if borrow.status == 'PENDING' %}
-                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
-                    {% elif borrow.status == 'APPROVED' %}
-                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">Approved</span>
-                    {% elif borrow.status == 'ACTIVE' %}
-                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">Active</span>
-                    {% elif borrow.status == 'RETURNED' %}
-                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Returned</span>
-                    {% elif borrow.status == 'OVERDUE' %}
-                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">Overdue</span>
-                    {% elif borrow.status == 'REJECTED' %}
-                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">Rejected</span>
-                    {% elif borrow.status == 'CANCELLED' %}
-                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">Cancelled</span>
+                    {% if res.status == 'PENDING' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
+                    {% elif res.status == 'CONFIRMED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">Confirmed</span>
+                    {% elif res.status == 'ACTIVE' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
+                    {% elif res.status == 'RETURN_PENDING' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">Return Pending</span>
+                    {% elif res.status == 'RETURNED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Returned</span>
+                    {% elif res.status == 'CANCELLED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">Cancelled</span>
+                    {% elif res.status == 'EXPIRED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-400">Expired</span>
                     {% endif %}
                   </td>
                 </tr>
@@ -335,7 +326,7 @@
             </table>
           </div>
           {% else %}
-          <p class="text-sm text-gray-500 text-center py-8">No borrow history for this equipment.</p>
+          <p class="text-sm text-gray-500 text-center py-8">No reservation history for this equipment.</p>
           {% endif %}
         </div>
 
@@ -468,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const navButtons = document.querySelectorAll('nav button[\\@click]');
   if (!window.Alpine) {
     // Show calendar by default
-    const allTabNames = ['borrow-history','lifecycle','movements','incidents','maintenance','calendar'];
+    const allTabNames = ['reservation-history','lifecycle','movements','incidents','maintenance','calendar'];
     allTabNames.forEach(name => {
       const el = document.getElementById('tab-' + name);
       if (el) el.style.display = name === 'calendar' ? 'block' : 'none';

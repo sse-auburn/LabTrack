@@ -69,8 +69,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.username[0].upper()
 
     def __str__(self):
-        name = f"{self.first_name} {self.last_name}".strip()
-        return f"{name} ({self.username})" if name else self.username
+        return self.full_name
 
     class Meta:
         ordering = ['username']

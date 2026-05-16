@@ -49,8 +49,10 @@
           <option value="">All Statuses</option>
           <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>Pending</option>
           <option value="CONFIRMED" {% if request.GET.status == 'CONFIRMED' %}selected{% endif %}>Confirmed</option>
+          <option value="ACTIVE" {% if request.GET.status == 'ACTIVE' %}selected{% endif %}>Active</option>
+          <option value="RETURN_PENDING" {% if request.GET.status == 'RETURN_PENDING' %}selected{% endif %}>Return Pending</option>
+          <option value="RETURNED" {% if request.GET.status == 'RETURNED' %}selected{% endif %}>Returned</option>
           <option value="CANCELLED" {% if request.GET.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
-          <option value="COMPLETED" {% if request.GET.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
           <option value="EXPIRED" {% if request.GET.status == 'EXPIRED' %}selected{% endif %}>Expired</option>
         </select>
       </div>
@@ -125,14 +127,18 @@
               {{ reservation.end_date|date:"M d, Y" }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              {% if reservation.status == 'CONFIRMED' %}
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Confirmed</span>
-              {% elif reservation.status == 'PENDING' %}
+              {% if reservation.status == 'PENDING' %}
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
+              {% elif reservation.status == 'CONFIRMED' %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">Confirmed</span>
+              {% elif reservation.status == 'ACTIVE' %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
+              {% elif reservation.status == 'RETURN_PENDING' %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">Return Pending</span>
+              {% elif reservation.status == 'RETURNED' %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Returned</span>
               {% elif reservation.status == 'CANCELLED' %}
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Cancelled</span>
-              {% elif reservation.status == 'COMPLETED' %}
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Completed</span>
               {% elif reservation.status == 'EXPIRED' %}
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Expired</span>
               {% endif %}

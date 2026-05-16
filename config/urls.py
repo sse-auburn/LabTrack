@@ -34,9 +34,6 @@ urlpatterns = [
     # Equipment management
     path('equipment/', include('apps.equipment.urls', namespace='equipment')),
 
-    # Borrowing / check-out management
-    path('borrowing/', include('apps.borrowing.urls', namespace='borrowing')),
-
     # Reservations
     path('reservations/', include('apps.reservations.urls', namespace='reservations')),
 

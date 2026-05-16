@@ -59,7 +59,6 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'apps.accounts',
     'apps.equipment',
-    'apps.borrowing',
     'apps.reservations',
     'apps.kits',
     'apps.incidents',

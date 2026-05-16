@@ -108,7 +108,7 @@
       </div>
     </a>
 
-    <a href="{% url 'borrowing:return_queue' %}"
+    <a href="{% url 'reservations:list' %}?status=RETURN_PENDING"
        class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-amber-400 hover:shadow-md transition-all group">
       <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center group-hover:bg-amber-200 transition-colors">
         <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,11 +118,11 @@
       </div>
       <div>
         <p class="text-xl font-bold text-slate-800">{{ pending_approvals }}</p>
-        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-amber-600 transition-colors">Kit Returns Pending</p>
+        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-amber-600 transition-colors">Returns Pending</p>
       </div>
     </a>
 
-    <a href="{% url 'borrowing:list' %}"
+    <a href="{% url 'reservations:list' %}?status=ACTIVE"
        class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-blue-400 hover:shadow-md transition-all group">
       <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
         <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,12 +131,12 @@
         </svg>
       </div>
       <div>
-        <p class="text-xl font-bold text-slate-800">{{ active_borrows.count }}</p>
-        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-blue-600 transition-colors">Active Borrows</p>
+        <p class="text-xl font-bold text-slate-800">{{ active_reservations.count }}</p>
+        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-blue-600 transition-colors">Active Reservations</p>
       </div>
     </a>
 
-    <a href="{% url 'borrowing:return_queue' %}"
+    <a href="{% url 'reservations:list' %}?status=RETURN_PENDING"
        class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-yellow-400 hover:shadow-md transition-all group">
       <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
         <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,7 +145,7 @@
         </svg>
       </div>
       <div>
-        <p class="text-xl font-bold text-slate-800">{{ return_approvals.count|add:kit_item_approvals.count }}</p>
+        <p class="text-xl font-bold text-slate-800">{{ return_approvals.count }}</p>
         <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-yellow-600 transition-colors">Returns to Approve</p>
       </div>
     </a>
@@ -167,7 +167,7 @@
   </div>
 
   <!-- [ADMIN] Alert Cards -->
-  {% if overdue_borrows or pending_equipment %}
+  {% if overdue_reservations or pending_equipment %}
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {% if pending_equipment %}
     <div class="flex items-center gap-4 bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-4">
@@ -184,7 +184,7 @@
       <a href="{% url 'equipment:pending_list' %}" class="text-xs font-semibold text-yellow-700 hover:text-yellow-900 hover:underline flex-shrink-0">Review &rarr;</a>
     </div>
     {% endif %}
-    {% if overdue_borrows %}
+    {% if overdue_reservations %}
     <div class="flex items-center gap-4 bg-red-50 border border-red-200 rounded-xl px-5 py-4">
       <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,10 +193,10 @@
         </svg>
       </div>
       <div class="flex-1 min-w-0">
-        <p class="text-sm font-bold text-red-800">{{ overdue_borrows|length }} Overdue Borrow{{ overdue_borrows|length|pluralize }}</p>
-        <p class="text-xs text-red-600">Not returned by due date</p>
+        <p class="text-sm font-bold text-red-800">{{ overdue_reservations|length }} Overdue Reservation{{ overdue_reservations|length|pluralize }}</p>
+        <p class="text-xs text-red-600">Not returned by end date</p>
       </div>
-      <a href="#overdue-borrows" class="text-xs font-semibold text-red-700 hover:text-red-900 hover:underline flex-shrink-0">View &darr;</a>
+      <a href="#overdue-reservations" class="text-xs font-semibold text-red-700 hover:text-red-900 hover:underline flex-shrink-0">View &darr;</a>
     </div>
     {% endif %}
   </div>
@@ -206,7 +206,7 @@
   <!-- ── Personal Stat Cards (members) ── -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
-    <a href="{% url 'borrowing:list' %}"
+    <a href="{% url 'reservations:list' %}?status=ACTIVE"
        class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4 hover:border-blue-400 hover:shadow-md transition-all group">
       <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
         <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,12 +215,12 @@
         </svg>
       </div>
       <div>
-        <p class="text-2xl font-bold text-slate-800">{{ active_borrows.count }}</p>
-        <p class="text-sm text-slate-500 font-medium group-hover:text-blue-600 transition-colors">Active Borrows</p>
+        <p class="text-2xl font-bold text-slate-800">{{ active_reservations.count }}</p>
+        <p class="text-sm text-slate-500 font-medium group-hover:text-blue-600 transition-colors">Active Reservations</p>
       </div>
     </a>
 
-    <a href="{% url 'borrowing:return_queue' %}"
+    <a href="{% url 'reservations:list' %}?status=RETURN_PENDING"
        class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4 hover:border-yellow-400 hover:shadow-md transition-all group">
       <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
         <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,7 +229,7 @@
         </svg>
       </div>
       <div>
-        <p class="text-2xl font-bold text-slate-800">{{ return_approvals.count|add:kit_item_approvals.count }}</p>
+        <p class="text-2xl font-bold text-slate-800">{{ return_approvals.count }}</p>
         <p class="text-sm text-slate-500 font-medium group-hover:text-yellow-600 transition-colors">Returns to Approve</p>
       </div>
     </a>
@@ -251,40 +251,31 @@
   </div>
   {% endif %}
 
-  <!-- ── Active Borrows + Upcoming Reservations ── -->
+  <!-- ── Active Reservations + Upcoming Reservations ── -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
         <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-          <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+          <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
           </svg>
-          Active Borrows
+          Active Reservations
         </h3>
-        <a href="{% url 'borrowing:list' %}" class="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">View all</a>
+        <a href="{% url 'reservations:list' %}?status=ACTIVE" class="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">View all</a>
       </div>
-      {% if active_borrows %}
+      {% if active_reservations %}
         <div class="divide-y divide-slate-100">
-          {% for borrow in active_borrows %}
+          {% for reservation in active_reservations %}
           <div class="px-5 py-3 flex items-center justify-between gap-3">
             <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium text-slate-800 truncate">{{ borrow.item }}</p>
-              <p class="text-xs text-slate-500 mt-0.5">Due: {{ borrow.due_date|date:"M j, Y" }}</p>
+              <p class="text-sm font-medium text-slate-800 truncate">{{ reservation.equipment|default:reservation.kit }}</p>
+              <p class="text-xs text-slate-500 mt-0.5">Ends: {{ reservation.end_date|date:"M j, Y" }}</p>
             </div>
             <div class="flex-shrink-0">
-              {% if borrow.is_overdue %}
-                <span class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-red-100 text-red-700">
-                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                  </svg>
-                  Overdue
-                </span>
-              {% else %}
-                <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-green-100 text-green-700">
-                  Due in {{ borrow.due_date|timeuntil }}
-                </span>
-              {% endif %}
+              <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                Active
+              </span>
             </div>
           </div>
           {% endfor %}
@@ -292,9 +283,9 @@
       {% else %}
         <div class="flex flex-col items-center justify-center py-8 text-center">
           <svg class="w-7 h-7 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
           </svg>
-          <p class="text-sm text-slate-500">No active borrows</p>
+          <p class="text-sm text-slate-500">No active reservations</p>
         </div>
       {% endif %}
     </div>
@@ -373,51 +364,42 @@
   <div class="bg-white rounded-xl border border-blue-200 shadow-sm overflow-hidden">
     <div class="px-5 py-4 border-b border-blue-100 flex items-center justify-between">
       <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-blue-400 inline-block"></span>
+        <span class="w-2 h-2 rounded-full bg-orange-400 inline-block"></span>
         My Pending Returns
       </h3>
-      <a href="{% url 'borrowing:list' %}?status=RETURN_PENDING" class="text-xs text-brand-600 hover:underline font-medium">View all</a>
+      <a href="{% url 'reservations:list' %}?status=RETURN_PENDING" class="text-xs text-brand-600 hover:underline font-medium">View all</a>
     </div>
     <div class="divide-y divide-slate-100">
-      {% for borrow in my_pending_returns %}
+      {% for reservation in my_pending_returns %}
       <div class="px-5 py-3 flex items-center justify-between gap-3">
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-slate-800 truncate">{{ borrow.item }}</p>
-          <p class="text-xs text-slate-500 mt-0.5">Submitted {{ borrow.returned_date|timesince }} ago &mdash; awaiting owner confirmation</p>
+          <p class="text-sm font-medium text-slate-800 truncate">{{ reservation.equipment|default:reservation.kit }}</p>
+          <p class="text-xs text-slate-500 mt-0.5">Ended {{ reservation.end_date|date:"M j, Y" }} &mdash; awaiting owner confirmation</p>
         </div>
-        <a href="{% url 'borrowing:detail' borrow.pk %}" class="flex-shrink-0 text-xs text-brand-600 hover:underline font-medium">View</a>
+        <a href="{% url 'reservations:detail' reservation.pk %}" class="flex-shrink-0 text-xs text-brand-600 hover:underline font-medium">View</a>
       </div>
       {% endfor %}
     </div>
   </div>
   {% endif %}
 
-  {% if return_approvals or kit_item_approvals %}
+  {% if return_approvals %}
   <div class="bg-white rounded-xl border border-orange-200 shadow-sm overflow-hidden">
     <div class="px-5 py-4 border-b border-orange-100 flex items-center justify-between">
       <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-orange-400 inline-block"></span>
         Returns Awaiting Your Confirmation
       </h3>
-      <a href="{% url 'borrowing:return_queue' %}" class="text-xs text-brand-600 hover:underline font-medium">View all</a>
+      <a href="{% url 'reservations:list' %}?status=RETURN_PENDING" class="text-xs text-brand-600 hover:underline font-medium">View all</a>
     </div>
     <div class="divide-y divide-slate-100">
-      {% for borrow in return_approvals %}
+      {% for reservation in return_approvals %}
       <div class="px-5 py-3 flex items-center justify-between gap-3">
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-slate-800 truncate">{{ borrow.item }}</p>
-          <p class="text-xs text-slate-500 mt-0.5">Returned by {{ borrow.borrower.full_name }} &mdash; condition: {{ borrow.return_condition }}</p>
+          <p class="text-sm font-medium text-slate-800 truncate">{{ reservation.equipment|default:reservation.kit }}</p>
+          <p class="text-xs text-slate-500 mt-0.5">Reserved by {{ reservation.requester.full_name }}{% if reservation.return_condition %} &mdash; condition: {{ reservation.return_condition }}{% endif %}</p>
         </div>
-        <a href="{% url 'borrowing:return_confirm' borrow.pk %}" class="flex-shrink-0 px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700">Confirm</a>
-      </div>
-      {% endfor %}
-      {% for approval in kit_item_approvals %}
-      <div class="px-5 py-3 flex items-center justify-between gap-3">
-        <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-slate-800 truncate">{{ approval.equipment.name }} <span class="text-xs text-slate-400">(in kit {{ approval.borrow_request.kit.name }})</span></p>
-          <p class="text-xs text-slate-500 mt-0.5">Returned by {{ approval.borrow_request.borrower.full_name }}</p>
-        </div>
-        <a href="{% url 'borrowing:kit_item_confirm' approval.pk %}" class="flex-shrink-0 px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700">Confirm</a>
+        <a href="{% url 'reservations:return_confirm' reservation.pk %}" class="flex-shrink-0 px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700">Confirm</a>
       </div>
       {% endfor %}
     </div>
@@ -443,12 +425,12 @@
         </svg>
         <span class="text-xs font-semibold text-center leading-tight">Browse Equipment</span>
       </a>
-      <a href="{% url 'borrowing:create' %}"
+      <a href="{% url 'reservations:list' %}"
          class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-blue-400 hover:bg-blue-50 text-slate-600 hover:text-blue-700 transition-all group">
         <svg class="w-6 h-6 text-slate-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
         </svg>
-        <span class="text-xs font-semibold text-center leading-tight">Borrow Request</span>
+        <span class="text-xs font-semibold text-center leading-tight">My Reservations</span>
       </a>
       <a href="{% url 'reservations:create' %}"
          class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-purple-400 hover:bg-purple-50 text-slate-600 hover:text-purple-700 transition-all group">
@@ -469,49 +451,49 @@
     </div>
   </div>
 
-  <!-- ── [ADMIN] Overdue Borrows Table ── -->
-  {% if user.is_admin and overdue_borrows %}
-  <div id="overdue-borrows" class="bg-white rounded-xl border border-red-200 shadow-sm overflow-hidden">
+  <!-- ── [ADMIN] Overdue Reservations Table ── -->
+  {% if user.is_admin and overdue_reservations %}
+  <div id="overdue-reservations" class="bg-white rounded-xl border border-red-200 shadow-sm overflow-hidden">
     <div class="px-5 py-4 border-b border-red-100 bg-red-50 flex items-center gap-3">
       <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
       </svg>
-      <h3 class="text-base font-semibold text-red-800">Overdue Borrows</h3>
+      <h3 class="text-base font-semibold text-red-800">Overdue Reservations</h3>
       <span class="ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-200 text-red-800">
-        {{ overdue_borrows|length }} item{{ overdue_borrows|length|pluralize }}
+        {{ overdue_reservations|length }} item{{ overdue_reservations|length|pluralize }}
       </span>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead class="bg-slate-50 border-b border-slate-200">
           <tr>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Equipment</th>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Borrower</th>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Due Date</th>
+            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Item</th>
+            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Reserved By</th>
+            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">End Date</th>
             <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Overdue</th>
             <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
-          {% for borrow in overdue_borrows %}
+          {% for reservation in overdue_reservations %}
           <tr class="hover:bg-red-50 transition-colors">
-            <td class="px-5 py-3"><span class="font-medium text-slate-800">{{ borrow.item }}</span></td>
+            <td class="px-5 py-3"><span class="font-medium text-slate-800">{{ reservation.equipment|default:reservation.kit }}</span></td>
             <td class="px-5 py-3">
               <div class="flex items-center gap-2">
                 <div class="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
-                  <span class="text-white text-xs font-semibold">{{ borrow.borrower.first_name|first|upper }}</span>
+                  <span class="text-white text-xs font-semibold">{{ reservation.requester.first_name|first|upper }}</span>
                 </div>
-                <span class="text-slate-700">{{ borrow.borrower.full_name }}</span>
+                <span class="text-slate-700">{{ reservation.requester.full_name }}</span>
               </div>
             </td>
-            <td class="px-5 py-3 text-slate-600">{{ borrow.due_date|date:"M j, Y" }}</td>
+            <td class="px-5 py-3 text-slate-600">{{ reservation.end_date|date:"M j, Y" }}</td>
             <td class="px-5 py-3">
               <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
-                {{ borrow.due_date|timesince }}
+                {{ reservation.end_date|timesince }}
               </span>
             </td>
             <td class="px-5 py-3">
-              <a href="{% url 'borrowing:detail' borrow.pk %}" class="text-xs font-medium text-brand-600 hover:text-brand-700 hover:underline">View</a>
+              <a href="{% url 'reservations:detail' reservation.pk %}" class="text-xs font-medium text-brand-600 hover:text-brand-700 hover:underline">View</a>
             </td>
           </tr>
           {% endfor %}

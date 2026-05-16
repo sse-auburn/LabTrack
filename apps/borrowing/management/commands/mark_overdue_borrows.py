@@ -52,7 +52,7 @@ class Command(BaseCommand):
             for borrow in overdue_qs:
                 self.stdout.write(
                     f'  #{borrow.pk} {borrow.item} '
-                    f'(borrower: {borrow.borrower.username}, due: {borrow.due_date})'
+                    f'(borrower: {borrow.borrower.full_name}, due: {borrow.due_date})'
                 )
             return
 

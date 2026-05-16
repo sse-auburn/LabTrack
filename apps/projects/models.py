@@ -72,7 +72,7 @@ class ProjectMember(models.Model):
     joined_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} in {self.project.name}"
+        return f"{self.user.full_name} in {self.project.name}"
 
     class Meta:
         unique_together = ['project', 'user']

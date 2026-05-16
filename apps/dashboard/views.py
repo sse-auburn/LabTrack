@@ -7,7 +7,6 @@ from django.db.models import Q
 from django.shortcuts import redirect, render
 
 from apps.activity.models import ActivityLog
-from apps.borrowing.models import BorrowRequest, KitItemReturnApproval
 from apps.equipment.models import Equipment
 from apps.incidents.models import IncidentReport
 from apps.kits.models import Kit
@@ -30,26 +29,20 @@ def dashboard_home_view(request):
     is_admin = user.is_admin
 
     # ── Personal data (everyone) ──────────────────────────────────────────────
-    active_borrows = BorrowRequest.objects.filter(
-        borrower=user,
-        status__in=['APPROVED', 'ACTIVE'],
-    ).select_related('equipment', 'kit').order_by('due_date')
+    active_reservations = Reservation.objects.filter(
+        requester=user,
+        status='ACTIVE',
+    ).select_related('equipment', 'kit').order_by('end_date')
 
-    my_pending_returns = BorrowRequest.objects.filter(
-        borrower=user,
+    my_pending_returns = Reservation.objects.filter(
+        requester=user,
         status='RETURN_PENDING',
     ).select_related('equipment', 'kit').order_by('-returned_date')
 
-    return_approvals = BorrowRequest.objects.filter(
+    return_approvals = Reservation.objects.filter(
         status='RETURN_PENDING',
         equipment__owner=user,
-    ).select_related('borrower', 'equipment').order_by('returned_date')
-
-    kit_item_approvals = KitItemReturnApproval.objects.filter(
-        owner=user,
-        confirmed_by__isnull=True,
-        borrow_request__status='RETURN_PENDING',
-    ).select_related('borrow_request__borrower', 'borrow_request__kit', 'equipment')
+    ).select_related('requester', 'equipment').order_by('returned_date')
 
     upcoming_reservations = Reservation.objects.filter(
         requester=user,
@@ -73,10 +66,9 @@ def dashboard_home_view(request):
     )
 
     context = {
-        'active_borrows': active_borrows,
+        'active_reservations': active_reservations,
         'my_pending_returns': my_pending_returns,
         'return_approvals': return_approvals,
-        'kit_item_approvals': kit_item_approvals,
         'upcoming_reservations': upcoming_reservations,
         'recent_notifications': recent_notifications,
         'my_recent_activity': my_recent_activity,
@@ -88,8 +80,8 @@ def dashboard_home_view(request):
         total_equipment = Equipment.objects.filter(is_active=True).count()
         available_equipment = Equipment.objects.filter(status='AVAILABLE', is_active=True).count()
         pending_equipment = Equipment.objects.filter(approval_status='PENDING', is_active=True).count()
-        pending_approvals = BorrowRequest.objects.filter(
-            status='RETURN_PENDING', kit__isnull=False
+        pending_approvals = Reservation.objects.filter(
+            status='RETURN_PENDING',
         ).count()
         open_incidents = IncidentReport.objects.filter(
             status__in=['OPEN', 'INVESTIGATING']
@@ -98,10 +90,10 @@ def dashboard_home_view(request):
         total_kits = Kit.objects.filter(is_active=True).count()
         shared_kits = Kit.objects.filter(is_active=True, is_shared=True).count()
 
-        overdue_borrows = BorrowRequest.objects.filter(
-            due_date__lt=today,
-            status__in=['APPROVED', 'ACTIVE'],
-        ).select_related('borrower', 'equipment', 'kit').order_by('due_date')
+        overdue_reservations = Reservation.objects.filter(
+            end_date__lt=today,
+            status__in=['CONFIRMED', 'ACTIVE'],
+        ).select_related('requester', 'equipment', 'kit').order_by('end_date')
 
         system_activity = ActivityLog.objects.select_related('actor').order_by('-timestamp')[:15]
 
@@ -113,7 +105,7 @@ def dashboard_home_view(request):
             'open_incidents': open_incidents,
             'total_kits': total_kits,
             'shared_kits': shared_kits,
-            'overdue_borrows': overdue_borrows,
+            'overdue_reservations': overdue_reservations,
             'system_activity': system_activity,
         })
 

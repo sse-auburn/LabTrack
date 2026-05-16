@@ -176,30 +176,32 @@
     <div class="space-y-6">
       <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 class="text-base font-semibold text-gray-900">Borrow History</h2>
-          <a href="{% url 'borrowing:list' %}?kit={{ kit.pk }}" class="text-xs text-indigo-600 hover:underline">View all</a>
+          <h2 class="text-base font-semibold text-gray-900">Reservation History</h2>
+          <a href="{% url 'reservations:list' %}?kit={{ kit.pk }}" class="text-xs text-indigo-600 hover:underline">View all</a>
         </div>
         <div class="divide-y divide-gray-100">
-          {% for b in borrow_history|slice:":6" %}
+          {% for r in reservation_history|slice:":6" %}
           <div class="px-4 py-3">
             <div class="flex items-start justify-between">
               <div>
-                <p class="text-xs font-medium text-gray-800">{{ b.borrower.full_name|default:b.borrower.username }}</p>
-                <p class="text-xs text-gray-400 mt-0.5">Due {{ b.due_date|date:"M d, Y" }}</p>
+                <p class="text-xs font-medium text-gray-800">{{ r.requester.full_name|default:r.requester.username }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">{{ r.start_date|date:"M d" }} – {{ r.end_date|date:"M d, Y" }}</p>
               </div>
-              {% if b.status == 'ACTIVE' or b.status == 'APPROVED' %}
-                <span class="text-xs text-amber-600 font-medium">Active</span>
-              {% elif b.status == 'RETURNED' %}
+              {% if r.status == 'ACTIVE' %}
+                <span class="text-xs text-emerald-600 font-medium">Active</span>
+              {% elif r.status == 'CONFIRMED' %}
+                <span class="text-xs text-indigo-600 font-medium">Confirmed</span>
+              {% elif r.status == 'RETURNED' %}
                 <span class="text-xs text-green-600 font-medium">Returned</span>
-              {% elif b.status == 'OVERDUE' %}
-                <span class="text-xs text-red-600 font-medium">Overdue</span>
+              {% elif r.status == 'RETURN_PENDING' %}
+                <span class="text-xs text-orange-600 font-medium">Return Pending</span>
               {% else %}
-                <span class="text-xs text-gray-500 font-medium">{{ b.get_status_display }}</span>
+                <span class="text-xs text-gray-500 font-medium">{{ r.get_status_display }}</span>
               {% endif %}
             </div>
           </div>
           {% empty %}
-          <div class="px-4 py-8 text-center text-sm text-gray-400">No borrow history yet.</div>
+          <div class="px-4 py-8 text-center text-sm text-gray-400">No reservation history yet.</div>
           {% endfor %}
         </div>
       </div>

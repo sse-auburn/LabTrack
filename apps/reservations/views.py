@@ -10,11 +10,10 @@ from django.urls import reverse
 from django.utils import timezone
 
 from apps.activity.utils import log_activity
-from apps.borrowing.forms import ReturnForm
 from apps.equipment.models import Equipment
 from apps.equipment.utils import sync_equipment_status
 from apps.notifications.utils import notify, notify_admins
-from apps.reservations.forms import BulkReservationForm, ReservationForm, WaitlistEntryForm
+from apps.reservations.forms import BulkReservationForm, ReservationForm, ReturnForm, WaitlistEntryForm
 from apps.reservations.models import Reservation, WaitlistEntry
 
 
@@ -82,7 +81,7 @@ def reservation_calendar_view(request):
     month_end = date(year, month, calendar.monthrange(year, month)[1])
 
     qs = Reservation.objects.filter(
-        status__in=['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'EXPIRED'],
+        status__in=['PENDING', 'CONFIRMED', 'ACTIVE', 'RETURN_PENDING', 'COMPLETED', 'CANCELLED', 'EXPIRED'],
         start_date__lte=month_end,
         end_date__gte=month_start,
     ).select_related('equipment', 'kit', 'requester')
@@ -184,7 +183,7 @@ def reservation_create_view(request):
                 actor=request.user,
                 action='RESERVATION_CREATED',
                 description=(
-                    f'{request.user.username} reserved '
+                    f'{request.user.full_name or request.user.username} reserved '
                     f'{reservation.equipment or reservation.kit} '
                     f'({reservation.start_date} – {reservation.end_date})'
                 ),
@@ -377,7 +376,7 @@ def reservation_cancel_view(request, pk):
         messages.error(request, 'You do not have permission to cancel this reservation.')
         return redirect('reservations:list')
 
-    if reservation.status in ('CANCELLED', 'COMPLETED', 'EXPIRED'):
+    if reservation.status in ('CANCELLED', 'COMPLETED', 'EXPIRED', 'RETURNED', 'RETURN_PENDING'):
         messages.error(request, 'This reservation cannot be cancelled in its current state.')
         return redirect('reservations:detail', pk=reservation.pk)
 
@@ -396,7 +395,7 @@ def reservation_cancel_view(request, pk):
             actor=request.user,
             action='RESERVATION_CANCELLED',
             description=(
-                f'{request.user.username} cancelled reservation #{reservation.pk} '
+                f'{request.user.full_name or request.user.username} cancelled reservation #{reservation.pk} '
                 f'for {reservation.equipment or reservation.kit}'
             ),
             content_type_label='reservation',
@@ -486,7 +485,7 @@ def reservation_confirm_view(request, pk):
             actor=request.user,
             action='RESERVATION_CONFIRMED',
             description=(
-                f'{request.user.username} confirmed reservation #{reservation.pk} '
+                f'{request.user.full_name or request.user.username} confirmed reservation #{reservation.pk} '
                 f'for {reservation.equipment or reservation.kit}'
             ),
             content_type_label='reservation',
@@ -525,8 +524,8 @@ def reservation_return_view(request, pk):
         messages.error(request, 'Only the requester can submit a return.')
         return redirect('reservations:detail', pk=pk)
 
-    if reservation.status != 'CONFIRMED':
-        messages.error(request, 'Only confirmed reservations can be returned.')
+    if reservation.status not in ('CONFIRMED', 'ACTIVE'):
+        messages.error(request, 'Only confirmed or active reservations can be returned.')
         return redirect('reservations:detail', pk=pk)
 
     if request.method == 'POST':
@@ -542,7 +541,7 @@ def reservation_return_view(request, pk):
                 actor=request.user,
                 action='RESERVATION_RETURN_SUBMITTED',
                 description=(
-                    f'{request.user.username} submitted return for reservation '
+                    f'{request.user.full_name or request.user.username} submitted return for reservation '
                     f'#{reservation.pk} ({reservation.equipment or reservation.kit})'
                 ),
                 content_type_label='reservation',
@@ -590,11 +589,14 @@ def reservation_return_confirm_view(request, pk):
     reservation = get_object_or_404(
         Reservation.objects.select_related('requester', 'equipment', 'kit'),
         pk=pk,
-        status='RETURN_PENDING',
     )
 
+    if reservation.status not in ('RETURN_PENDING', 'ACTIVE', 'CONFIRMED'):
+        messages.error(request, 'This reservation is not awaiting a return confirmation.')
+        return redirect('reservations:detail', pk=pk)
+
     if reservation.equipment:
-        if request.user != reservation.equipment.owner:
+        if request.user != reservation.equipment.owner and not _is_admin(request.user):
             messages.error(request, 'Only the equipment owner can confirm this return.')
             return redirect('reservations:detail', pk=pk)
     elif reservation.kit:
@@ -603,46 +605,58 @@ def reservation_return_confirm_view(request, pk):
             return redirect('reservations:detail', pk=pk)
 
     if request.method == 'POST':
-        reservation.status = 'RETURNED'
-        reservation.save()
+        form = ReturnForm(request.POST)
+        if form.is_valid():
+            reservation.status = 'RETURNED'
+            reservation.return_condition = form.cleaned_data['return_condition']
+            reservation.return_notes = form.cleaned_data.get('notes', '')
+            reservation.returned_date = timezone.now()
+            reservation.return_approved_by = request.user
+            reservation.return_approved_at = timezone.now()
+            reservation.save()
 
-        # Recompute status — another borrow/maintenance may still be blocking.
-        if reservation.equipment:
-            sync_equipment_status(reservation.equipment)
-        if reservation.kit:
-            for kit_item in reservation.kit.items.select_related('equipment'):
-                sync_equipment_status(kit_item.equipment)
+            if reservation.equipment:
+                sync_equipment_status(reservation.equipment)
+            if reservation.kit:
+                for kit_item in reservation.kit.items.select_related('equipment'):
+                    sync_equipment_status(kit_item.equipment)
 
-        notify(
-            recipient=reservation.requester,
-            title='Reservation Return Confirmed',
-            message=(
-                f'Your return of "{reservation.equipment or reservation.kit}" '
-                f'has been confirmed. Thank you!'
-            ),
-            level='success',
-            link=f'/reservations/{reservation.pk}/',
-            category='reservations',
-        )
+            notify(
+                recipient=reservation.requester,
+                title='Reservation Return Confirmed',
+                message=(
+                    f'Your return of "{reservation.equipment or reservation.kit}" '
+                    f'has been confirmed. Thank you!'
+                ),
+                level='success',
+                link=f'/reservations/{reservation.pk}/',
+                category='reservations',
+            )
 
-        log_activity(
-            actor=request.user,
-            action='RESERVATION_RETURN_CONFIRMED',
-            description=(
-                f'{request.user.username} confirmed return for reservation '
-                f'#{reservation.pk} ({reservation.equipment or reservation.kit})'
-            ),
-            content_type_label='reservation',
-            object_id=reservation.pk,
-            object_repr=str(reservation),
-            request=request,
-        )
+            log_activity(
+                actor=request.user,
+                action='RESERVATION_RETURN_CONFIRMED',
+                description=(
+                    f'{request.user.full_name or request.user.username} confirmed return for reservation '
+                    f'#{reservation.pk} ({reservation.equipment or reservation.kit})'
+                ),
+                content_type_label='reservation',
+                object_id=reservation.pk,
+                object_repr=str(reservation),
+                request=request,
+            )
 
-        messages.success(request, 'Return confirmed.')
-        return redirect('reservations:detail', pk=pk)
+            messages.success(request, 'Return confirmed.')
+            return redirect('reservations:detail', pk=pk)
+    else:
+        form = ReturnForm(initial={
+            'return_condition': reservation.return_condition or 'GOOD',
+            'notes': reservation.return_notes,
+        })
 
     return render(request, 'reservations/reservation_confirm_return.html', {
         'reservation': reservation,
+        'form': form,
     })
 
 
@@ -767,7 +781,7 @@ def reservation_delete_view(request, pk):
         log_activity(
             actor=request.user,
             action='RESERVATION_DELETED',
-            description=f'{request.user.username} deleted reservation for {item_name}',
+            description=f'{request.user.full_name or request.user.username} deleted reservation for {item_name}',
             content_type_label='reservation',
             object_id=pk,
             object_repr=item_name,

@@ -4,42 +4,29 @@ import random
 from datetime import date
 
 
-def sync_equipment_status(equipment, exclude_borrow_pk=None):
+def sync_equipment_status(equipment):
     """Compute and save the correct status for *equipment* by querying live data.
 
     Priority (highest first):
     1. DAMAGED / RETIRED — never overridden automatically.
-    2. BORROWED  — any active BorrowRequest (APPROVED / ACTIVE / RETURN_PENDING).
+    2. IN_USE  — any ACTIVE or RETURN_PENDING Reservation.
     3. MAINTENANCE — any active MaintenanceLog (SCHEDULED / IN_PROGRESS).
     4. RESERVED  — a CONFIRMED Reservation whose window spans today.
     5. AVAILABLE — nothing else blocking.
-
-    Parameters
-    ----------
-    equipment : Equipment instance
-    exclude_borrow_pk : int | None
-        Skip this BorrowRequest PK when checking for active borrows. Used when
-        confirming a kit-item return where the parent borrow is still
-        RETURN_PENDING while individual items are freed one by one.
     """
     if equipment.status in ('DAMAGED', 'RETIRED'):
         return
 
-    from apps.borrowing.models import BorrowRequest
     from apps.incidents.models import MaintenanceLog
     from apps.reservations.models import Reservation
 
     today = date.today()
 
-    borrow_qs = BorrowRequest.objects.filter(
+    if Reservation.objects.filter(
         equipment=equipment,
-        status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING', 'OVERDUE'],
-    )
-    if exclude_borrow_pk is not None:
-        borrow_qs = borrow_qs.exclude(pk=exclude_borrow_pk)
-
-    if borrow_qs.exists():
-        new_status = 'BORROWED'
+        status__in=['ACTIVE', 'RETURN_PENDING'],
+    ).exists():
+        new_status = 'IN_USE'
     elif MaintenanceLog.objects.filter(
         equipment=equipment,
         status__in=['SCHEDULED', 'IN_PROGRESS'],

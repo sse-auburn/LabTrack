@@ -305,34 +305,6 @@ class Command(BaseCommand):
                             ki.equipment.save(update_fields=['status'])
                 self.stdout.write(f'  Created reservation: {res}')
 
-        # ── Borrows ──────────────────────────────────────────────────
-        self.stdout.write('Seeding borrows...')
-        from apps.borrowing.models import BorrowRequest
-        for row in self._load_sheet('borrows.xlsx'):
-            borrower = users.get(row.get('borrower_username'))
-            eq = equipment_map.get(row.get('equipment_serial_number', '')) or None
-            kit = kits.get(row.get('kit_name', '')) or None
-            due_date = self._parse_date(row.get('due_date'))
-            if not borrower or (not eq and not kit) or not due_date:
-                continue
-            status = row.get('status', 'PENDING')
-            defaults = {
-                'purpose': row.get('purpose', ''),
-                'status': status,
-                'due_date': due_date,
-            }
-            # Create a unique-enough filter; borrow requests don't have a natural unique key
-            # so we just create new ones each time seed is run.
-            br = BorrowRequest.objects.create(**defaults, borrower=borrower, equipment=eq, kit=kit)
-            if status in ('APPROVED', 'ACTIVE'):
-                if eq:
-                    eq.status = 'BORROWED'
-                    eq.save(update_fields=['status'])
-                elif kit:
-                    for ki in kit.items.select_related('equipment'):
-                        ki.equipment.status = 'BORROWED'
-                        ki.equipment.save(update_fields=['status'])
-            self.stdout.write(f'  Created borrow: {br}')
 
         # ── Incidents ────────────────────────────────────────────────
         self.stdout.write('Seeding incidents...')

@@ -8,6 +8,9 @@
 
   <!-- TailwindCSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -154,16 +157,6 @@
         <span class="text-sm font-medium">Equipment</span>
       </a>
 
-      <a href="{% url 'borrowing:list' %}"
-        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'borrowing' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-        <svg class="flex-shrink-0 text-amber-400 group-hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          style="width:1.1rem;height:1.1rem">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-        </svg>
-        <span class="text-sm font-medium">Borrow</span>
-      </a>
-
       <a href="{% url 'reservations:list' %}"
         class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'reservations' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
         <svg class="flex-shrink-0 text-emerald-400 group-hover:text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -252,7 +245,7 @@
         {% endif %}
         <div class="min-w-0 flex-1">
           <p class="text-sm font-medium text-slate-200 truncate">{{ user.full_name }}</p>
-          <p class="text-xs text-slate-500 truncate">@{{ user.username }}</p>
+          <p class="text-xs text-slate-500 truncate">{{ user.username }}</p>
         </div>
       </a>
     </div>
@@ -453,7 +446,7 @@
               {% endif %}
               <div class="hidden sm:block text-left">
                 <p class="text-sm font-medium text-slate-700 leading-tight">{{ user.full_name }}</p>
-                <p class="text-xs text-slate-500 leading-tight">@{{ user.username }}</p>
+                <p class="text-xs text-slate-500 leading-tight">{{ user.username }}</p>
               </div>
               <svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
