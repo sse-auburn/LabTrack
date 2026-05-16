@@ -91,6 +91,44 @@
         {% endfor %}
       </div>
 
+      <!-- Equipment Items -->
+      <div class="mb-5">
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div class="px-4 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-gray-700">Equipment Items</h3>
+            <span id="eq-count" class="text-xs text-gray-400">0 selected</span>
+          </div>
+          <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
+            <input type="text" id="eq-search" placeholder="Search equipment…"
+                   class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button type="button" onclick="selectAllEq()"
+                    class="px-3 py-2 text-xs font-medium text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition">
+              All
+            </button>
+            <button type="button" onclick="clearEq()"
+                    class="px-3 py-2 text-xs font-medium text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+              Clear
+            </button>
+          </div>
+          <div class="divide-y divide-gray-100 max-h-64 overflow-y-auto" id="eq-list">
+            {% for eq in available_equipment %}
+            <label class="eq-item flex items-center gap-3 px-4 py-2.5 hover:bg-indigo-50 cursor-pointer transition-colors"
+                   data-name="{{ eq.name|lower }}">
+              <input type="checkbox" name="equipment_ids" value="{{ eq.pk }}"
+                     class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                     onchange="updateEqCount()">
+              <div class="flex-1 min-w-0">
+                <span class="text-sm text-gray-800 truncate">{{ eq.name }}</span>
+                {% if eq.category %}<span class="text-xs text-gray-400 ml-1">{{ eq.category.name }}</span>{% endif %}
+              </div>
+            </label>
+            {% empty %}
+            <p class="px-4 py-4 text-sm text-gray-400">No equipment available to add.</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
       <!-- Submit -->
       <div class="pt-5 border-t border-gray-100 flex items-center gap-3">
         <button type="submit"
@@ -104,14 +142,30 @@
       </div>
     </form>
   </div>
-
-  <!-- Help Box -->
-  <div class="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4">
-    <h3 class="text-sm font-semibold text-blue-800 mb-1">After creating</h3>
-    <p class="text-xs text-blue-700">
-      You can add equipment items to this kit from the kit's detail page.
-      Users will be able to reserve the entire kit as a bundle.
-    </p>
-  </div>
 </div>
+
+<script>
+  function updateEqCount() {
+    const n = document.querySelectorAll('input[name="equipment_ids"]:checked').length;
+    document.getElementById('eq-count').textContent = n ? n + ' selected' : '0 selected';
+  }
+  function selectAllEq() {
+    document.querySelectorAll('.eq-item').forEach(row => {
+      if (row.style.display !== 'none') {
+        row.querySelector('input').checked = true;
+      }
+    });
+    updateEqCount();
+  }
+  function clearEq() {
+    document.querySelectorAll('input[name="equipment_ids"]').forEach(cb => cb.checked = false);
+    updateEqCount();
+  }
+  document.getElementById('eq-search').addEventListener('input', function () {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.eq-item').forEach(row => {
+      row.style.display = (!q || row.dataset.name.includes(q)) ? '' : 'none';
+    });
+  });
+</script>
 {% endblock %}

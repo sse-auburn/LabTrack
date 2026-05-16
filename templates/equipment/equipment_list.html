@@ -231,8 +231,6 @@
               <td class="px-4 py-3 text-gray-600 text-xs truncate max-w-[120px]">{{ item.owner.full_name|default:"—" }}</td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-end gap-1.5">
-                  <a href="{% url 'equipment:detail' item.pk %}"
-                     class="inline-flex items-center px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-lg transition-colors">View</a>
                   {% if item.status == 'AVAILABLE' and item.approval_status == 'APPROVED' and user.is_authenticated %}
                   <a href="{% url 'borrowing:create' %}?equipment={{ item.pk }}"
                      class="inline-flex items-center px-2.5 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs font-medium rounded-lg transition-colors">Borrow</a>
@@ -242,15 +240,6 @@
                   {% if item.user_active_borrow_pk %}
                   <a href="{% url 'borrowing:return' item.user_active_borrow_pk %}"
                      class="inline-flex items-center px-2.5 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-lg transition-colors">Return</a>
-                  {% endif %}
-                  {% if user.is_admin or item.owner == user %}
-                  <a href="{% url 'equipment:delete' item.pk %}"
-                     class="inline-flex items-center px-2.5 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-medium rounded-lg transition-colors" title="Delete">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                  </a>
                   {% endif %}
                 </div>
               </td>
@@ -317,7 +306,9 @@
           <!-- Name, category, owner, location, condition overlaid at bottom of image -->
           <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/85 via-black/60 to-transparent px-4 pt-10 pb-3 space-y-1.5">
             <div class="flex items-start justify-between gap-2">
-              <h3 class="text-sm font-semibold text-white leading-tight line-clamp-2 flex-1">{{ item.name }}</h3>
+              <a href="{% url 'equipment:detail' item.pk %}" class="flex-1">
+                <h3 class="text-sm font-semibold text-white leading-tight line-clamp-2 hover:underline">{{ item.name }}</h3>
+              </a>
               {% if item.category %}
               <span class="shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white border border-white/30"
                     style="background-color: {{ item.category.color }};">
@@ -361,10 +352,6 @@
 
             <!-- Action Buttons -->
             <div class="flex items-center gap-1.5 pt-2">
-              <a href="{% url 'equipment:detail' item.pk %}"
-                 class="flex-1 text-center px-2 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-medium rounded-lg border border-white/30 transition-colors duration-150">
-                View
-              </a>
               {% if item.status == 'AVAILABLE' and item.approval_status == 'APPROVED' and user.is_authenticated %}
               <a href="{% url 'borrowing:create' %}?equipment={{ item.pk }}"
                  class="flex-1 text-center px-2 py-1.5 bg-indigo-500/80 hover:bg-indigo-500 backdrop-blur-sm text-white text-xs font-medium rounded-lg transition-colors duration-150">
@@ -379,16 +366,6 @@
               <a href="{% url 'borrowing:return' item.user_active_borrow_pk %}"
                  class="flex-1 text-center px-2 py-1.5 bg-emerald-500/80 hover:bg-emerald-500 backdrop-blur-sm text-white text-xs font-medium rounded-lg transition-colors duration-150">
                 Return
-              </a>
-              {% endif %}
-              {% if user.is_admin or item.owner == user %}
-              <a href="{% url 'equipment:delete' item.pk %}"
-                 class="px-2 py-1.5 bg-red-500/70 hover:bg-red-500/90 backdrop-blur-sm text-white rounded-lg transition-colors duration-150"
-                 title="Delete">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
               </a>
               {% endif %}
             </div>

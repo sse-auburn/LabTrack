@@ -42,12 +42,27 @@ def kit_detail_view(request, pk):
 @login_required
 def kit_create_view(request):
     """Create a new kit (any authenticated user)."""
+    from apps.equipment.models import Equipment as EquipmentModel
+    available_equipment = EquipmentModel.objects.filter(
+        is_active=True
+    ).select_related('category').order_by('name')
+
     if request.method == 'POST':
         form = KitForm(request.POST)
         if form.is_valid():
             kit = form.save(commit=False)
             kit.created_by = request.user
             kit.save()
+
+            equipment_ids = request.POST.getlist('equipment_ids')
+            added = []
+            for eq_id in equipment_ids:
+                try:
+                    eq = EquipmentModel.objects.get(pk=int(eq_id), is_active=True)
+                    KitItem.objects.create(kit=kit, equipment=eq)
+                    added.append(eq.name)
+                except (ValueError, EquipmentModel.DoesNotExist):
+                    continue
 
             log_activity(
                 actor=request.user,
@@ -72,7 +87,11 @@ def kit_create_view(request):
     else:
         form = KitForm()
 
-    return render(request, 'kits/kit_form.html', {'form': form, 'action': 'Create'})
+    return render(request, 'kits/kit_form.html', {
+        'form': form,
+        'action': 'Create',
+        'available_equipment': available_equipment,
+    })
 
 
 @login_required
@@ -84,10 +103,23 @@ def kit_edit_view(request, pk):
         messages.error(request, 'You do not have permission to edit this kit.')
         return redirect('kits:detail', pk=kit.pk)
 
+    from apps.equipment.models import Equipment as EquipmentModel
+
     if request.method == 'POST':
+        existing_ids = set(kit.items.values_list('equipment_id', flat=True))
         form = KitForm(request.POST, instance=kit)
         if form.is_valid():
             form.save()
+
+            equipment_ids = request.POST.getlist('equipment_ids')
+            for eq_id in equipment_ids:
+                try:
+                    eq = EquipmentModel.objects.get(pk=int(eq_id), is_active=True)
+                    if eq.pk not in existing_ids:
+                        KitItem.objects.create(kit=kit, equipment=eq)
+                        existing_ids.add(eq.pk)
+                except (ValueError, EquipmentModel.DoesNotExist):
+                    continue
 
             log_activity(
                 actor=request.user,
@@ -112,7 +144,17 @@ def kit_edit_view(request, pk):
     else:
         form = KitForm(instance=kit)
 
-    return render(request, 'kits/kit_form.html', {'form': form, 'kit': kit, 'action': 'Edit'})
+    existing_ids = set(kit.items.values_list('equipment_id', flat=True))
+    available_equipment = EquipmentModel.objects.filter(
+        is_active=True
+    ).exclude(pk__in=existing_ids).select_related('category').order_by('name')
+
+    return render(request, 'kits/kit_form.html', {
+        'form': form,
+        'kit': kit,
+        'action': 'Edit',
+        'available_equipment': available_equipment,
+    })
 
 
 @login_required
