@@ -31,6 +31,21 @@ services:
       redis:
         condition: service_healthy
 
+  # ── Daily scheduler ───────────────────────────────────────────────────────────
+  scheduler:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - media_data:/app/media
+    entrypoint: ["/scheduler.sh"]
+    depends_on:
+      redis:
+        condition: service_healthy
+
   # ── Nginx ─────────────────────────────────────────────────────────────────────
   nginx:
     image: nginx:1.25-alpine

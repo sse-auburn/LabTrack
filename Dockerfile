@@ -67,9 +67,10 @@ COPY . .
 # Create dirs that must exist at runtime
 RUN mkdir -p /app/staticfiles /app/media /app/static
 
-# Entrypoint
+# Entrypoints
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY scheduler.sh /scheduler.sh
+RUN chmod +x /entrypoint.sh /scheduler.sh
 
 EXPOSE 8000
 

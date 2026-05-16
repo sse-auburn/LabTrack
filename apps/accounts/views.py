@@ -125,14 +125,17 @@ def logout_view(request):
 def profile_view(request):
     """Display the current user's profile."""
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
-    reservations = Reservation.objects.filter(requester=request.user)
+    reservations = Reservation.objects.filter(requester=request.user).select_related('equipment', 'kit').order_by('-created_at')
+    today = date.today()
     return render(request, 'accounts/profile.html', {
         'profile': profile,
         'profile_user': request.user,
         'total_borrows': reservations.count(),
         'active_borrows': reservations.filter(status__in=['ACTIVE', 'RETURN_PENDING']).count(),
         'pending_borrows': reservations.filter(status='PENDING').count(),
-        'overdue_borrows': reservations.filter(status__in=['CONFIRMED', 'ACTIVE'], end_date__lt=date.today()).count(),
+        'overdue_borrows': reservations.filter(status__in=['CONFIRMED', 'ACTIVE'], end_date__lt=today).count(),
+        'active_borrow_list': reservations.filter(status='ACTIVE'),
+        'recent_borrows': reservations[:10],
     })
 
 

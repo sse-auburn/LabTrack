@@ -232,24 +232,17 @@
       <div class="divide-y divide-slate-100">
         <div class="px-5 py-3 flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-slate-800">Borrow Requests</p>
-            <p class="text-xs text-slate-500">{{ counts.borrow_requests }} total, {{ counts.pending_returns }} awaiting return confirmation</p>
+            <p class="text-sm font-medium text-slate-800">Reservations</p>
+            <p class="text-xs text-slate-500">{{ counts.pending_returns }} awaiting return confirmation</p>
           </div>
-          <a href="{% url 'borrowing:list' %}" class="text-xs font-medium text-brand-600 hover:underline">Manage</a>
-        </div>
-        <div class="px-5 py-3 flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-slate-800">Overdue Items</p>
-            <p class="text-xs text-slate-500">{{ counts.overdue }} overdue borrows</p>
-          </div>
-          <a href="{% url 'borrowing:overdue' %}" class="text-xs font-medium text-red-600 hover:underline">View</a>
+          <a href="{% url 'reservations:list' %}" class="text-xs font-medium text-brand-600 hover:underline">Manage</a>
         </div>
         <div class="px-5 py-3 flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-slate-800">Return Queue</p>
             <p class="text-xs text-slate-500">Pending confirmations</p>
           </div>
-          <a href="{% url 'borrowing:return_queue' %}" class="text-xs font-medium text-brand-600 hover:underline">Process</a>
+          <a href="{% url 'reservations:list' %}?status=RETURN_PENDING" class="text-xs font-medium text-brand-600 hover:underline">Process</a>
         </div>
         <div class="px-5 py-3 flex items-center justify-between">
           <div>

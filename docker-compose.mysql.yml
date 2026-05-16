@@ -40,5 +40,13 @@ services:
       db:
         condition: service_healthy
 
+  scheduler:
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   mysql_data:
