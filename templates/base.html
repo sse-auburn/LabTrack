@@ -100,7 +100,7 @@
      SIDEBAR
      ============================================================ -->
   <aside id="sidebar"
-    class="fixed inset-y-0 left-0 z-30 w-64 flex flex-col bg-sidebar-bg transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0">
+    class="fixed top-60 bottom-70 left-0 z-30 w-64 flex flex-col bg-sidebar-bg transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0">
 
     <!-- Logo -->
     <div class="flex items-center gap-3 px-6 py-5 border-b border-sidebar-border flex-shrink-0">
@@ -123,7 +123,7 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
+    <nav class="flex-1 overflow-y-auto py-8 px-3 space-y-0.5">
 
       <!-- Main navigation group -->
       <p class="px-3 pt-2 pb-1 text-xs font-semibold uppercase tracking-widest text-slate-500">Main</p>
@@ -230,7 +230,7 @@
 
     <!-- Sidebar footer: notifications + activity + user -->
     {% if user.is_authenticated %}
-    <div class="flex-shrink-0 px-3 py-3 border-t border-sidebar-border space-y-1">
+    <div class="flex-shrink-0 px-3 py-3 mt-4 border-t border-sidebar-border space-y-1">
 
       <!-- Notifications -->
       <div class="relative" id="notifications-dropdown-wrapper">
@@ -250,7 +250,7 @@
         </button>
 
         <div id="notifications-dropdown-menu"
-          class="hidden absolute z-50 lg:left-full lg:top-0 lg:ml-2 lg:w-80 lg:bottom-auto lg:mb-0 left-0 right-0 bottom-full mb-2 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-2 max-h-[28rem] flex flex-col">
+          class="hidden absolute z-50 left-0 right-0 bottom-full mb-2 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-2 max-h-[28rem] flex flex-col">
           <div class="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
             <p class="text-sm font-semibold text-slate-800">Notifications</p>
             {% if unread_notification_count and unread_notification_count > 0 %}
@@ -335,7 +335,7 @@
         </button>
 
         <div id="activity-dropdown-menu"
-          class="hidden absolute z-50 lg:left-full lg:top-0 lg:ml-2 lg:w-80 lg:bottom-auto lg:mb-0 left-0 right-0 bottom-full mb-2 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-2 max-h-[28rem] flex flex-col">
+          class="hidden absolute z-50 left-0 right-0 bottom-full mb-2 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-2 max-h-[28rem] flex flex-col">
           <div class="px-4 py-2 border-b border-slate-100">
             <p class="text-sm font-semibold text-slate-800">Activity</p>
           </div>
@@ -401,7 +401,7 @@
         </button>
 
         <div id="user-dropdown-menu"
-          class="hidden absolute z-50 lg:left-full lg:top-0 lg:ml-2 lg:w-52 lg:bottom-auto lg:mb-0 left-0 right-0 bottom-full mb-2 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-1">
+          class="hidden absolute z-50 left-0 right-0 bottom-full mb-2 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-1">
           <div class="px-4 py-2 border-b border-slate-100">
             <p class="text-sm font-semibold text-slate-800 truncate">{{ user.full_name }}</p>
             <p class="text-xs text-slate-500 truncate">{{ user.email }}</p>
@@ -475,7 +475,7 @@
     </header>
 
     <!-- Content card overlapping sidebar -->
-    <div class="flex-1 lg:ml-6 relative z-40 bg-slate-100 rounded-l-[2.5rem] shadow-2xl overflow-hidden flex flex-col">
+    <div class="flex-1 lg:ml-6 relative z-40 bg-slate-100 rounded-l-[4rem] shadow-2xl overflow-hidden flex flex-col">
 
       <!-- ====== MAIN CONTENT ====== -->
       <main class="flex-1 p-4 sm:p-6 overflow-y-auto">
