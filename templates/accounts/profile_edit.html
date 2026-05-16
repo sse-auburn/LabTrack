@@ -331,19 +331,6 @@
           </div>
         </label>
 
-        <!-- Consumables -->
-        <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition">
-          <input type="checkbox"
-                 name="{{ profile_form.notify_consumables.html_name }}"
-                 id="{{ profile_form.notify_consumables.id_for_label }}"
-                 {% if profile_form.notify_consumables.value %}checked{% endif %}
-                 class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-          <div>
-            <span class="text-sm font-semibold text-slate-700">Consumables</span>
-            <p class="text-xs text-slate-500">Stock alerts &amp; restocking</p>
-          </div>
-        </label>
-
         <!-- Incidents -->
         <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition">
           <input type="checkbox"

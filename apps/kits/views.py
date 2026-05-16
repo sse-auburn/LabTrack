@@ -154,52 +154,62 @@ def kit_delete_view(request, pk):
 
 @login_required
 def kit_item_add_view(request, pk):
-    """Add a piece of equipment to a kit."""
+    """Add one or more pieces of equipment to a kit."""
     kit = get_object_or_404(Kit, pk=pk)
 
     if kit.created_by != request.user:
         messages.error(request, 'You do not have permission to modify this kit.')
         return redirect('kits:detail', pk=kit.pk)
 
-    if request.method == 'POST':
-        form = KitItemForm(request.POST, kit=kit)
-        if form.is_valid():
-            item = form.save(commit=False)
-            item.kit = kit
-            item.save()
+    from apps.equipment.models import Equipment as EquipmentModel
+    existing_ids = set(kit.items.values_list('equipment_id', flat=True))
+    available_equipment = EquipmentModel.objects.filter(
+        is_active=True
+    ).exclude(pk__in=existing_ids).select_related('category', 'location').order_by('name')
 
+    if request.method == 'POST':
+        equipment_ids = request.POST.getlist('equipment_ids')
+        added = []
+        for eq_id in equipment_ids:
+            try:
+                eq = EquipmentModel.objects.get(pk=int(eq_id), is_active=True)
+                if eq.pk not in existing_ids:
+                    KitItem.objects.create(kit=kit, equipment=eq)
+                    added.append(eq.name)
+                    existing_ids.add(eq.pk)
+            except (ValueError, EquipmentModel.DoesNotExist):
+                continue
+
+        if added:
+            names = ', '.join(f'"{n}"' for n in added)
             log_activity(
                 actor=request.user,
                 action='KIT_UPDATED',
-                description=(
-                    f'{request.user.username} added "{item.equipment.name}" to kit "{kit.name}"'
-                ),
+                description=f'{request.user.username} added {names} to kit "{kit.name}"',
                 content_type_label='kit',
                 object_id=kit.pk,
                 object_repr=str(kit),
                 request=request,
             )
-
             notify_admins(
-                title='Kit Item Added',
+                title='Kit Items Added',
                 message=(
                     f'{request.user.full_name or request.user.username} added '
-                    f'"{item.equipment.name}" to kit "{kit.name}".'
+                    f'{len(added)} item(s) to kit "{kit.name}".'
                 ),
                 level='info',
                 link=f'/kits/{kit.pk}/',
                 category='kits',
             )
+            messages.success(request, f'{len(added)} item(s) added to kit "{kit.name}".')
+        else:
+            messages.warning(request, 'No items were added. Please select at least one.')
+        return redirect('kits:detail', pk=kit.pk)
 
-            messages.success(
-                request,
-                f'"{item.equipment.name}" added to kit "{kit.name}".'
-            )
-            return redirect('kits:detail', pk=kit.pk)
-    else:
-        form = KitItemForm(kit=kit)
-
-    return render(request, 'kits/kit_item_form.html', {'form': form, 'kit': kit})
+    return render(request, 'kits/kit_item_form.html', {
+        'kit': kit,
+        'available_equipment': available_equipment,
+    })
 
 
 @login_required

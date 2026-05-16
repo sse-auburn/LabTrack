@@ -26,6 +26,16 @@ class Project(models.Model):
         related_name='projects',
         blank=True,
     )
+    equipment = models.ManyToManyField(
+        'equipment.Equipment',
+        related_name='projects',
+        blank=True,
+    )
+    kits = models.ManyToManyField(
+        'kits.Kit',
+        related_name='projects',
+        blank=True,
+    )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ACTIVE')
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)

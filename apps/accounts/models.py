@@ -113,10 +113,6 @@ class UserProfile(models.Model):
         default=True,
         help_text='Kit creations, updates, and deletions.',
     )
-    notify_consumables = models.BooleanField(
-        default=True,
-        help_text='Consumable usage, restocking, and low-stock alerts.',
-    )
     notify_projects = models.BooleanField(
         default=True,
         help_text='Project creations and updates.',

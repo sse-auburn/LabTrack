@@ -46,9 +46,6 @@ urlpatterns = [
     # Projects
     path('projects/', include('apps.projects.urls', namespace='projects')),
 
-    # Consumables
-    path('consumables/', include('apps.consumables.urls', namespace='consumables')),
-
     # Incidents / maintenance reports
     path('incidents/', include('apps.incidents.urls', namespace='incidents')),
 

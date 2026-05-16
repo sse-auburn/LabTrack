@@ -92,7 +92,7 @@
   </div>
 
   <!-- [ADMIN] Alert Cards -->
-  {% if overdue_borrows or low_stock_consumables or pending_equipment %}
+  {% if overdue_borrows or pending_equipment %}
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {% if pending_equipment %}
     <div class="flex items-center gap-4 bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-4">
@@ -122,21 +122,6 @@
         <p class="text-xs text-red-600">Not returned by due date</p>
       </div>
       <a href="#overdue-borrows" class="text-xs font-semibold text-red-700 hover:text-red-900 hover:underline flex-shrink-0">View &darr;</a>
-    </div>
-    {% endif %}
-    {% if low_stock_consumables %}
-    <div class="flex items-center gap-4 bg-amber-50 border border-amber-200 rounded-xl px-5 py-4">
-      <div class="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
-        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-        </svg>
-      </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-sm font-bold text-yellow-800">{{ low_stock_consumables|length }} Low-Stock Item{{ low_stock_consumables|length|pluralize }}</p>
-        <p class="text-xs text-yellow-600">Consumables below threshold</p>
-      </div>
-      <a href="#low-stock" class="text-xs font-semibold text-yellow-700 hover:text-yellow-900 hover:underline flex-shrink-0">View &darr;</a>
     </div>
     {% endif %}
   </div>
@@ -528,54 +513,6 @@
   </div>
   {% endif %}
 
-  <!-- ── [ADMIN] Low Stock Table ── -->
-  {% if user.is_admin and low_stock_consumables %}
-  <div id="low-stock" class="bg-white rounded-xl border border-yellow-200 shadow-sm overflow-hidden">
-    <div class="px-5 py-4 border-b border-yellow-100 bg-yellow-50 flex items-center gap-3">
-      <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-      </svg>
-      <h3 class="text-base font-semibold text-yellow-800">Low Stock Alerts</h3>
-      <span class="ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-200 text-yellow-800">
-        {{ low_stock_consumables|length }} item{{ low_stock_consumables|length|pluralize }}
-      </span>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead class="bg-slate-50 border-b border-slate-200">
-          <tr>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Item</th>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Current Qty</th>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Threshold</th>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Category</th>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Action</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
-          {% for item in low_stock_consumables %}
-          <tr class="hover:bg-yellow-50 transition-colors">
-            <td class="px-5 py-3"><span class="font-medium text-slate-800">{{ item.name }}</span></td>
-            <td class="px-5 py-3">
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700">
-                {{ item.quantity }} {{ item.get_unit_display }}
-              </span>
-            </td>
-            <td class="px-5 py-3 text-slate-600">{{ item.low_stock_threshold }} {{ item.get_unit_display }}</td>
-            <td class="px-5 py-3 text-slate-500">{% if item.category %}{{ item.category.name }}{% else %}&mdash;{% endif %}</td>
-            <td class="px-5 py-3">
-              <a href="{% url 'consumables:restock' item.pk %}"
-                 class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-yellow-500 hover:bg-yellow-600 rounded-lg transition-colors">
-                Restock
-              </a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-  {% endif %}
 
   <!-- ── System Activity + My Recent Activity (side by side) ── -->
   <div class="grid grid-cols-1 {% if user.is_admin %}lg:grid-cols-2{% endif %} gap-6">

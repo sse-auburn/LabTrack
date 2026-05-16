@@ -157,6 +157,53 @@
     <!-- Right Column -->
     <div class="lg:col-span-2 space-y-6">
 
+      <!-- Equipment -->
+      {% if project.equipment.exists %}
+      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-gray-900">Equipment</h2>
+          <span class="text-sm text-gray-400">{{ project.equipment.count }}</span>
+        </div>
+        <div class="divide-y divide-gray-100">
+          {% for eq in project.equipment.all %}
+          <div class="px-5 py-3 flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-900">{{ eq.name }}</p>
+              <p class="text-xs text-gray-400">{% if eq.category %}{{ eq.category.name }}{% endif %}{% if eq.location %} &bull; {{ eq.location.name }}{% endif %}</p>
+            </div>
+            <span class="text-xs font-medium px-2 py-0.5 rounded-full
+              {% if eq.status == 'AVAILABLE' %}bg-green-100 text-green-700
+              {% elif eq.status == 'BORROWED' %}bg-yellow-100 text-yellow-700
+              {% else %}bg-gray-100 text-gray-600{% endif %}">
+              {{ eq.get_status_display }}
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Kits -->
+      {% if project.kits.exists %}
+      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-gray-900">Kits</h2>
+          <span class="text-sm text-gray-400">{{ project.kits.count }}</span>
+        </div>
+        <div class="divide-y divide-gray-100">
+          {% for kit in project.kits.all %}
+          <div class="px-5 py-3 flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-900">{{ kit.name }}</p>
+              <p class="text-xs text-gray-400">{{ kit.items.count }} item{{ kit.items.count|pluralize }}</p>
+            </div>
+            <a href="{% url 'kits:detail' kit.pk %}" class="text-xs text-indigo-600 hover:underline">View</a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
       <!-- Linked Borrow Requests -->
       <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div class="px-5 py-4 border-b border-gray-100">
@@ -182,41 +229,6 @@
         </div>
       </div>
 
-      <!-- Consumable Usage -->
-      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 class="text-base font-semibold text-gray-900">Consumable Usage</h2>
-        </div>
-        <div class="divide-y divide-gray-100">
-          {% for usage in project.consumable_usage.all|slice:":8" %}
-          <div class="px-5 py-3 flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-900">{{ usage.consumable.name }}</p>
-              <p class="text-xs text-gray-400">
-                Used by {{ usage.used_by.get_full_name|default:usage.used_by.username|default:"Unknown" }}
-                • {{ usage.timestamp|date:"M d, Y" }}
-                {% if usage.purpose %} — {{ usage.purpose }}{% endif %}
-              </p>
-            </div>
-            <span class="text-sm font-semibold text-gray-700">
-              {{ usage.quantity_used }} {{ usage.consumable.unit }}
-            </span>
-          </div>
-          {% empty %}
-          <div class="px-5 py-8 text-center text-sm text-gray-400">
-            No consumables logged for this project.
-          </div>
-          {% endfor %}
-        </div>
-        {% if project.consumable_usage.count > 8 %}
-        <div class="px-5 py-3 border-t border-gray-100 text-center">
-          <a href="{% url 'consumables:list' %}?project={{ project.pk }}"
-             class="text-xs text-indigo-600 hover:underline">
-            View all {{ project.consumable_usage.count }} usage records
-          </a>
-        </div>
-        {% endif %}
-      </div>
     </div>
   </div>
 </div>

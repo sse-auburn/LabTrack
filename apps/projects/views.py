@@ -83,11 +83,12 @@ def project_detail_view(request, pk):
 def project_create_view(request):
     """Create a new project."""
     if request.method == 'POST':
-        form = ProjectForm(request.POST)
+        form = ProjectForm(request.POST, current_user=request.user)
         if form.is_valid():
             project = form.save(commit=False)
             project.lead = request.user
             project.save()
+            form.save_m2m()
 
             # Automatically add the creator as a LEAD member.
             ProjectMember.objects.create(
@@ -95,6 +96,14 @@ def project_create_view(request):
                 user=request.user,
                 role='LEAD',
             )
+
+            # Add any additionally selected members as MEMBER.
+            for user in form.cleaned_data.get('initial_members', []):
+                ProjectMember.objects.get_or_create(
+                    project=project,
+                    user=user,
+                    defaults={'role': 'MEMBER'},
+                )
 
             log_activity(
                 actor=request.user,
@@ -117,9 +126,15 @@ def project_create_view(request):
             messages.success(request, f'Project "{project.name}" created successfully.')
             return redirect('projects:detail', pk=project.pk)
     else:
-        form = ProjectForm()
+        form = ProjectForm(current_user=request.user)
 
-    return render(request, 'projects/project_form.html', {'form': form, 'action': 'Create'})
+    return render(request, 'projects/project_form.html', {
+        'form': form,
+        'action': 'Create',
+        'selected_equipment_ids': set(),
+        'selected_kit_ids': set(),
+        'selected_member_ids': set(),
+    })
 
 
 @login_required
@@ -136,9 +151,17 @@ def project_edit_view(request, pk):
         return redirect('projects:detail', pk=project.pk)
 
     if request.method == 'POST':
-        form = ProjectForm(request.POST, instance=project)
+        form = ProjectForm(request.POST, instance=project, current_user=request.user)
         if form.is_valid():
             form.save()
+
+            # Add any newly selected members (skips duplicates).
+            for user in form.cleaned_data.get('initial_members', []):
+                ProjectMember.objects.get_or_create(
+                    project=project,
+                    user=user,
+                    defaults={'role': 'MEMBER'},
+                )
 
             log_activity(
                 actor=request.user,
@@ -161,12 +184,15 @@ def project_edit_view(request, pk):
             messages.success(request, f'Project "{project.name}" updated successfully.')
             return redirect('projects:detail', pk=project.pk)
     else:
-        form = ProjectForm(instance=project)
+        form = ProjectForm(instance=project, current_user=request.user)
 
     return render(request, 'projects/project_form.html', {
         'form': form,
         'project': project,
         'action': 'Edit',
+        'selected_equipment_ids': set(project.equipment.values_list('pk', flat=True)),
+        'selected_kit_ids': set(project.kits.values_list('pk', flat=True)),
+        'selected_member_ids': set(project.project_members.values_list('user_id', flat=True)),
     })
 
 

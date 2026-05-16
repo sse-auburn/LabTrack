@@ -114,23 +114,13 @@
     </a>
 
     <a href="{% url 'pcard:list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'pcard' and request.resolver_match.url_name != 'deletion_requests' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
+       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'pcard' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
       <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
       </svg>
       <span class="text-sm font-medium">P-Card</span>
     </a>
-    {% if user.is_admin %}
-    <a href="{% url 'pcard:deletion_requests' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.url_name == 'deletion_requests' %}active{% endif %} flex items-center gap-3 pl-9 pr-3 py-2 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group text-xs">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:0.9rem;height:0.9rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-      </svg>
-      <span>Deletion Requests</span>
-    </a>
-    {% endif %}
 
     <a href="{% url 'equipment:list' %}"
        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'equipment' and 'category' not in request.resolver_match.url_name and 'location' not in request.resolver_match.url_name %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
@@ -149,13 +139,6 @@
       </svg>
       <span class="text-sm font-medium">Borrow</span>
     </a>
-    <a href="{% url 'borrowing:return_queue' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.url_name == 'return_queue' %}active{% endif %} flex items-center gap-3 pl-9 pr-3 py-2 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group text-xs">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:0.9rem;height:0.9rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3 3L22 4M3 21v-1a6 6 0 0112 0v1H3z"/>
-      </svg>
-      <span>Return Queue</span>
-    </a>
 
     <a href="{% url 'reservations:list' %}"
        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'reservations' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
@@ -164,13 +147,6 @@
               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
       </svg>
       <span class="text-sm font-medium">Reservations</span>
-    </a>
-    <a href="{% url 'reservations:calendar' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.url_name == 'calendar' %}active{% endif %} flex items-center gap-3 pl-9 pr-3 py-2 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group text-xs">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:0.9rem;height:0.9rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-      </svg>
-      <span>Calendar</span>
     </a>
 
     <!-- Lab group -->
@@ -192,15 +168,6 @@
               d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
       </svg>
       <span class="text-sm font-medium">Projects</span>
-    </a>
-
-    <a href="{% url 'consumables:list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'consumables' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-      </svg>
-      <span class="text-sm font-medium">Consumables</span>
     </a>
 
     <a href="{% url 'equipment:category_list' %}"
@@ -241,43 +208,6 @@
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
       </svg>
       <span class="text-sm font-medium">Incidents</span>
-    </a>
-    <a href="{% url 'incidents:maintenance_list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'incidents' and 'maintenance' in request.resolver_match.url_name %}active{% endif %} flex items-center gap-3 pl-9 pr-3 py-2 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group text-xs">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:0.9rem;height:0.9rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-      </svg>
-      <span>Maintenance</span>
-    </a>
-    <a href="{% url 'incidents:calibration_list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'incidents' and 'calibration' in request.resolver_match.url_name %}active{% endif %} flex items-center gap-3 pl-9 pr-3 py-2 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group text-xs">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:0.9rem;height:0.9rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-      </svg>
-      <span>Calibration</span>
-    </a>
-
-    <a href="{% url 'notifications:list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'notifications' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-      </svg>
-      <span class="text-sm font-medium">Notifications</span>
-      {% if unread_notification_count and unread_notification_count > 0 %}
-      <span class="ml-auto bg-brand-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
-        {{ unread_notification_count }}
-      </span>
-      {% endif %}
-    </a>
-
-    <a href="{% url 'activity:feed' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'activity' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-      </svg>
-      <span class="text-sm font-medium">Activity</span>
     </a>
 
   </nav>
@@ -331,19 +261,132 @@
       <!-- Right side controls -->
       <div class="flex items-center gap-2 ml-4">
 
-        <!-- Notification bell -->
-        <a href="{% url 'notifications:list' %}"
-           class="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-          </svg>
-          {% if unread_notification_count and unread_notification_count > 0 %}
-          <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center leading-none">
-            {{ unread_notification_count }}
-          </span>
-          {% endif %}
-        </a>
+        {% if user.is_authenticated %}
+        <!-- Notifications dropdown -->
+        <div class="relative" id="notifications-dropdown-wrapper">
+          <button onclick="toggleNotificationsDropdown()"
+                  class="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none"
+                  aria-label="Notifications">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            {% if unread_notification_count and unread_notification_count > 0 %}
+            <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center leading-none">
+              {{ unread_notification_count }}
+            </span>
+            {% endif %}
+          </button>
+
+          <div id="notifications-dropdown-menu"
+               class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-2 z-50 max-h-[28rem] flex flex-col">
+            <div class="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
+              <p class="text-sm font-semibold text-slate-800">Notifications</p>
+              {% if unread_notification_count and unread_notification_count > 0 %}
+              <span class="text-xs text-brand-600 font-medium">{{ unread_notification_count }} new</span>
+              {% endif %}
+            </div>
+            <div class="overflow-y-auto flex-1">
+              {% if recent_notifications %}
+                {% for n in recent_notifications %}
+                <a href="{% if n.link %}{{ n.link }}{% else %}{% url 'notifications:list' %}{% endif %}"
+                   class="block px-4 py-3 hover:bg-slate-50 transition-colors {% if not n.is_read %}bg-brand-50/50{% endif %}">
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
+                                {% if n.level == 'error' %}bg-red-100 text-red-600{% elif n.level == 'warning' %}bg-amber-100 text-amber-600{% elif n.level == 'success' %}bg-green-100 text-green-600{% else %}bg-blue-100 text-blue-600{% endif %}">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {% if n.level == 'error' %}
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        {% elif n.level == 'warning' %}
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        {% elif n.level == 'success' %}
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        {% else %}
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        {% endif %}
+                      </svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <p class="text-sm font-medium text-slate-800 truncate">{{ n.title }}</p>
+                      <p class="text-xs text-slate-500 line-clamp-2">{{ n.message }}</p>
+                      <p class="text-[11px] text-slate-400 mt-0.5">{{ n.created_at|timesince }} ago</p>
+                    </div>
+                    {% if not n.is_read %}
+                    <span class="w-2 h-2 bg-brand-500 rounded-full flex-shrink-0 mt-1.5"></span>
+                    {% endif %}
+                  </div>
+                </a>
+                {% endfor %}
+              {% else %}
+                <div class="px-4 py-6 text-center">
+                  <p class="text-sm text-slate-400">No new notifications</p>
+                </div>
+              {% endif %}
+            </div>
+            <div class="border-t border-slate-100 mt-auto">
+              <a href="{% url 'notifications:list' %}"
+                 class="block px-4 py-2.5 text-sm text-brand-600 font-medium text-center hover:bg-slate-50 transition-colors">
+                See all notifications
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity dropdown -->
+        <div class="relative" id="activity-dropdown-wrapper">
+          <button onclick="toggleActivityDropdown()"
+                  class="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none"
+                  aria-label="Activity">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </button>
+
+          <div id="activity-dropdown-menu"
+               class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-2 z-50 max-h-[28rem] flex flex-col">
+            <div class="px-4 py-2 border-b border-slate-100">
+              <p class="text-sm font-semibold text-slate-800">Activity</p>
+            </div>
+            <div class="overflow-y-auto flex-1">
+              {% if recent_activities %}
+                {% for a in recent_activities %}
+                <a href="{% url 'activity:feed' %}"
+                   class="block px-4 py-3 hover:bg-slate-50 transition-colors">
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <p class="text-sm text-slate-800">
+                        <span class="font-medium">{{ a.actor.get_full_name|default:a.actor.username }}</span>
+                        <span class="text-slate-500">{{ a.get_action_display|lower }}</span>
+                      </p>
+                      {% if a.object_repr %}
+                      <p class="text-xs text-slate-500 truncate">{{ a.object_repr }}</p>
+                      {% endif %}
+                      <p class="text-[11px] text-slate-400 mt-0.5">{{ a.timestamp|timesince }} ago</p>
+                    </div>
+                  </div>
+                </a>
+                {% endfor %}
+              {% else %}
+                <div class="px-4 py-6 text-center">
+                  <p class="text-sm text-slate-400">No recent activity</p>
+                </div>
+              {% endif %}
+            </div>
+            <div class="border-t border-slate-100 mt-auto">
+              <a href="{% url 'activity:feed' %}"
+                 class="block px-4 py-2.5 text-sm text-brand-600 font-medium text-center hover:bg-slate-50 transition-colors">
+                See all activity
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
 
         <!-- User dropdown -->
         {% if user.is_authenticated %}
@@ -476,11 +519,36 @@
     const menu = document.getElementById('user-dropdown-menu');
     menu.classList.toggle('hidden');
   }
-  // Close dropdown on outside click
+
+  /* ---- Notifications dropdown ---- */
+  function toggleNotificationsDropdown() {
+    const menu = document.getElementById('notifications-dropdown-menu');
+    menu.classList.toggle('hidden');
+    // Close activity dropdown if open
+    document.getElementById('activity-dropdown-menu').classList.add('hidden');
+  }
+
+  /* ---- Activity dropdown ---- */
+  function toggleActivityDropdown() {
+    const menu = document.getElementById('activity-dropdown-menu');
+    menu.classList.toggle('hidden');
+    // Close notifications dropdown if open
+    document.getElementById('notifications-dropdown-menu').classList.add('hidden');
+  }
+
+  // Close dropdowns on outside click
   document.addEventListener('click', function(e) {
-    const wrapper = document.getElementById('user-dropdown-wrapper');
-    if (wrapper && !wrapper.contains(e.target)) {
+    const userWrapper = document.getElementById('user-dropdown-wrapper');
+    if (userWrapper && !userWrapper.contains(e.target)) {
       document.getElementById('user-dropdown-menu').classList.add('hidden');
+    }
+    const notifWrapper = document.getElementById('notifications-dropdown-wrapper');
+    if (notifWrapper && !notifWrapper.contains(e.target)) {
+      document.getElementById('notifications-dropdown-menu').classList.add('hidden');
+    }
+    const activityWrapper = document.getElementById('activity-dropdown-wrapper');
+    if (activityWrapper && !activityWrapper.contains(e.target)) {
+      document.getElementById('activity-dropdown-menu').classList.add('hidden');
     }
   });
 

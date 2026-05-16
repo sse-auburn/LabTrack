@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
   <!-- Breadcrumb -->
   <nav class="text-sm text-gray-500 mb-4">
@@ -19,142 +19,219 @@
     </p>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 p-6">
-    <form method="post" novalidate>
-      {% csrf_token %}
+  <form method="post" novalidate>
+    {% csrf_token %}
 
-      <!-- Non-field errors -->
-      {% if form.non_field_errors %}
-      <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-        {% for error in form.non_field_errors %}
-          <p class="text-sm text-red-700">{{ error }}</p>
-        {% endfor %}
-      </div>
-      {% endif %}
+    <!-- Non-field errors -->
+    {% if form.non_field_errors %}
+    <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+      {% for error in form.non_field_errors %}
+        <p class="text-sm text-red-700">{{ error }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
 
-      <!-- Project Name -->
-      <div class="mb-5">
-        <label for="{{ form.name.id_for_label }}"
-               class="block text-sm font-medium text-gray-700 mb-1">
-          Project Name <span class="text-red-500">*</span>
-        </label>
-        <input type="text"
-               name="{{ form.name.html_name }}"
-               id="{{ form.name.id_for_label }}"
-               value="{{ form.name.value|default:'' }}"
-               placeholder="e.g., Autonomous Robot Prototype v2"
-               class="w-full border {% if form.name.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        {% for error in form.name.errors %}
-          <p class="mt-1 text-xs text-red-600">{{ error }}</p>
-        {% endfor %}
-      </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      <!-- Description -->
-      <div class="mb-5">
-        <label for="{{ form.description.id_for_label }}"
-               class="block text-sm font-medium text-gray-700 mb-1">
-          Description
-        </label>
-        <textarea name="{{ form.description.html_name }}"
-                  id="{{ form.description.id_for_label }}"
-                  rows="4"
-                  placeholder="Describe the project goals, scope, and expected outcomes..."
-                  class="w-full border {% if form.description.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none">{{ form.description.value|default:'' }}</textarea>
-        {% for error in form.description.errors %}
-          <p class="mt-1 text-xs text-red-600">{{ error }}</p>
-        {% endfor %}
-      </div>
+      <!-- Left: core fields -->
+      <div class="lg:col-span-2 space-y-5">
+        <div class="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
 
-      <!-- Status -->
-      <div class="mb-5">
-        <label for="{{ form.status.id_for_label }}"
-               class="block text-sm font-medium text-gray-700 mb-1">
-          Status <span class="text-red-500">*</span>
-        </label>
-        <select name="{{ form.status.html_name }}"
-                id="{{ form.status.id_for_label }}"
-                class="w-full border {% if form.status.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <option value="ACTIVE" {% if form.status.value == 'ACTIVE' %}selected{% endif %}>Active</option>
-          <option value="COMPLETED" {% if form.status.value == 'COMPLETED' %}selected{% endif %}>Completed</option>
-          <option value="ON_HOLD" {% if form.status.value == 'ON_HOLD' %}selected{% endif %}>On Hold</option>
-          <option value="CANCELLED" {% if form.status.value == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
-        </select>
-        {% for error in form.status.errors %}
-          <p class="mt-1 text-xs text-red-600">{{ error }}</p>
-        {% endfor %}
-      </div>
-
-      <!-- Date Range -->
-      <div class="mb-5">
-        <div class="grid grid-cols-2 gap-4">
+          <!-- Project Name -->
           <div>
-            <label for="{{ form.start_date.id_for_label }}"
+            <label for="{{ form.name.id_for_label }}"
                    class="block text-sm font-medium text-gray-700 mb-1">
-              Start Date
+              Project Name <span class="text-red-500">*</span>
             </label>
-            <input type="date"
-                   name="{{ form.start_date.html_name }}"
-                   id="{{ form.start_date.id_for_label }}"
-                   value="{{ form.start_date.value|date:'Y-m-d'|default:'' }}"
-                   class="w-full border {% if form.start_date.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            {% for error in form.start_date.errors %}
+            <input type="text"
+                   name="{{ form.name.html_name }}"
+                   id="{{ form.name.id_for_label }}"
+                   value="{{ form.name.value|default:'' }}"
+                   placeholder="e.g., Autonomous Robot Prototype v2"
+                   class="w-full border {% if form.name.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            {% for error in form.name.errors %}
               <p class="mt-1 text-xs text-red-600">{{ error }}</p>
             {% endfor %}
           </div>
+
+          <!-- Description -->
           <div>
-            <label for="{{ form.end_date.id_for_label }}"
-                   class="block text-sm font-medium text-gray-700 mb-1">
-              End Date
+            <label for="{{ form.description.id_for_label }}"
+                   class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea name="{{ form.description.html_name }}"
+                      id="{{ form.description.id_for_label }}"
+                      rows="4"
+                      placeholder="Describe the project goals, scope, and expected outcomes..."
+                      class="w-full border {% if form.description.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none">{{ form.description.value|default:'' }}</textarea>
+          </div>
+
+          <!-- Status + dates row -->
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label for="{{ form.status.id_for_label }}"
+                     class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-red-500">*</span></label>
+              <select name="{{ form.status.html_name }}"
+                      id="{{ form.status.id_for_label }}"
+                      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="ACTIVE" {% if form.status.value == 'ACTIVE' %}selected{% endif %}>Active</option>
+                <option value="COMPLETED" {% if form.status.value == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                <option value="ON_HOLD" {% if form.status.value == 'ON_HOLD' %}selected{% endif %}>On Hold</option>
+                <option value="CANCELLED" {% if form.status.value == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+              </select>
+            </div>
+            <div>
+              <label for="{{ form.start_date.id_for_label }}"
+                     class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <input type="date"
+                     name="{{ form.start_date.html_name }}"
+                     id="{{ form.start_date.id_for_label }}"
+                     value="{{ form.start_date.value|date:'Y-m-d'|default:'' }}"
+                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label for="{{ form.end_date.id_for_label }}"
+                     class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+              <input type="date"
+                     name="{{ form.end_date.html_name }}"
+                     id="{{ form.end_date.id_for_label }}"
+                     value="{{ form.end_date.value|date:'Y-m-d'|default:'' }}"
+                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Equipment panel -->
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-gray-700">Equipment</h3>
+            <span id="eq-count" class="text-xs text-gray-400">0 selected</span>
+          </div>
+          <div class="px-5 py-3 border-b border-gray-100">
+            <input type="text" id="eq-search" placeholder="Search equipment…"
+                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div class="divide-y divide-gray-100 max-h-56 overflow-y-auto" id="eq-list">
+            {% for eq in form.equipment.field.queryset %}
+            <label class="eq-item flex items-center gap-3 px-5 py-2.5 hover:bg-indigo-50 cursor-pointer transition-colors"
+                   data-name="{{ eq.name|lower }}">
+              <input type="checkbox" name="equipment" value="{{ eq.pk }}"
+                     {% if eq.pk in selected_equipment_ids %}checked{% endif %}
+                     class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                     onchange="updateEqCount()">
+              <div class="flex-1 min-w-0">
+                <span class="text-sm text-gray-800 truncate">{{ eq.name }}</span>
+                {% if eq.category %}<span class="text-xs text-gray-400 ml-1">{{ eq.category.name }}</span>{% endif %}
+              </div>
             </label>
-            <input type="date"
-                   name="{{ form.end_date.html_name }}"
-                   id="{{ form.end_date.id_for_label }}"
-                   value="{{ form.end_date.value|date:'Y-m-d'|default:'' }}"
-                   class="w-full border {% if form.end_date.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            {% for error in form.end_date.errors %}
-              <p class="mt-1 text-xs text-red-600">{{ error }}</p>
+            {% empty %}
+            <p class="px-5 py-4 text-sm text-gray-400">No equipment available.</p>
             {% endfor %}
           </div>
         </div>
-        <p class="mt-1.5 text-xs text-gray-400">Leave blank if dates are not yet determined.</p>
-      </div>
 
-      <!-- Lead (admin only) -->
-      {% if form.lead and request.user.is_staff %}
-      <div class="mb-5">
-        <label for="{{ form.lead.id_for_label }}"
-               class="block text-sm font-medium text-gray-700 mb-1">
-          Project Lead
-        </label>
-        <select name="{{ form.lead.html_name }}"
-                id="{{ form.lead.id_for_label }}"
-                class="w-full border {% if form.lead.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <option value="">-- Assign Lead --</option>
-          {% for user in form.lead.field.queryset %}
-            <option value="{{ user.pk }}"
-                    {% if form.lead.value == user.pk|stringformat:"s" %}selected{% endif %}>
-              {{ user.get_full_name|default:user.username }}
-            </option>
-          {% endfor %}
-        </select>
-        {% for error in form.lead.errors %}
-          <p class="mt-1 text-xs text-red-600">{{ error }}</p>
-        {% endfor %}
-      </div>
-      {% endif %}
+        <!-- Kits panel -->
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-gray-700">Kits</h3>
+            <span id="kit-count" class="text-xs text-gray-400">0 selected</span>
+          </div>
+          <div class="divide-y divide-gray-100 max-h-48 overflow-y-auto">
+            {% for kit in form.kits.field.queryset %}
+            <label class="flex items-center gap-3 px-5 py-2.5 hover:bg-indigo-50 cursor-pointer transition-colors">
+              <input type="checkbox" name="kits" value="{{ kit.pk }}"
+                     {% if kit.pk in selected_kit_ids %}checked{% endif %}
+                     class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                     onchange="updateKitCount()">
+              <span class="text-sm text-gray-800">{{ kit.name }}</span>
+            </label>
+            {% empty %}
+            <p class="px-5 py-4 text-sm text-gray-400">No kits available.</p>
+            {% endfor %}
+          </div>
+        </div>
 
-      <!-- Submit -->
-      <div class="pt-5 border-t border-gray-100 flex items-center gap-3">
-        <button type="submit"
-                class="px-6 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
-          {% if form.instance.pk %}Save Changes{% else %}Create Project{% endif %}
-        </button>
-        <a href="{% if form.instance.pk %}{% url 'projects:detail' form.instance.pk %}{% else %}{% url 'projects:list' %}{% endif %}"
-           class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50 transition">
-          Cancel
-        </a>
-      </div>
-    </form>
-  </div>
+      </div><!-- end left col -->
+
+      <!-- Right: members -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-20">
+          <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-gray-700">Members</h3>
+            <span id="mem-count" class="text-xs text-gray-400">0 selected</span>
+          </div>
+          <div class="px-4 py-3 border-b border-gray-100">
+            <input type="text" id="mem-search" placeholder="Search users…"
+                   class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div class="px-4 py-2 border-b border-gray-100 bg-indigo-50">
+            <p class="text-xs text-indigo-700 font-medium">You will be added as Lead automatically.</p>
+          </div>
+          <div class="divide-y divide-gray-100 max-h-80 overflow-y-auto" id="mem-list">
+            {% for user in form.initial_members.field.queryset %}
+            <label class="mem-item flex items-center gap-3 px-4 py-2.5 hover:bg-indigo-50 cursor-pointer transition-colors"
+                   data-name="{{ user.username|lower }} {{ user.first_name|lower }} {{ user.last_name|lower }}">
+              <input type="checkbox" name="initial_members" value="{{ user.pk }}"
+                     {% if user.pk in selected_member_ids %}checked{% endif %}
+                     class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                     onchange="updateMemCount()">
+              <div class="min-w-0">
+                <p class="text-sm text-gray-800 truncate">{{ user.get_full_name|default:user.username }}</p>
+                <p class="text-xs text-gray-400 truncate">@{{ user.username }}</p>
+              </div>
+            </label>
+            {% empty %}
+            <p class="px-4 py-4 text-sm text-gray-400">No other users.</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Submit card -->
+        <div class="mt-4 bg-white rounded-xl border border-gray-200 p-4 flex flex-col gap-3">
+          <button type="submit"
+                  class="w-full px-4 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition text-center">
+            {% if form.instance.pk %}Save Changes{% else %}Create Project{% endif %}
+          </button>
+          <a href="{% if form.instance.pk %}{% url 'projects:detail' form.instance.pk %}{% else %}{% url 'projects:list' %}{% endif %}"
+             class="w-full px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50 transition text-center">
+            Cancel
+          </a>
+        </div>
+      </div><!-- end right col -->
+
+    </div>
+  </form>
 </div>
+
+<script>
+  function updateEqCount() {
+    const n = document.querySelectorAll('input[name="equipment"]:checked').length;
+    document.getElementById('eq-count').textContent = n ? n + ' selected' : '0 selected';
+  }
+  function updateKitCount() {
+    const n = document.querySelectorAll('input[name="kits"]:checked').length;
+    document.getElementById('kit-count').textContent = n ? n + ' selected' : '0 selected';
+  }
+  function updateMemCount() {
+    const n = document.querySelectorAll('input[name="initial_members"]:checked').length;
+    document.getElementById('mem-count').textContent = n ? n + ' selected' : '0 selected';
+  }
+
+  document.getElementById('eq-search').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.eq-item').forEach(row => {
+      row.style.display = (!q || row.dataset.name.includes(q)) ? '' : 'none';
+    });
+  });
+
+  document.getElementById('mem-search').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.mem-item').forEach(row => {
+      row.style.display = (!q || row.dataset.name.includes(q)) ? '' : 'none';
+    });
+  });
+
+  // Init counts on load
+  updateEqCount(); updateKitCount(); updateMemCount();
+</script>
 {% endblock %}

@@ -8,7 +8,6 @@ from django.shortcuts import redirect, render
 
 from apps.activity.models import ActivityLog
 from apps.borrowing.models import BorrowRequest, KitItemReturnApproval
-from apps.consumables.models import Consumable
 from apps.equipment.models import Equipment
 from apps.incidents.models import IncidentReport
 from apps.notifications.models import Notification
@@ -99,9 +98,6 @@ def dashboard_home_view(request):
             status__in=['APPROVED', 'ACTIVE'],
         ).select_related('borrower', 'equipment', 'kit').order_by('due_date')
 
-        all_consumables = Consumable.objects.filter(is_active=True).select_related('category')
-        low_stock_consumables = [c for c in all_consumables if c.is_low_stock]
-
         system_activity = ActivityLog.objects.select_related('actor').order_by('-timestamp')[:15]
 
         most_borrowed = (
@@ -146,7 +142,6 @@ def dashboard_home_view(request):
             'pending_approvals': pending_approvals,
             'open_incidents': open_incidents,
             'overdue_borrows': overdue_borrows,
-            'low_stock_consumables': low_stock_consumables,
             'system_activity': system_activity,
             'most_borrowed': most_borrowed,
             'category_usage': category_usage,

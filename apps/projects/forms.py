@@ -3,6 +3,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
+from apps.equipment.models import Equipment
+from apps.kits.models import Kit
 from apps.projects.models import Project, ProjectMember
 
 User = get_user_model()
@@ -11,14 +13,38 @@ User = get_user_model()
 class ProjectForm(forms.ModelForm):
     """Form for creating or editing a Project."""
 
+    initial_members = forms.ModelMultipleChoiceField(
+        queryset=User.objects.filter(is_active=True).order_by('first_name', 'last_name', 'username'),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label='Members',
+        help_text='Select members to add to this project (you will be added as Lead automatically).',
+    )
+
     class Meta:
         model = Project
-        fields = ['name', 'description', 'status', 'start_date', 'end_date']
+        fields = ['name', 'description', 'status', 'start_date', 'end_date', 'equipment', 'kits']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'equipment': forms.CheckboxSelectMultiple,
+            'kits': forms.CheckboxSelectMultiple,
         }
+
+    def __init__(self, *args, current_user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Exclude the current user from the members list (they're auto-added as Lead)
+        if current_user:
+            self.fields['initial_members'].queryset = User.objects.filter(
+                is_active=True
+            ).exclude(pk=current_user.pk).order_by('first_name', 'last_name', 'username')
+        self.fields['equipment'].queryset = Equipment.objects.filter(
+            is_active=True
+        ).select_related('category').order_by('name')
+        self.fields['kits'].queryset = Kit.objects.filter(
+            is_active=True
+        ).order_by('name')
 
     def clean(self):
         cleaned_data = super().clean()
