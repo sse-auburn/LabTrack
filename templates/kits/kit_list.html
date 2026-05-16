@@ -7,11 +7,11 @@
 <div>
 
   <!-- Page Header Banner -->
-  <div class="bg-gradient-to-r from-violet-600 to-purple-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-gradient-to-r from-brand-600 to-brand-800 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight">Equipment Kits</h1>
-        <p class="text-violet-100 text-sm mt-0.5">Curated bundles for common tasks</p>
+        <p class="text-white/80 text-sm mt-0.5">Curated bundles for common tasks</p>
       </div>
       <div class="flex items-center gap-2">
         <form method="get" class="flex gap-2">
@@ -24,7 +24,26 @@
           </div>
           {% if search %}<a href="{% url 'kits:list' %}" class="px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm rounded-lg transition-colors">Clear</a>{% endif %}
         </form>
-        <a href="{% url 'kits:create' %}" class="inline-flex items-center px-4 py-1.5 bg-white text-violet-700 text-sm font-semibold rounded-lg hover:bg-violet-50 transition-colors shadow-sm">
+        <div class="inline-flex rounded-lg border border-white/30 overflow-hidden">
+          <a href="?{{ query_string }}&view=grid"
+             class="inline-flex items-center px-3 py-1.5 text-sm transition-colors
+               {% if view_mode == 'grid' %}bg-white text-brand-700 font-semibold{% else %}text-white hover:bg-white/20{% endif %}"
+             title="Grid view">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+            </svg>
+          </a>
+          <a href="?{{ query_string }}&view=list"
+             class="inline-flex items-center px-3 py-1.5 text-sm border-l border-white/30 transition-colors
+               {% if view_mode == 'list' %}bg-white text-brand-700 font-semibold{% else %}text-white hover:bg-white/20{% endif %}"
+             title="List view">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+            </svg>
+          </a>
+        </div>
+        <a href="{% url 'kits:create' %}" class="inline-flex items-center px-4 py-1.5 bg-white text-brand-700 text-sm font-semibold rounded-lg hover:bg-brand-50 transition-colors shadow-sm">
           <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
@@ -37,7 +56,7 @@
   <!-- ====== My Kits ====== -->
   <div class="mb-10">
     <h2 class="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2">
-      <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
       </svg>
@@ -45,16 +64,63 @@
     </h2>
 
     {% if my_kits %}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {% for kit in my_kits %}
-      {% include 'kits/_kit_card.html' with kit=kit show_actions=True %}
-      {% endfor %}
-    </div>
+      {% if view_mode == 'list' %}
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Kit</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Items</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Shared</th>
+                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+              {% for kit in my_kits %}
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-brand-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">{{ kit.name }}</p>
+                      <p class="text-xs text-gray-500">#{{ kit.pk }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ kit.items.count }} item{{ kit.items.count|pluralize }}</td>
+                <td class="px-6 py-4 text-sm text-gray-700">
+                  {% if kit.is_shared %}<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">Yes</span>{% else %}<span class="text-gray-400">—</span>{% endif %}
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <a href="{% url 'kits:detail' kit.pk %}" class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium rounded-lg border border-gray-300 transition-colors">View</a>
+                    <a href="{% url 'reservations:create' %}?kit={{ kit.pk }}" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-medium rounded-lg transition-colors">Reserve</a>
+                    <a href="{% url 'kits:edit' kit.pk %}" class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium rounded-lg border border-gray-300 transition-colors">Edit</a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% else %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        {% for kit in my_kits %}
+        {% include 'kits/_kit_card.html' with kit=kit show_actions=True %}
+        {% endfor %}
+      </div>
+      {% endif %}
     {% else %}
-    <div class="bg-indigo-50 border border-indigo-100 rounded-xl px-6 py-8 text-center">
-      <p class="text-sm text-indigo-700 font-medium mb-2">You haven't created any kits yet.</p>
+    <div class="bg-brand-50 border border-brand-100 rounded-xl px-6 py-8 text-center">
+      <p class="text-sm text-brand-700 font-medium mb-2">You haven't created any kits yet.</p>
       <a href="{% url 'kits:create' %}"
-        class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
+        class="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition">
         Create Your First Kit
       </a>
     </div>
@@ -72,11 +138,55 @@
     </h2>
 
     {% if shared_kits %}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {% for kit in shared_kits %}
-      {% include 'kits/_kit_card.html' with kit=kit show_actions=False %}
-      {% endfor %}
-    </div>
+      {% if view_mode == 'list' %}
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Kit</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Items</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Created By</th>
+                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+              {% for kit in shared_kits %}
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-brand-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">{{ kit.name }}</p>
+                      <p class="text-xs text-gray-500">#{{ kit.pk }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ kit.items.count }} item{{ kit.items.count|pluralize }}</td>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ kit.created_by.full_name|default:"—" }}</td>
+                <td class="px-6 py-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <a href="{% url 'kits:detail' kit.pk %}" class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium rounded-lg border border-gray-300 transition-colors">View</a>
+                    <a href="{% url 'reservations:create' %}?kit={{ kit.pk }}" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-medium rounded-lg transition-colors">Reserve</a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% else %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        {% for kit in shared_kits %}
+        {% include 'kits/_kit_card.html' with kit=kit show_actions=False %}
+        {% endfor %}
+      </div>
+      {% endif %}
     {% else %}
     <p class="text-sm text-gray-400 py-4">No shared kits from other members yet.</p>
     {% endif %}

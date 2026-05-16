@@ -17,6 +17,7 @@ def kit_list_view(request):
     """List kits: split into the user's own and everyone else's."""
     from django.db.models import Q as _Q
     search = request.GET.get('q', '').strip()
+    view_mode = request.GET.get('view', 'grid')
     base_qs = Kit.objects.filter(is_active=True).prefetch_related('items__equipment').select_related('created_by')
     my_kits = base_qs.filter(created_by=request.user)
     shared_kits = base_qs.filter(is_shared=True).exclude(created_by=request.user)
@@ -26,10 +27,17 @@ def kit_list_view(request):
             sq |= _Q(pk=int(search))
         my_kits = my_kits.filter(sq)
         shared_kits = shared_kits.filter(sq)
+
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    query_string = query_params.urlencode()
+
     return render(request, 'kits/kit_list.html', {
         'my_kits': my_kits,
         'shared_kits': shared_kits,
         'search': search,
+        'view_mode': view_mode,
+        'query_string': query_string,
     })
 
 

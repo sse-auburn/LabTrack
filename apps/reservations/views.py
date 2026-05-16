@@ -163,7 +163,12 @@ def reservation_create_view(request):
         if form.is_valid():
             reservation = form.save(commit=False)
             reservation.requester = request.user
-            reservation.status = 'CONFIRMED'
+            today = timezone.now().date()
+            if reservation.start_date <= today:
+                reservation.status = 'ACTIVE'
+                reservation.start_notified = True
+            else:
+                reservation.status = 'CONFIRMED'
             reservation.save()
 
             # Sync equipment status so kit reservations are reflected on individual items.
@@ -460,7 +465,12 @@ def reservation_confirm_view(request, pk):
         return redirect('reservations:detail', pk=reservation.pk)
 
     if request.method == 'POST':
-        reservation.status = 'CONFIRMED'
+        today = timezone.now().date()
+        if reservation.start_date <= today:
+            reservation.status = 'ACTIVE'
+            reservation.start_notified = True
+        else:
+            reservation.status = 'CONFIRMED'
         reservation.save()
 
         # Sync equipment status so kit reservations are reflected on individual items.

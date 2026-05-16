@@ -17,6 +17,7 @@ urlpatterns = [
     path('<int:pk>/delete/', views.equipment_delete_view, name='delete'),
     path('<int:pk>/approve/', views.equipment_approve_view, name='approve'),
     path('<int:pk>/reject/', views.equipment_reject_view, name='reject'),
+    path('<int:pk>/ask-approval/', views.equipment_ask_approval_view, name='ask_approval'),
 
     # Lifecycle & movement
     path('<int:pk>/lifecycle/', views.lifecycle_timeline_view, name='lifecycle'),

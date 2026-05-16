@@ -53,6 +53,8 @@ def equipment_list_view(request):
     search = request.GET.get('q', '').strip()
     category_id = request.GET.get('category', '').strip()
     location_id = request.GET.get('location', '').strip()
+    owner_id = request.GET.get('owner', '').strip()
+    kit_id = request.GET.get('kit', '').strip()
     status = request.GET.get('status', '').strip()
     condition = request.GET.get('condition', '').strip()
 
@@ -71,6 +73,10 @@ def equipment_list_view(request):
         queryset = queryset.filter(category_id=category_id)
     if location_id:
         queryset = queryset.filter(location_id=location_id)
+    if owner_id:
+        queryset = queryset.filter(owner_id=owner_id)
+    if kit_id:
+        queryset = queryset.filter(kit_memberships__kit_id=kit_id)
     if status:
         queryset = queryset.filter(status=status)
     if condition:
@@ -91,12 +97,16 @@ def equipment_list_view(request):
     query_params.pop('page', None)
     query_string = query_params.urlencode()
 
+    from apps.accounts.models import CustomUser
+    from apps.kits.models import Kit
     return render(request, 'equipment/equipment_list.html', {
         'page_obj': page_obj,
         'equipment_list': page_obj,
         'total_count': total_count,
         'categories': Category.objects.all().order_by('name'),
         'locations': Location.objects.all().order_by('name'),
+        'owners': CustomUser.objects.filter(is_active=True).order_by('first_name', 'last_name'),
+        'kits': Kit.objects.filter(is_active=True).order_by('name'),
         'view_mode': view_mode,
         'query_string': query_string,
     })
@@ -427,6 +437,35 @@ def equipment_pending_list_view(request):
         'pending_list': page_obj,
         'total_count': queryset.count(),
     })
+
+
+@login_required
+def equipment_ask_approval_view(request, pk):
+    """Resend approval notification for pending equipment. Creator only."""
+    equipment = get_object_or_404(Equipment, pk=pk, approval_status='PENDING', is_active=True)
+
+    if request.user != equipment.created_by and request.user.role != 'ADMIN':
+        messages.error(request, 'Only the creator or an admin can request approval again.')
+        return redirect('equipment:detail', pk=pk)
+
+    if equipment.owner and equipment.owner != request.user:
+        from apps.notifications.utils import notify
+        notify(
+            recipient=equipment.owner,
+            title='Equipment Assigned — Approval Reminder',
+            message=(
+                f'{request.user.full_name} is requesting your approval for '
+                f'"{equipment.name}". Please review and approve or reject it.'
+            ),
+            level='warning',
+            link=f'/equipment/{equipment.pk}/',
+            category='equipment',
+        )
+        messages.success(request, f'Approval reminder sent to {equipment.owner.full_name}.')
+    else:
+        messages.info(request, 'No owner assigned to notify.')
+
+    return redirect('equipment:detail', pk=pk)
 
 
 @login_required

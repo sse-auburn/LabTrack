@@ -92,6 +92,13 @@
                     Reject
                   </a>
                   {% endif %}
+                  {% if item.approval_status == 'PENDING' and request.user == item.created_by and not user.is_admin and item.owner != user %}
+                  <a href="{% url 'equipment:ask_approval' item.pk %}"
+                     class="px-3 py-1.5 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-xs font-semibold rounded-lg transition-colors border border-yellow-300"
+                     title="Send approval reminder to {{ item.owner.full_name|default:'owner' }}">
+                    Ask Again
+                  </a>
+                  {% endif %}
                 </div>
               </td>
             </tr>

@@ -7,11 +7,11 @@
 <div>
 
   <!-- Page Header Banner -->
-  <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-gradient-to-r from-brand-600 to-brand-800 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight">Reservations</h1>
-        <p class="text-emerald-100 text-sm mt-0.5">
+        <p class="text-white/80 text-sm mt-0.5">
           {% if request.user.is_staff %}All lab reservations{% else %}Your reservations{% endif %}
         </p>
       </div>

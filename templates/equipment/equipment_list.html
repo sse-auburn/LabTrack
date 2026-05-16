@@ -8,19 +8,19 @@
   <div>
 
     <!-- Page Header Banner -->
-    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="bg-gradient-to-r from-brand-600 to-brand-800 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 class="text-2xl font-bold tracking-tight">Equipment</h1>
           {% if total_count is not None %}
-          <p class="text-blue-100 text-sm mt-0.5">{{ total_count }} item{{ total_count|pluralize }} in the lab</p>
+          <p class="text-white/80 text-sm mt-0.5">{{ total_count }} item{{ total_count|pluralize }} in the lab</p>
           {% endif %}
         </div>
         <div class="flex items-center gap-2 flex-wrap">
           <div class="inline-flex rounded-lg border border-white/30 overflow-hidden">
             <a href="?{{ query_string }}&view=grid"
                class="inline-flex items-center px-3 py-1.5 text-sm transition-colors
-                 {% if view_mode == 'grid' %}bg-white text-blue-700 font-semibold{% else %}text-white hover:bg-white/20{% endif %}"
+                 {% if view_mode == 'grid' %}bg-white text-brand-700 font-semibold{% else %}text-white hover:bg-white/20{% endif %}"
                title="Grid view">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -29,7 +29,7 @@
             </a>
             <a href="?{{ query_string }}&view=list"
                class="inline-flex items-center px-3 py-1.5 text-sm border-l border-white/30 transition-colors
-                 {% if view_mode == 'list' %}bg-white text-blue-700 font-semibold{% else %}text-white hover:bg-white/20{% endif %}"
+                 {% if view_mode == 'list' %}bg-white text-brand-700 font-semibold{% else %}text-white hover:bg-white/20{% endif %}"
                title="List view">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
@@ -37,7 +37,7 @@
             </a>
           </div>
           <a href="{% url 'equipment:create' %}"
-             class="inline-flex items-center px-4 py-1.5 bg-white text-blue-700 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors shadow-sm">
+             class="inline-flex items-center px-4 py-1.5 bg-white text-brand-700 text-sm font-semibold rounded-lg hover:bg-brand-50 transition-colors shadow-sm">
             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
@@ -60,7 +60,7 @@
     <!-- Filter Bar -->
     <form method="get" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
       <input type="hidden" name="view" value="{{ view_mode }}">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
         <!-- Search -->
         <div class="lg:col-span-1">
           <label for="search" class="block text-xs font-medium text-gray-500 mb-1">Search</label>
@@ -110,6 +110,30 @@
             <option value="MAINTENANCE" {% if request.GET.status == 'MAINTENANCE' %}selected{% endif %}>Maintenance</option>
             <option value="DAMAGED" {% if request.GET.status == 'DAMAGED' %}selected{% endif %}>Damaged</option>
             <option value="RETIRED" {% if request.GET.status == 'RETIRED' %}selected{% endif %}>Retired</option>
+          </select>
+        </div>
+
+        <!-- Owner -->
+        <div>
+          <label for="owner" class="block text-xs font-medium text-gray-500 mb-1">Owner</label>
+          <select id="owner" name="owner"
+                  class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+            <option value="">All Owners</option>
+            {% for u in owners %}
+            <option value="{{ u.pk }}" {% if request.GET.owner == u.pk|stringformat:"s" %}selected{% endif %}>{{ u.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Kit -->
+        <div>
+          <label for="kit" class="block text-xs font-medium text-gray-500 mb-1">Kit</label>
+          <select id="kit" name="kit"
+                  class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+            <option value="">All Kits</option>
+            {% for k in kits %}
+            <option value="{{ k.pk }}" {% if request.GET.kit == k.pk|stringformat:"s" %}selected{% endif %}>{{ k.name }}</option>
+            {% endfor %}
           </select>
         </div>
 
@@ -222,7 +246,7 @@
                 {% elif item.status == 'BORROWED' %}
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Borrowed</span>
                 {% elif item.status == 'RESERVED' %}
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Reserved</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-brand-700">Reserved</span>
                 {% elif item.status == 'MAINTENANCE' %}
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">Maintenance</span>
                 {% elif item.status == 'DAMAGED' %}

@@ -56,6 +56,14 @@
               </a>
             </div>
             {% endif %}
+            {% if equipment.approval_status == 'PENDING' and request.user == equipment.created_by and not can_approve %}
+            <div class="flex items-center gap-2 mt-2">
+              <a href="{% url 'equipment:ask_approval' equipment.pk %}"
+                 class="px-3 py-1.5 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-xs font-semibold rounded-lg transition-colors border border-yellow-300">
+                Ask Again for Approval
+              </a>
+            </div>
+            {% endif %}
           </div>
           {% endif %}
 

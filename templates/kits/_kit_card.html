@@ -1,4 +1,4 @@
-<div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition group">
+<div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition group flex flex-col h-full">
   <!-- Card Header -->
   <div class="bg-gradient-to-r from-indigo-50 to-purple-50 px-5 pt-5 pb-4 border-b border-gray-100">
     <div class="flex items-start justify-between">
@@ -30,11 +30,11 @@
   </div>
 
   <!-- Card Body -->
-  <div class="px-5 py-4">
+  <div class="px-5 py-4 flex flex-col flex-1">
     <!-- Kit Items Preview -->
     {% with items=kit.items.all|slice:":3" %}
     {% if items %}
-    <div class="mb-4">
+    <div class="mb-4 flex-1">
       <p class="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Contains</p>
       <div class="space-y-1">
         {% for item in items %}

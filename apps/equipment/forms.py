@@ -218,6 +218,12 @@ class EquipmentFilterForm(forms.Form):
         empty_label='All locations',
         widget=forms.Select(attrs={'class': 'form-select'}),
     )
+    owner = forms.ModelChoiceField(
+        queryset=None,
+        required=False,
+        empty_label='All owners',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
     status = forms.ChoiceField(
         choices=[('', 'All statuses')] + Equipment.STATUS_CHOICES,
         required=False,
@@ -228,3 +234,20 @@ class EquipmentFilterForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'}),
     )
+    kit = forms.ModelChoiceField(
+        queryset=None,
+        required=False,
+        empty_label='All kits',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from apps.accounts.models import CustomUser
+        from apps.kits.models import Kit
+        self.fields['owner'].queryset = CustomUser.objects.filter(
+            is_active=True
+        ).order_by('first_name', 'last_name')
+        self.fields['kit'].queryset = Kit.objects.filter(
+            is_active=True
+        ).order_by('name')
