@@ -3,9 +3,20 @@
 {% block page_title %}Incident Reports{% endblock %}
 {% block content %}
 <div class="space-y-6">
-  <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-bold text-gray-900">Incident Reports</h1>
-    <a href="{% url 'incidents:create' %}" class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700">Report Incident</a>
+  <!-- Page Header Banner -->
+  <div class="bg-gradient-to-r from-red-600 to-rose-700 rounded-2xl px-6 py-4 text-white shadow-md">
+    <div class="flex items-center justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">Incident Reports</h1>
+        <p class="text-red-100 text-sm mt-0.5">Track and manage lab incidents and issues</p>
+      </div>
+      <a href="{% url 'incidents:create' %}" class="inline-flex items-center px-4 py-1.5 bg-white text-red-700 text-sm font-semibold rounded-lg hover:bg-red-50 transition-colors shadow-sm">
+        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Report Incident
+      </a>
+    </div>
   </div>
 
   <!-- Filters -->

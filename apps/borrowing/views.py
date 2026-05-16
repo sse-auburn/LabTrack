@@ -38,11 +38,11 @@ def borrow_list_view(request):
 
     if _is_admin(request.user):
         qs = BorrowRequest.objects.select_related(
-            'borrower', 'equipment', 'kit', 'project', 'approved_by'
+            'borrower', 'equipment', 'kit', 'approved_by'
         )
     else:
         qs = BorrowRequest.objects.filter(borrower=request.user).select_related(
-            'equipment', 'kit', 'project', 'approved_by'
+            'equipment', 'kit', 'approved_by'
         )
 
     pending_count = qs.filter(status='RETURN_PENDING').count()
@@ -147,7 +147,6 @@ def borrow_bulk_create_view(request):
         if form.is_valid():
             purpose = form.cleaned_data['purpose']
             due_date = form.cleaned_data['due_date']
-            project = form.cleaned_data.get('project')
 
             with transaction.atomic():
                 items = Equipment.objects.select_for_update().filter(
@@ -173,7 +172,6 @@ def borrow_bulk_create_view(request):
                     borrow = BorrowRequest.objects.create(
                         borrower=request.user,
                         equipment=item,
-                        project=project,
                         purpose=purpose,
                         due_date=due_date,
                         status='APPROVED',
@@ -248,7 +246,7 @@ def borrow_detail_view(request, pk):
     """Show full details of a single borrow request."""
     borrow = get_object_or_404(
         BorrowRequest.objects.select_related(
-            'borrower', 'equipment', 'kit', 'project', 'approved_by'
+            'borrower', 'equipment', 'kit', 'approved_by'
         ),
         pk=pk,
     )
@@ -530,7 +528,7 @@ def overdue_list_view(request):
     qs = BorrowRequest.objects.filter(
         due_date__lt=date.today(),
         status__in=['APPROVED', 'ACTIVE'],
-    ).select_related('borrower', 'equipment', 'kit', 'project').order_by('due_date')
+    ).select_related('borrower', 'equipment', 'kit').order_by('due_date')
 
     paginator = Paginator(qs, 20)
     overdue_borrows = paginator.get_page(request.GET.get('page'))
@@ -547,7 +545,7 @@ def return_queue_view(request):
     equipment_returns = BorrowRequest.objects.filter(
         status='RETURN_PENDING',
         equipment__owner=request.user,
-    ).select_related('borrower', 'equipment', 'project').order_by('returned_date')
+    ).select_related('borrower', 'equipment').order_by('returned_date')
 
     # Kit item approvals assigned to this user
     kit_approvals = KitItemReturnApproval.objects.filter(

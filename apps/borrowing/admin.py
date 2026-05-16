@@ -10,7 +10,7 @@ class BorrowRequestAdmin(admin.ModelAdmin):
     search_fields = ('borrower__email', 'borrower__username', 'equipment__name')
     readonly_fields = ('requested_date', 'approved_date', 'returned_date')
     date_hierarchy = 'requested_date'
-    raw_id_fields = ('borrower', 'equipment', 'kit', 'project', 'approved_by')
+    raw_id_fields = ('borrower', 'equipment', 'kit', 'approved_by')
 
 
 @admin.register(KitItemReturnApproval)

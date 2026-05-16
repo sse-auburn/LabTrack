@@ -12,7 +12,6 @@ from apps.equipment.models import Equipment
 from apps.incidents.models import IncidentReport
 from apps.kits.models import Kit
 from apps.notifications.models import Notification
-from apps.projects.models import Project
 from apps.reservations.models import Reservation
 
 
@@ -98,8 +97,6 @@ def dashboard_home_view(request):
 
         total_kits = Kit.objects.filter(is_active=True).count()
         shared_kits = Kit.objects.filter(is_active=True, is_shared=True).count()
-        total_projects = Project.objects.count()
-        active_projects = Project.objects.filter(status='ACTIVE').count()
 
         overdue_borrows = BorrowRequest.objects.filter(
             due_date__lt=today,
@@ -116,8 +113,6 @@ def dashboard_home_view(request):
             'open_incidents': open_incidents,
             'total_kits': total_kits,
             'shared_kits': shared_kits,
-            'total_projects': total_projects,
-            'active_projects': active_projects,
             'overdue_borrows': overdue_borrows,
             'system_activity': system_activity,
         })

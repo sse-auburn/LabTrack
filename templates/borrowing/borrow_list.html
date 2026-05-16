@@ -7,46 +7,48 @@
 <div>
   <div>
 
-    <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">
-          {% if user.is_admin %}Borrow Requests{% else %}My Borrows{% endif %}
-        </h1>
-        <p class="mt-1 text-sm text-gray-500">
-          {% if user.is_admin %}Manage all equipment borrow requests.{% else %}Track your equipment borrowing history.{% endif %}
-        </p>
-      </div>
-      {% if user.is_authenticated %}
-      <div class="flex gap-2">
-        <a href="{% url 'borrowing:return_queue' %}"
-           class="inline-flex items-center px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-medium rounded-lg border border-amber-200 transition-colors duration-150">
-          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-          </svg>
-          Return Queue
-          {% if pending_count %}
-          <span class="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500 text-white text-xs font-bold">{{ pending_count }}</span>
+    <!-- Page Header Banner -->
+    <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight">
+            {% if user.is_admin %}Borrow Requests{% else %}My Borrows{% endif %}
+          </h1>
+          <p class="text-amber-100 text-sm mt-0.5">
+            {% if user.is_admin %}Manage all equipment borrow requests{% else %}Track your equipment borrowing history{% endif %}
+          </p>
+        </div>
+        {% if user.is_authenticated %}
+        <div class="flex items-center gap-2 flex-wrap">
+          <a href="{% url 'borrowing:return_queue' %}"
+             class="inline-flex items-center px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-medium rounded-lg transition-colors">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            Return Queue
+            {% if pending_count %}
+            <span class="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-white text-amber-600 text-xs font-bold">{{ pending_count }}</span>
+            {% endif %}
+          </a>
+          {% if user.is_admin %}
+          <a href="{% url 'borrowing:overdue' %}"
+             class="inline-flex items-center px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-medium rounded-lg transition-colors">
+            Overdue
+            {% if overdue_count %}
+            <span class="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-white text-red-600 text-xs font-bold">{{ overdue_count }}</span>
+            {% endif %}
+          </a>
           {% endif %}
-        </a>
-        {% if user.is_admin %}
-        <a href="{% url 'borrowing:overdue' %}"
-           class="inline-flex items-center px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 text-sm font-medium rounded-lg border border-red-200 transition-colors duration-150">
-          Overdue
-          {% if overdue_count %}
-          <span class="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold">{{ overdue_count }}</span>
-          {% endif %}
-        </a>
+          <a href="{% url 'borrowing:create' %}"
+             class="inline-flex items-center px-4 py-1.5 bg-white text-orange-700 text-sm font-semibold rounded-lg hover:bg-orange-50 transition-colors shadow-sm">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            New Request
+          </a>
+        </div>
         {% endif %}
-        <a href="{% url 'borrowing:create' %}"
-           class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors duration-150">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-          </svg>
-          New Request
-        </a>
       </div>
-      {% endif %}
     </div>
 
     <!-- Search Bar -->
@@ -145,9 +147,6 @@
                 {% endif %}
                 <td class="px-6 py-4">
                   <p class="text-sm text-gray-600 max-w-xs truncate">{{ borrow.purpose }}</p>
-                  {% if borrow.project %}
-                  <p class="text-xs text-indigo-600 mt-0.5">{{ borrow.project.name }}</p>
-                  {% endif %}
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-600">{{ borrow.requested_date|date:"M d, Y" }}</td>
                 <td class="px-6 py-4">

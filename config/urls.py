@@ -43,9 +43,6 @@ urlpatterns = [
     # Lab kits
     path('kits/', include('apps.kits.urls', namespace='kits')),
 
-    # Projects
-    path('projects/', include('apps.projects.urls', namespace='projects')),
-
     # Incidents / maintenance reports
     path('incidents/', include('apps.incidents.urls', namespace='incidents')),
 

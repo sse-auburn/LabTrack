@@ -12,7 +12,6 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('equipment', '0001_initial'),
-        ('projects', '0001_initial'),
         ('kits', '0001_initial'),
     ]
 
@@ -33,7 +32,6 @@ class Migration(migrations.Migration):
                 ('borrower', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='borrow_requests', to=settings.AUTH_USER_MODEL)),
                 ('equipment', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='borrow_requests', to='equipment.equipment')),
                 ('kit', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='borrow_requests', to='kits.kit')),
-                ('project', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='borrow_requests', to='projects.project')),
             ],
             options={
                 'ordering': ['-requested_date'],

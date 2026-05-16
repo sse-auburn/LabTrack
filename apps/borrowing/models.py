@@ -35,13 +35,6 @@ class BorrowRequest(models.Model):
         blank=True,
         related_name='borrow_requests',
     )
-    project = models.ForeignKey(
-        'projects.Project',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='borrow_requests',
-    )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     purpose = models.TextField()
     requested_date = models.DateTimeField(auto_now_add=True)

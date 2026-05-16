@@ -62,7 +62,6 @@ LOCAL_APPS = [
     'apps.borrowing',
     'apps.reservations',
     'apps.kits',
-    'apps.projects',
     'apps.incidents',
     'apps.notifications',
     'apps.activity',

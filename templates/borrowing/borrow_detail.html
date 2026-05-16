@@ -49,10 +49,6 @@
         </p>
       </div>
       <div>
-        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Project</p>
-        <p class="mt-1 text-sm text-gray-900">{% if borrow.project %}<a href="{% url 'projects:detail' borrow.project.pk %}" class="text-indigo-600 hover:underline">{{ borrow.project.name }}</a>{% else %}—{% endif %}</p>
-      </div>
-      <div>
         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Due Date</p>
         <p class="mt-1 text-sm {% if borrow.is_overdue %}text-red-600 font-semibold{% else %}text-gray-900{% endif %}">{{ borrow.due_date|date:"M d, Y" }}</p>
       </div>

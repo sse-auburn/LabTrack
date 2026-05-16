@@ -6,7 +6,6 @@ from django.utils import timezone
 from apps.borrowing.models import BorrowRequest
 from apps.equipment.models import Equipment
 from apps.kits.models import Kit
-from apps.projects.models import Project
 from apps.reservations.models import Reservation
 
 
@@ -25,15 +24,9 @@ class BorrowRequestForm(forms.ModelForm):
         empty_label='-- Select Kit --',
         help_text='Select a kit OR equipment, not both.',
     )
-    project = forms.ModelChoiceField(
-        queryset=Project.objects.filter(status='ACTIVE'),
-        required=False,
-        empty_label='-- No Project --',
-    )
-
     class Meta:
         model = BorrowRequest
-        fields = ['equipment', 'kit', 'project', 'purpose', 'due_date']
+        fields = ['equipment', 'kit', 'purpose', 'due_date']
         widgets = {
             'due_date': forms.DateInput(attrs={'type': 'date'}),
             'purpose': forms.Textarea(attrs={'rows': 3}),
@@ -120,11 +113,6 @@ class BorrowRequestForm(forms.ModelForm):
 class BulkBorrowForm(forms.Form):
     """Shared purpose/due_date when borrowing multiple equipment items at once."""
 
-    project = forms.ModelChoiceField(
-        queryset=Project.objects.filter(status='ACTIVE'),
-        required=False,
-        empty_label='-- No Project --',
-    )
     purpose = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 3}),
         help_text='Why are you borrowing these items?',
