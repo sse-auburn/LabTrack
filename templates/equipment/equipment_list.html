@@ -185,7 +185,7 @@
               </td>
               {% endif %}
               <td class="px-4 py-3">
-                <div class="flex items-center gap-3">
+                <a href="{% url 'equipment:detail' item.pk %}" class="flex items-center gap-3 group">
                   {% if item.image %}
                   <img src="{{ item.image.url }}" alt="{{ item.name }}"
                        class="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-gray-200">
@@ -198,10 +198,10 @@
                   </div>
                   {% endif %}
                   <div class="min-w-0">
-                    <p class="font-semibold text-gray-900 truncate">{{ item.name }}</p>
+                    <p class="font-semibold text-gray-900 truncate group-hover:text-indigo-600 transition-colors">{{ item.name }}</p>
                     {% if item.serial_number %}<p class="text-xs text-gray-400 truncate">S/N: {{ item.serial_number }}</p>{% endif %}
                   </div>
-                </div>
+                </a>
               </td>
               <td class="px-4 py-3">
                 {% if item.category %}

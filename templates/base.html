@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,7 +14,7 @@
         extend: {
           colors: {
             brand: {
-              50:  '#eef2ff',
+              50: '#eef2ff',
               100: '#e0e7ff',
               200: '#c7d2fe',
               300: '#a5b4fc',
@@ -25,11 +26,11 @@
               900: '#312e81',
             },
             sidebar: {
-              bg:      '#0f172a',
-              hover:   '#1e293b',
-              active:  '#312e81',
-              border:  '#1e293b',
-              text:    '#94a3b8',
+              bg: '#0f172a',
+              hover: '#1e293b',
+              active: '#312e81',
+              border: '#1e293b',
+              text: '#94a3b8',
               textAct: '#e2e8f0',
             }
           },
@@ -47,262 +48,298 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    [x-cloak] { display: none !important; }
+    [x-cloak] {
+      display: none !important;
+    }
+
     .sidebar-link.active {
       background-color: #312e81;
       color: #e2e8f0;
     }
-    .sidebar-link.active svg { color: #a5b4fc; }
+
+    .sidebar-link.active svg {
+      color: #a5b4fc;
+    }
+
     /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #1e293b; }
-    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
   </style>
 
   {% block extra_head %}{% endblock %}
 </head>
+
 <body class="h-full bg-slate-100 font-sans antialiased">
 
-<!-- ============================================================
+  <!-- ============================================================
      MOBILE OVERLAY (sidebar backdrop)
      ============================================================ -->
-<div id="sidebar-overlay"
-     class="fixed inset-0 z-20 bg-black/60 backdrop-blur-sm hidden lg:hidden"
-     onclick="closeSidebar()">
-</div>
-
-<!-- ============================================================
-     SIDEBAR
-     ============================================================ -->
-<aside id="sidebar"
-       class="fixed inset-y-0 left-0 z-30 w-64 flex flex-col bg-sidebar-bg transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0">
-
-  <!-- Logo -->
-  <div class="flex items-center gap-3 px-6 py-5 border-b border-sidebar-border flex-shrink-0">
-    <div class="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center flex-shrink-0">
-      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-      </svg>
-    </div>
-    <div class="flex-1 min-w-0">
-      <span class="text-white font-bold text-base tracking-tight leading-tight">SSELabTrack</span>
-      <p class="text-sidebar-text text-xs leading-tight">Lab Management</p>
-    </div>
-    <!-- Close button (mobile only) -->
-    <button onclick="closeSidebar()" class="lg:hidden text-sidebar-text hover:text-white">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-      </svg>
-    </button>
+  <div id="sidebar-overlay" class="fixed inset-0 z-20 bg-black/60 backdrop-blur-sm hidden lg:hidden"
+    onclick="closeSidebar()">
   </div>
 
-  <!-- Navigation -->
-  <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
+  <!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+  <aside id="sidebar"
+    class="fixed inset-y-0 left-0 z-30 w-64 flex flex-col bg-sidebar-bg transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0">
 
-    <!-- Main navigation group -->
-    <p class="px-3 pt-2 pb-1 text-xs font-semibold uppercase tracking-widest text-slate-500">Main</p>
+    <!-- Logo -->
+    <div class="flex items-center gap-3 px-6 py-5 border-b border-sidebar-border flex-shrink-0">
+      <div class="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center flex-shrink-0">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <span class="text-white font-bold text-base tracking-tight leading-tight">SSELabTrack</span>
+        <p class="text-sidebar-text text-xs leading-tight">Lab Management</p>
+      </div>
+      <!-- Close button (mobile only) -->
+      <button onclick="closeSidebar()" class="lg:hidden text-sidebar-text hover:text-white">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
 
-    <a href="{% url 'dashboard:home' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'dashboard' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="w-4.5 h-4.5 flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-      </svg>
-      <span class="text-sm font-medium">Dashboard</span>
-    </a>
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
 
-    <a href="{% url 'pcard:list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'pcard' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-      </svg>
-      <span class="text-sm font-medium">P-Card</span>
-    </a>
+      <!-- Main navigation group -->
+      <p class="px-3 pt-2 pb-1 text-xs font-semibold uppercase tracking-widest text-slate-500">Main</p>
 
-    <a href="{% url 'equipment:list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'equipment' and 'category' not in request.resolver_match.url_name and 'location' not in request.resolver_match.url_name %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
-      </svg>
-      <span class="text-sm font-medium">Equipment</span>
-    </a>
+      <a href="{% url 'dashboard:home' %}"
+        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'dashboard' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
+        <svg class="w-4.5 h-4.5 flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        <span class="text-sm font-medium">Dashboard</span>
+      </a>
+      <a href="{% url 'projects:list' %}"
+        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'projects' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
+        <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          style="width:1.1rem;height:1.1rem">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+        </svg>
+        <span class="text-sm font-medium">Projects</span>
+      </a>
+      <a href="{% url 'kits:list' %}"
+        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'kits' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
+        <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          style="width:1.1rem;height:1.1rem">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+        <span class="text-sm font-medium">Kits</span>
+      </a>
 
-    <a href="{% url 'borrowing:list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'borrowing' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-      </svg>
-      <span class="text-sm font-medium">Borrow</span>
-    </a>
+      <a href="{% url 'equipment:list' %}"
+        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'equipment' and 'category' not in request.resolver_match.url_name and 'location' not in request.resolver_match.url_name %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
+        <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          style="width:1.1rem;height:1.1rem">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
+        </svg>
+        <span class="text-sm font-medium">Equipment</span>
+      </a>
 
-    <a href="{% url 'reservations:list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'reservations' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-      </svg>
-      <span class="text-sm font-medium">Reservations</span>
-    </a>
+      <a href="{% url 'borrowing:list' %}"
+        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'borrowing' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
+        <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          style="width:1.1rem;height:1.1rem">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+        </svg>
+        <span class="text-sm font-medium">Borrow</span>
+      </a>
 
-    <!-- Lab group -->
-    <p class="px-3 pt-4 pb-1 text-xs font-semibold uppercase tracking-widest text-slate-500">Lab Resources</p>
+      <a href="{% url 'reservations:list' %}"
+        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'reservations' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
+        <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          style="width:1.1rem;height:1.1rem">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span class="text-sm font-medium">Reservations</span>
+      </a>
 
-    <a href="{% url 'kits:list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'kits' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-      </svg>
-      <span class="text-sm font-medium">Kits</span>
-    </a>
+      <!-- Lab group -->
+      <p class="px-3 pt-4 pb-1 text-xs font-semibold uppercase tracking-widest text-slate-500">Lab Resources</p>
 
-    <a href="{% url 'projects:list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'projects' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
-      </svg>
-      <span class="text-sm font-medium">Projects</span>
-    </a>
+      <a href="{% url 'equipment:category_list' %}"
+        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'equipment' and 'category' in request.resolver_match.url_name %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
+        <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          style="width:1.1rem;height:1.1rem">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a2 2 0 012-2z" />
+        </svg>
+        <span class="text-sm font-medium">Categories</span>
+      </a>
 
-    <a href="{% url 'equipment:category_list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'equipment' and 'category' in request.resolver_match.url_name %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a2 2 0 012-2z"/>
-      </svg>
-      <span class="text-sm font-medium">Categories</span>
-    </a>
+      <a href="{% url 'equipment:location_list' %}"
+        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'equipment' and 'location' in request.resolver_match.url_name %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
+        <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          style="width:1.1rem;height:1.1rem">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span class="text-sm font-medium">Locations</span>
+      </a>
 
-    <a href="{% url 'equipment:location_list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'equipment' and 'location' in request.resolver_match.url_name %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-      </svg>
-      <span class="text-sm font-medium">Locations</span>
-    </a>
+      {% if user.is_admin %}
+      <a href="{% url 'accounts:user_list' %}"
+        class="sidebar-link {% if request.resolver_match and request.resolver_match.url_name == 'user_list' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
+        <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          style="width:1.1rem;height:1.1rem">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <span class="text-sm font-medium">Users</span>
+      </a>
+      {% endif %}
 
-    {% if user.is_admin %}
-    <a href="{% url 'accounts:user_list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.url_name == 'user_list' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-      </svg>
-      <span class="text-sm font-medium">Users</span>
-    </a>
-    {% endif %}
+      <!-- Reports group -->
+      <p class="px-3 pt-4 pb-1 text-xs font-semibold uppercase tracking-widest text-slate-500">Reports</p>
 
-    <!-- Reports group -->
-    <p class="px-3 pt-4 pb-1 text-xs font-semibold uppercase tracking-widest text-slate-500">Reports</p>
+      <a href="{% url 'pcard:list' %}"
+        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'pcard' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
+        <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          style="width:1.1rem;height:1.1rem">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+        </svg>
+        <span class="text-sm font-medium">P-Card</span>
+      </a>
 
-    <a href="{% url 'incidents:list' %}"
-       class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'incidents' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
-      <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.1rem;height:1.1rem">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-      </svg>
-      <span class="text-sm font-medium">Incidents</span>
-    </a>
+      <a href="{% url 'incidents:list' %}"
+        class="sidebar-link {% if request.resolver_match and request.resolver_match.namespace == 'incidents' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors group">
+        <svg class="flex-shrink-0 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          style="width:1.1rem;height:1.1rem">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <span class="text-sm font-medium">Incidents</span>
+      </a>
 
-  </nav>
+    </nav>
 
-  <!-- Sidebar footer: user mini card -->
-  {% if user.is_authenticated %}
-  <div class="flex-shrink-0 px-4 py-4 border-t border-sidebar-border">
-    <a href="{% url 'accounts:profile' %}" class="flex items-center gap-3 group">
-      {% if user.profile.avatar %}
-        <img src="{{ user.profile.avatar.url }}"
-             alt="{{ user.get_full_name }}"
-             class="w-9 h-9 rounded-full object-cover ring-2 ring-slate-700 group-hover:ring-brand-500 transition-all" />
-      {% else %}
-        <div class="w-9 h-9 rounded-full bg-brand-700 flex items-center justify-center ring-2 ring-slate-700 group-hover:ring-brand-500 transition-all flex-shrink-0">
+    <!-- Sidebar footer: user mini card -->
+    {% if user.is_authenticated %}
+    <div class="flex-shrink-0 px-4 py-4 border-t border-sidebar-border">
+      <a href="{% url 'accounts:profile' %}" class="flex items-center gap-3 group">
+        {% if user.profile.avatar %}
+        <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name }}"
+          class="w-9 h-9 rounded-full object-cover ring-2 ring-slate-700 group-hover:ring-brand-500 transition-all" />
+        {% else %}
+        <div
+          class="w-9 h-9 rounded-full bg-brand-700 flex items-center justify-center ring-2 ring-slate-700 group-hover:ring-brand-500 transition-all flex-shrink-0">
           <span class="text-white text-sm font-semibold">
             {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
           </span>
         </div>
-      {% endif %}
-      <div class="min-w-0 flex-1">
-        <p class="text-sm font-medium text-slate-200 truncate">{{ user.full_name }}</p>
-        <p class="text-xs text-slate-500 truncate">@{{ user.username }}</p>
-      </div>
-    </a>
-  </div>
-  {% endif %}
-</aside>
+        {% endif %}
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-medium text-slate-200 truncate">{{ user.full_name }}</p>
+          <p class="text-xs text-slate-500 truncate">@{{ user.username }}</p>
+        </div>
+      </a>
+    </div>
+    {% endif %}
+  </aside>
 
-<!-- ============================================================
+  <!-- ============================================================
      MAIN WRAPPER (navbar + content)
      ============================================================ -->
-<div class="flex flex-col flex-1 min-h-screen lg:ml-64">
+  <div class="flex flex-col flex-1 min-h-screen lg:ml-64">
 
-  <!-- ====== TOP NAVBAR ====== -->
-  <header class="sticky top-0 z-10 bg-white border-b border-slate-200 shadow-sm flex-shrink-0">
-    <div class="flex items-center h-16 px-4 sm:px-6">
+    <!-- ====== TOP NAVBAR ====== -->
+    <header class="sticky top-0 z-10 bg-white border-b border-slate-200 shadow-sm flex-shrink-0">
+      <div class="flex items-center h-16 px-4 sm:px-6">
 
-      <!-- Hamburger (mobile) -->
-      <button onclick="openSidebar()"
-              class="lg:hidden p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 focus:outline-none mr-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-      </button>
+        <!-- Hamburger (mobile) -->
+        <button onclick="openSidebar()"
+          class="lg:hidden p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 focus:outline-none mr-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
 
-      <!-- Page title slot -->
-      <div class="flex-1 min-w-0">
-        <h1 class="text-lg font-semibold text-slate-800 truncate">{% block page_title %}{% endblock %}</h1>
-      </div>
+        <!-- Page title slot -->
+        <div class="flex-1 min-w-0">
+          <h1 class="text-lg font-semibold text-slate-800 truncate">{% block page_title %}{% endblock %}</h1>
+        </div>
 
-      <!-- Right side controls -->
-      <div class="flex items-center gap-2 ml-4">
+        <!-- Right side controls -->
+        <div class="flex items-center gap-2 ml-4">
 
-        {% if user.is_authenticated %}
-        <!-- Notifications dropdown -->
-        <div class="relative" id="notifications-dropdown-wrapper">
-          <button onclick="toggleNotificationsDropdown()"
-                  class="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none"
-                  aria-label="Notifications">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
-            {% if unread_notification_count and unread_notification_count > 0 %}
-            <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center leading-none">
-              {{ unread_notification_count }}
-            </span>
-            {% endif %}
-          </button>
-
-          <div id="notifications-dropdown-menu"
-               class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-2 z-50 max-h-[28rem] flex flex-col">
-            <div class="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
-              <p class="text-sm font-semibold text-slate-800">Notifications</p>
+          {% if user.is_authenticated %}
+          <!-- Notifications dropdown -->
+          <div class="relative" id="notifications-dropdown-wrapper">
+            <button onclick="toggleNotificationsDropdown()"
+              class="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none"
+              aria-label="Notifications">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
               {% if unread_notification_count and unread_notification_count > 0 %}
-              <span class="text-xs text-brand-600 font-medium">{{ unread_notification_count }} new</span>
+              <span
+                class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center leading-none">
+                {{ unread_notification_count }}
+              </span>
               {% endif %}
-            </div>
-            <div class="overflow-y-auto flex-1">
-              {% if recent_notifications %}
+            </button>
+
+            <div id="notifications-dropdown-menu"
+              class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-2 z-50 max-h-[28rem] flex flex-col">
+              <div class="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
+                <p class="text-sm font-semibold text-slate-800">Notifications</p>
+                {% if unread_notification_count and unread_notification_count > 0 %}
+                <span class="text-xs text-brand-600 font-medium">{{ unread_notification_count }} new</span>
+                {% endif %}
+              </div>
+              <div class="overflow-y-auto flex-1">
+                {% if recent_notifications %}
                 {% for n in recent_notifications %}
                 <a href="{% if n.link %}{{ n.link }}{% else %}{% url 'notifications:list' %}{% endif %}"
-                   class="block px-4 py-3 hover:bg-slate-50 transition-colors {% if not n.is_read %}bg-brand-50/50{% endif %}">
+                  class="block px-4 py-3 hover:bg-slate-50 transition-colors {% if not n.is_read %}bg-brand-50/50{% endif %}">
                   <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
+                    <div
+                      class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
                                 {% if n.level == 'error' %}bg-red-100 text-red-600{% elif n.level == 'warning' %}bg-amber-100 text-amber-600{% elif n.level == 'success' %}bg-green-100 text-green-600{% else %}bg-blue-100 text-blue-600{% endif %}">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         {% if n.level == 'error' %}
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         {% elif n.level == 'warning' %}
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         {% elif n.level == 'success' %}
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         {% else %}
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         {% endif %}
                       </svg>
                     </div>
@@ -317,46 +354,47 @@
                   </div>
                 </a>
                 {% endfor %}
-              {% else %}
+                {% else %}
                 <div class="px-4 py-6 text-center">
                   <p class="text-sm text-slate-400">No new notifications</p>
                 </div>
-              {% endif %}
-            </div>
-            <div class="border-t border-slate-100 mt-auto">
-              <a href="{% url 'notifications:list' %}"
-                 class="block px-4 py-2.5 text-sm text-brand-600 font-medium text-center hover:bg-slate-50 transition-colors">
-                See all notifications
-              </a>
+                {% endif %}
+              </div>
+              <div class="border-t border-slate-100 mt-auto">
+                <a href="{% url 'notifications:list' %}"
+                  class="block px-4 py-2.5 text-sm text-brand-600 font-medium text-center hover:bg-slate-50 transition-colors">
+                  See all notifications
+                </a>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Activity dropdown -->
-        <div class="relative" id="activity-dropdown-wrapper">
-          <button onclick="toggleActivityDropdown()"
-                  class="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none"
-                  aria-label="Activity">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-            </svg>
-          </button>
+          <!-- Activity dropdown -->
+          <div class="relative" id="activity-dropdown-wrapper">
+            <button onclick="toggleActivityDropdown()"
+              class="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none"
+              aria-label="Activity">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </button>
 
-          <div id="activity-dropdown-menu"
-               class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-2 z-50 max-h-[28rem] flex flex-col">
-            <div class="px-4 py-2 border-b border-slate-100">
-              <p class="text-sm font-semibold text-slate-800">Activity</p>
-            </div>
-            <div class="overflow-y-auto flex-1">
-              {% if recent_activities %}
+            <div id="activity-dropdown-menu"
+              class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-2 z-50 max-h-[28rem] flex flex-col">
+              <div class="px-4 py-2 border-b border-slate-100">
+                <p class="text-sm font-semibold text-slate-800">Activity</p>
+              </div>
+              <div class="overflow-y-auto flex-1">
+                {% if recent_activities %}
                 {% for a in recent_activities %}
-                <a href="{% url 'activity:feed' %}"
-                   class="block px-4 py-3 hover:bg-slate-50 transition-colors">
+                <a href="{% url 'activity:feed' %}" class="block px-4 py-3 hover:bg-slate-50 transition-colors">
                   <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
+                    <div
+                      class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <div class="min-w-0 flex-1">
@@ -372,189 +410,189 @@
                   </div>
                 </a>
                 {% endfor %}
-              {% else %}
+                {% else %}
                 <div class="px-4 py-6 text-center">
                   <p class="text-sm text-slate-400">No recent activity</p>
                 </div>
-              {% endif %}
-            </div>
-            <div class="border-t border-slate-100 mt-auto">
-              <a href="{% url 'activity:feed' %}"
-                 class="block px-4 py-2.5 text-sm text-brand-600 font-medium text-center hover:bg-slate-50 transition-colors">
-                See all activity
-              </a>
+                {% endif %}
+              </div>
+              <div class="border-t border-slate-100 mt-auto">
+                <a href="{% url 'activity:feed' %}"
+                  class="block px-4 py-2.5 text-sm text-brand-600 font-medium text-center hover:bg-slate-50 transition-colors">
+                  See all activity
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-        {% endif %}
+          {% endif %}
 
-        <!-- User dropdown -->
-        {% if user.is_authenticated %}
-        <div class="relative" id="user-dropdown-wrapper">
-          <button onclick="toggleUserDropdown()"
-                  class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none">
-            {% if user.profile.avatar %}
-              <img src="{{ user.profile.avatar.url }}"
-                   alt="{{ user.get_full_name }}"
-                   class="w-8 h-8 rounded-full object-cover" />
-            {% else %}
+          <!-- User dropdown -->
+          {% if user.is_authenticated %}
+          <div class="relative" id="user-dropdown-wrapper">
+            <button onclick="toggleUserDropdown()"
+              class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none">
+              {% if user.profile.avatar %}
+              <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name }}"
+                class="w-8 h-8 rounded-full object-cover" />
+              {% else %}
               <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
                 <span class="text-white text-xs font-semibold">
                   {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
                 </span>
               </div>
-            {% endif %}
-            <div class="hidden sm:block text-left">
-              <p class="text-sm font-medium text-slate-700 leading-tight">{{ user.full_name }}</p>
-              <p class="text-xs text-slate-500 leading-tight">@{{ user.username }}</p>
-            </div>
-            <svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
-          </button>
+              {% endif %}
+              <div class="hidden sm:block text-left">
+                <p class="text-sm font-medium text-slate-700 leading-tight">{{ user.full_name }}</p>
+                <p class="text-xs text-slate-500 leading-tight">@{{ user.username }}</p>
+              </div>
+              <svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
 
-          <!-- Dropdown menu -->
-          <div id="user-dropdown-menu"
-               class="hidden absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-1 z-50">
-            <div class="px-4 py-2 border-b border-slate-100">
-              <p class="text-sm font-semibold text-slate-800 truncate">{{ user.full_name }}</p>
-              <p class="text-xs text-slate-500 truncate">{{ user.email }}</p>
-            </div>
-            <a href="{% url 'accounts:profile' %}"
-               class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-              </svg>
-              My Profile
-            </a>
-            <a href="{% url 'accounts:profile_edit' %}"
-               class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-              </svg>
-              Edit Profile
-            </a>
-            <a href="{% url 'accounts:password_change' %}"
-               class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-              </svg>
-              Change Password
-            </a>
-            <div class="border-t border-slate-100 mt-1 pt-1">
-              <form method="post" action="{% url 'accounts:logout' %}">
-                {% csrf_token %}
-                <button type="submit"
-                        class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                  </svg>
-                  Sign Out
-                </button>
-              </form>
+            <!-- Dropdown menu -->
+            <div id="user-dropdown-menu"
+              class="hidden absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-1 z-50">
+              <div class="px-4 py-2 border-b border-slate-100">
+                <p class="text-sm font-semibold text-slate-800 truncate">{{ user.full_name }}</p>
+                <p class="text-xs text-slate-500 truncate">{{ user.email }}</p>
+              </div>
+              <a href="{% url 'accounts:profile' %}"
+                class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                My Profile
+              </a>
+              <a href="{% url 'accounts:profile_edit' %}"
+                class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit Profile
+              </a>
+              <a href="{% url 'accounts:password_change' %}"
+                class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+                Change Password
+              </a>
+              <div class="border-t border-slate-100 mt-1 pt-1">
+                <form method="post" action="{% url 'accounts:logout' %}">
+                  {% csrf_token %}
+                  <button type="submit"
+                    class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Sign Out
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
+          {% else %}
+          <a href="{% url 'accounts:login' %}"
+            class="px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors">
+            Sign In
+          </a>
+          {% endif %}
+
         </div>
-        {% else %}
-        <a href="{% url 'accounts:login' %}"
-           class="px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors">
-          Sign In
-        </a>
-        {% endif %}
-
       </div>
-    </div>
-  </header>
+    </header>
 
-  <!-- ====== MAIN CONTENT ====== -->
-  <main class="flex-1 p-4 sm:p-6">
+    <!-- ====== MAIN CONTENT ====== -->
+    <main class="flex-1 p-4 sm:p-6">
 
-    <!-- Breadcrumbs slot -->
-    {% block breadcrumbs %}{% endblock %}
+      <!-- Breadcrumbs slot -->
+      {% block breadcrumbs %}{% endblock %}
 
-    <!-- Flash messages -->
-    {% include 'partials/_messages.html' %}
+      <!-- Flash messages -->
+      {% include 'partials/_messages.html' %}
 
-    <!-- Page content -->
-    {% block content %}{% endblock %}
+      <!-- Page content -->
+      {% block content %}{% endblock %}
 
-  </main>
+    </main>
 
-  <!-- ====== FOOTER ====== -->
-  <footer class="bg-white border-t border-slate-200 px-6 py-4">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
-      <p class="text-xs text-slate-500">
-        &copy; {% now "Y" %} SSELabTrack &mdash; Smart Systems Engineering Lab
-      </p>
-      <p class="text-xs text-slate-400">
-        Lab Management System &bull; All rights reserved
-      </p>
-    </div>
-  </footer>
+    <!-- ====== FOOTER ====== -->
+    <footer class="bg-white border-t border-slate-200 px-6 py-4">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
+        <p class="text-xs text-slate-500">
+          &copy; {% now "Y" %} SSELabTrack &mdash; Smart Systems Engineering Lab
+        </p>
+        <p class="text-xs text-slate-400">
+          Lab Management System &bull; All rights reserved
+        </p>
+      </div>
+    </footer>
 
-</div><!-- end main wrapper -->
+  </div><!-- end main wrapper -->
 
-<!-- ============================================================
+  <!-- ============================================================
      GLOBAL JAVASCRIPT
      ============================================================ -->
-<script>
-  /* ---- Sidebar ---- */
-  function openSidebar() {
-    document.getElementById('sidebar').classList.remove('-translate-x-full');
-    document.getElementById('sidebar-overlay').classList.remove('hidden');
-    document.body.classList.add('overflow-hidden');
-  }
-  function closeSidebar() {
-    document.getElementById('sidebar').classList.add('-translate-x-full');
-    document.getElementById('sidebar-overlay').classList.add('hidden');
-    document.body.classList.remove('overflow-hidden');
-  }
-
-  /* ---- User dropdown ---- */
-  function toggleUserDropdown() {
-    const menu = document.getElementById('user-dropdown-menu');
-    menu.classList.toggle('hidden');
-  }
-
-  /* ---- Notifications dropdown ---- */
-  function toggleNotificationsDropdown() {
-    const menu = document.getElementById('notifications-dropdown-menu');
-    menu.classList.toggle('hidden');
-    // Close activity dropdown if open
-    document.getElementById('activity-dropdown-menu').classList.add('hidden');
-  }
-
-  /* ---- Activity dropdown ---- */
-  function toggleActivityDropdown() {
-    const menu = document.getElementById('activity-dropdown-menu');
-    menu.classList.toggle('hidden');
-    // Close notifications dropdown if open
-    document.getElementById('notifications-dropdown-menu').classList.add('hidden');
-  }
-
-  // Close dropdowns on outside click
-  document.addEventListener('click', function(e) {
-    const userWrapper = document.getElementById('user-dropdown-wrapper');
-    if (userWrapper && !userWrapper.contains(e.target)) {
-      document.getElementById('user-dropdown-menu').classList.add('hidden');
+  <script>
+    /* ---- Sidebar ---- */
+    function openSidebar() {
+      document.getElementById('sidebar').classList.remove('-translate-x-full');
+      document.getElementById('sidebar-overlay').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
     }
-    const notifWrapper = document.getElementById('notifications-dropdown-wrapper');
-    if (notifWrapper && !notifWrapper.contains(e.target)) {
-      document.getElementById('notifications-dropdown-menu').classList.add('hidden');
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('sidebar-overlay').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
     }
-    const activityWrapper = document.getElementById('activity-dropdown-wrapper');
-    if (activityWrapper && !activityWrapper.contains(e.target)) {
+
+    /* ---- User dropdown ---- */
+    function toggleUserDropdown() {
+      const menu = document.getElementById('user-dropdown-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    /* ---- Notifications dropdown ---- */
+    function toggleNotificationsDropdown() {
+      const menu = document.getElementById('notifications-dropdown-menu');
+      menu.classList.toggle('hidden');
+      // Close activity dropdown if open
       document.getElementById('activity-dropdown-menu').classList.add('hidden');
     }
-  });
 
-</script>
+    /* ---- Activity dropdown ---- */
+    function toggleActivityDropdown() {
+      const menu = document.getElementById('activity-dropdown-menu');
+      menu.classList.toggle('hidden');
+      // Close notifications dropdown if open
+      document.getElementById('notifications-dropdown-menu').classList.add('hidden');
+    }
 
-{% block extra_js %}{% endblock %}
+    // Close dropdowns on outside click
+    document.addEventListener('click', function (e) {
+      const userWrapper = document.getElementById('user-dropdown-wrapper');
+      if (userWrapper && !userWrapper.contains(e.target)) {
+        document.getElementById('user-dropdown-menu').classList.add('hidden');
+      }
+      const notifWrapper = document.getElementById('notifications-dropdown-wrapper');
+      if (notifWrapper && !notifWrapper.contains(e.target)) {
+        document.getElementById('notifications-dropdown-menu').classList.add('hidden');
+      }
+      const activityWrapper = document.getElementById('activity-dropdown-wrapper');
+      if (activityWrapper && !activityWrapper.contains(e.target)) {
+        document.getElementById('activity-dropdown-menu').classList.add('hidden');
+      }
+    });
+
+  </script>
+
+  {% block extra_js %}{% endblock %}
 
 </body>
+
 </html>
