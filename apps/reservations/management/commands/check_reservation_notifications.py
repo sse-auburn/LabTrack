@@ -10,6 +10,7 @@ from datetime import date
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
+from apps.equipment.utils import sync_equipment_status
 from apps.notifications.utils import notify
 from apps.reservations.models import Reservation
 
@@ -127,6 +128,13 @@ class Command(BaseCommand):
             res.status = 'RETURN_PENDING'
             res.end_notified = True
             res.save(update_fields=['status', 'end_notified'])
+
+            if res.equipment:
+                sync_equipment_status(res.equipment)
+            if res.kit:
+                for kit_item in res.kit.items.select_related('equipment'):
+                    sync_equipment_status(kit_item.equipment)
+
             count += 1
 
         return count

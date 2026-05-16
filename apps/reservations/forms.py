@@ -59,15 +59,22 @@ class ReservationForm(forms.ModelForm):
                 raise forms.ValidationError('Start date must be today or a future date.')
 
             # Overlap check: no CONFIRMED reservation for the same item in this window.
+            from django.db.models import Q
             overlap_qs = Reservation.objects.filter(status='CONFIRMED')
             # Exclude the current instance when editing.
             if self.instance and self.instance.pk:
                 overlap_qs = overlap_qs.exclude(pk=self.instance.pk)
 
             if equipment:
-                overlap_qs = overlap_qs.filter(equipment=equipment)
+                kit_ids = equipment.kit_memberships.values_list('kit_id', flat=True)
+                overlap_qs = overlap_qs.filter(
+                    Q(equipment=equipment) | Q(kit_id__in=kit_ids)
+                )
             else:
-                overlap_qs = overlap_qs.filter(kit=kit)
+                eq_ids = list(kit.items.values_list('equipment_id', flat=True))
+                overlap_qs = overlap_qs.filter(
+                    Q(kit=kit) | Q(equipment_id__in=eq_ids)
+                )
 
             # Overlapping date ranges: existing.start <= new.end AND existing.end >= new.start
             overlap_qs = overlap_qs.filter(

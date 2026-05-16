@@ -166,18 +166,12 @@ def reservation_create_view(request):
             reservation.status = 'CONFIRMED'
             reservation.save()
 
-            # Only block the item now if the reservation starts today or earlier.
-            # Future reservations leave the equipment available until their start date.
-            today = timezone.now().date()
-            if reservation.equipment and reservation.start_date <= today:
-                if reservation.equipment.status == 'AVAILABLE':
-                    reservation.equipment.status = 'RESERVED'
-                    reservation.equipment.save(update_fields=['status'])
-            if reservation.kit and reservation.start_date <= today:
+            # Sync equipment status so kit reservations are reflected on individual items.
+            if reservation.equipment:
+                sync_equipment_status(reservation.equipment)
+            if reservation.kit:
                 for kit_item in reservation.kit.items.select_related('equipment'):
-                    if kit_item.equipment.status == 'AVAILABLE':
-                        kit_item.equipment.status = 'RESERVED'
-                        kit_item.equipment.save(update_fields=['status'])
+                    sync_equipment_status(kit_item.equipment)
 
             log_activity(
                 actor=request.user,
@@ -262,13 +256,13 @@ def reservation_bulk_create_view(request):
                 )
                 created = []
                 for item in locked_items:
-                    # Check for overlapping confirmed reservations
+                    # Check for overlapping confirmed reservations (direct or via kit)
+                    from django.db.models import Q
                     overlap = Reservation.objects.filter(
                         status='CONFIRMED',
-                        equipment=item,
                         start_date__lte=end_date,
                         end_date__gte=start_date,
-                    ).exists()
+                    ).filter(Q(equipment=item) | Q(kit__items__equipment=item)).exists()
                     if overlap:
                         continue
 
@@ -469,17 +463,12 @@ def reservation_confirm_view(request, pk):
         reservation.status = 'CONFIRMED'
         reservation.save()
 
-        # Only block the item now if the reservation starts today or earlier.
-        today = timezone.now().date()
-        if reservation.equipment and reservation.start_date <= today:
-            if reservation.equipment.status == 'AVAILABLE':
-                reservation.equipment.status = 'RESERVED'
-                reservation.equipment.save(update_fields=['status'])
-        if reservation.kit and reservation.start_date <= today:
+        # Sync equipment status so kit reservations are reflected on individual items.
+        if reservation.equipment:
+            sync_equipment_status(reservation.equipment)
+        if reservation.kit:
             for kit_item in reservation.kit.items.select_related('equipment'):
-                if kit_item.equipment.status == 'AVAILABLE':
-                    kit_item.equipment.status = 'RESERVED'
-                    kit_item.equipment.save(update_fields=['status'])
+                sync_equipment_status(kit_item.equipment)
 
         log_activity(
             actor=request.user,

@@ -4,12 +4,12 @@ import random
 from datetime import date
 
 
-def sync_equipment_status(equipment):
+def sync_equipment_status(equipment, exclude_borrow_pk=None):
     """Compute and save the correct status for *equipment* by querying live data.
 
     Priority (highest first):
     1. DAMAGED / RETIRED — never overridden automatically.
-    2. IN_USE  — any ACTIVE or RETURN_PENDING Reservation.
+    2. BORROWED  — any active BorrowRequest or ACTIVE/RETURN_PENDING Reservation.
     3. MAINTENANCE — any active MaintenanceLog (SCHEDULED / IN_PROGRESS).
     4. RESERVED  — a CONFIRMED Reservation whose window spans today.
     5. AVAILABLE — nothing else blocking.
@@ -17,30 +17,50 @@ def sync_equipment_status(equipment):
     if equipment.status in ('DAMAGED', 'RETIRED'):
         return
 
+    from django.db.models import Q
     from apps.incidents.models import MaintenanceLog
     from apps.reservations.models import Reservation
 
     today = date.today()
+    res_q = Q(equipment=equipment) | Q(kit__items__equipment=equipment)
 
     if Reservation.objects.filter(
-        equipment=equipment,
+        res_q,
         status__in=['ACTIVE', 'RETURN_PENDING'],
     ).exists():
-        new_status = 'IN_USE'
-    elif MaintenanceLog.objects.filter(
-        equipment=equipment,
-        status__in=['SCHEDULED', 'IN_PROGRESS'],
-    ).exists():
-        new_status = 'MAINTENANCE'
-    elif Reservation.objects.filter(
-        equipment=equipment,
-        status='CONFIRMED',
-        start_date__lte=today,
-        end_date__gte=today,
-    ).exists():
-        new_status = 'RESERVED'
+        new_status = 'BORROWED'
     else:
-        new_status = 'AVAILABLE'
+        borrow_blocked = False
+        try:
+            from apps.borrowing.models import BorrowRequest
+            borrow_q = Q(equipment=equipment) | Q(kit__items__equipment=equipment)
+            borrow_qs = BorrowRequest.objects.filter(
+                borrow_q,
+                status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING'],
+            )
+            if exclude_borrow_pk:
+                borrow_qs = borrow_qs.exclude(pk=exclude_borrow_pk)
+            borrow_blocked = borrow_qs.exists()
+        except RuntimeError:
+            # Borrowing app is not in INSTALLED_APPS
+            pass
+
+        if borrow_blocked:
+            new_status = 'BORROWED'
+        elif MaintenanceLog.objects.filter(
+            equipment=equipment,
+            status__in=['SCHEDULED', 'IN_PROGRESS'],
+        ).exists():
+            new_status = 'MAINTENANCE'
+        elif Reservation.objects.filter(
+            res_q,
+            status='CONFIRMED',
+            start_date__lte=today,
+            end_date__gte=today,
+        ).exists():
+            new_status = 'RESERVED'
+        else:
+            new_status = 'AVAILABLE'
 
     if equipment.status != new_status:
         equipment.status = new_status

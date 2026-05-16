@@ -122,10 +122,11 @@ def equipment_detail_view(request, pk):
         messages.error(request, 'This equipment is awaiting approval and is not yet visible.')
         return redirect('equipment:list')
 
-    # Reservation history for this equipment
+    # Reservation history for this equipment (direct or via kit)
     from apps.reservations.models import Reservation
+    from django.db.models import Q
     reservation_history = Reservation.objects.filter(
-        equipment=equipment
+        Q(equipment=equipment) | Q(kit__items__equipment=equipment)
     ).select_related('requester').order_by('-start_date')[:10]
 
     # Lifecycle timeline (latest first)
@@ -146,7 +147,7 @@ def equipment_detail_view(request, pk):
     # Calendar events (reservations only)
     cal_events = []
     for r in Reservation.objects.filter(
-        equipment=equipment,
+        Q(equipment=equipment) | Q(kit__items__equipment=equipment),
         status__in=['PENDING', 'CONFIRMED', 'ACTIVE', 'RETURN_PENDING'],
     ).select_related('requester'):
         cal_events.append({
@@ -890,7 +891,10 @@ def equipment_availability_json(request):
             Equipment.objects.filter(pk__in=equipment_pks, is_active=True).values_list('pk', flat=True)
         )
         for equipment_pk in valid_pks:
-            for res in Reservation.objects.filter(equipment_id=equipment_pk, status__in=['CONFIRMED', 'ACTIVE', 'PENDING', 'RETURN_PENDING']):
+            for res in Reservation.objects.filter(
+                Q(equipment_id=equipment_pk) | Q(kit__items__equipment_id=equipment_pk),
+                status__in=['CONFIRMED', 'ACTIVE', 'PENDING', 'RETURN_PENDING']
+            ):
                 add_reservation(res)
             for mlog in MaintenanceLog.objects.filter(equipment_id=equipment_pk, status__in=['SCHEDULED', 'IN_PROGRESS']):
                 add_maintenance(mlog)

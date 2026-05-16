@@ -158,14 +158,14 @@ def borrow_bulk_create_view(request):
 
                 created = []
                 for item in items:
-                    # Skip items with overlapping reservations
+                    # Skip items with overlapping reservations (direct or via kit)
+                    from django.db.models import Q
                     from apps.reservations.models import Reservation
                     overlap = Reservation.objects.filter(
                         status='CONFIRMED',
-                        equipment=item,
                         start_date__lte=due_date,
                         end_date__gte=timezone.now().date(),
-                    ).exists()
+                    ).filter(Q(equipment=item) | Q(kit__items__equipment=item)).exists()
                     if overlap:
                         continue
 

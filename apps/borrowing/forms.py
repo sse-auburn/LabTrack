@@ -77,10 +77,11 @@ class BorrowRequestForm(forms.ModelForm):
         # Check for conflicting confirmed reservations.
         # A borrow from today through due_date conflicts with a reservation if:
         # reservation.start_date <= due_date AND reservation.end_date >= today
+        from django.db.models import Q
         today = timezone.now().date()
         if equipment and due_date:
             conflict = Reservation.objects.filter(
-                equipment=equipment,
+                Q(equipment=equipment) | Q(kit__items__equipment=equipment),
                 status='CONFIRMED',
                 start_date__lte=due_date,
                 end_date__gte=today,
@@ -95,7 +96,7 @@ class BorrowRequestForm(forms.ModelForm):
         if kit and due_date:
             for kit_item in kit.items.select_related('equipment'):
                 conflict = Reservation.objects.filter(
-                    equipment=kit_item.equipment,
+                    Q(equipment=kit_item.equipment) | Q(kit__items__equipment=kit_item.equipment),
                     status='CONFIRMED',
                     start_date__lte=due_date,
                     end_date__gte=today,
