@@ -4,7 +4,7 @@
 {% block content %}
 <div class="space-y-6">
   <!-- Page Header Banner -->
-  <div class="bg-gradient-to-r from-brand-600 to-brand-800 rounded-2xl px-6 py-4 text-white shadow-md">
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md">
     <div class="flex items-center justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight">Incident Reports</h1>
@@ -25,55 +25,55 @@
     <a href="?severity=HIGH" class="px-3 py-1.5 bg-orange-100 text-orange-700 text-xs font-medium rounded-lg hover:bg-orange-200">High</a>
     <a href="?status=OPEN" class="px-3 py-1.5 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-lg hover:bg-yellow-200">Open</a>
     <a href="?status=RESOLVED" class="px-3 py-1.5 bg-green-100 text-green-700 text-xs font-medium rounded-lg hover:bg-green-200">Resolved</a>
-    <a href="?" class="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200">Clear</a>
+    <a href="?" class="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-medium rounded-lg hover:bg-gray-200">Clear</a>
   </div>
 
   {% if incidents %}
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Equipment</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Severity</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reported By</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned To</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Title</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Equipment</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Severity</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Reported By</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Assigned To</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Date</th>
             <th class="px-6 py-3"></th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody class="divide-y divide-slate-100">
           {% for incident in incidents %}
-          <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ incident.title }}</td>
+          <tr class="hover:bg-slate-50">
+            <td class="px-6 py-4 text-sm font-medium text-slate-900">{{ incident.title }}</td>
             <td class="px-6 py-4 text-sm">
-              <a href="{% url 'equipment:detail' incident.equipment.pk %}" class="text-indigo-600 hover:underline">{{ incident.equipment.name }}</a>
+              <a href="{% url 'equipment:detail' incident.equipment.pk %}" class="text-brand-600 hover:underline">{{ incident.equipment.name }}</a>
             </td>
             <td class="px-6 py-4">
               {% if incident.severity == 'CRITICAL' %}<span class="px-2 py-0.5 bg-red-600 text-white text-xs font-bold rounded-full">Critical</span>
               {% elif incident.severity == 'HIGH' %}<span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full">High</span>
               {% elif incident.severity == 'MEDIUM' %}<span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-semibold rounded-full">Medium</span>
-              {% else %}<span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">Low</span>{% endif %}
+              {% else %}<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">Low</span>{% endif %}
             </td>
             <td class="px-6 py-4">
               {% if incident.status == 'OPEN' %}<span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">Open</span>
               {% elif incident.status == 'INVESTIGATING' %}<span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">Investigating</span>
               {% elif incident.status == 'RESOLVED' %}<span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">Resolved</span>
-              {% else %}<span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">Closed</span>{% endif %}
+              {% else %}<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">Closed</span>{% endif %}
             </td>
-            <td class="px-6 py-4 text-sm text-gray-600">{{ incident.reported_by.full_name|default:"—" }}</td>
+            <td class="px-6 py-4 text-sm text-slate-600">{{ incident.reported_by.full_name|default:"—" }}</td>
             <td class="px-6 py-4 text-sm">
               {% if incident.assigned_to %}
-                <span class="text-indigo-700 font-medium">{{ incident.assigned_to.full_name }}</span>
+                <span class="text-brand-700 font-medium">{{ incident.assigned_to.full_name }}</span>
               {% else %}
-                <span class="text-gray-400 italic">Unassigned</span>
+                <span class="text-slate-400 italic">Unassigned</span>
               {% endif %}
             </td>
-            <td class="px-6 py-4 text-sm text-gray-500">{{ incident.created_at|date:"M d, Y" }}</td>
+            <td class="px-6 py-4 text-sm text-slate-500">{{ incident.created_at|date:"M d, Y" }}</td>
             <td class="px-6 py-4 text-right">
               <div class="flex items-center justify-end gap-2">
-                <a href="{% url 'incidents:detail' incident.pk %}" class="text-xs text-indigo-600 hover:underline">View</a>
+                <a href="{% url 'incidents:detail' incident.pk %}" class="text-xs text-brand-600 hover:underline">View</a>
                 {% if user.is_admin or incident.reported_by == user %}
                 <a href="{% url 'incidents:delete' incident.pk %}" class="text-xs text-red-600 hover:underline">Delete</a>
                 {% endif %}
@@ -86,8 +86,8 @@
     </div>
     {% include 'partials/_pagination.html' with page_obj=incidents %}
   {% else %}
-    <div class="bg-white rounded-xl border border-gray-200 p-16 text-center">
-      <p class="text-gray-400">No incidents found.</p>
+    <div class="bg-white rounded-xl border border-slate-200 p-16 text-center">
+      <p class="text-slate-400">No incidents found.</p>
     </div>
   {% endif %}
 </div>

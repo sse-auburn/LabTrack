@@ -4,6 +4,15 @@
 {% block page_title %}{{ equipment.name }}{% endblock %}
 
 {% block content %}
+
+  <!-- Page Header Banner -->
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">{{ equipment.name }}</h1>
+      </div>
+    </div>
+  </div>
 <div>
   <div>
 
@@ -11,7 +20,7 @@
     <nav class="flex mb-6" aria-label="Breadcrumb">
       <ol class="inline-flex items-center space-x-1 md:space-x-3">
         <li class="inline-flex items-center">
-          <a href="{% url 'equipment:list' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors">
+          <a href="{% url 'equipment:list' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-brand-600 transition-colors">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
             </svg>
@@ -20,17 +29,17 @@
         </li>
         <li>
           <div class="flex items-center">
-            <svg class="w-4 h-4 text-gray-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-slate-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
-            <span class="ml-1 text-sm font-medium text-gray-700">{{ equipment.name }}</span>
+            <span class="ml-1 text-sm font-medium text-slate-700">{{ equipment.name }}</span>
           </div>
         </li>
       </ol>
     </nav>
 
     <!-- Equipment Header -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
       <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
         <div class="flex-1">
           <!-- Pending Approval Banner -->
@@ -68,7 +77,7 @@
           {% endif %}
 
           <div class="flex flex-wrap items-center gap-3 mb-2">
-            <h1 class="text-2xl font-bold text-gray-900">{{ equipment.name }}</h1>
+            
             <!-- Status Badge -->
             {% if equipment.status == 'AVAILABLE' %}
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
@@ -91,7 +100,7 @@
               <span class="w-2 h-2 rounded-full bg-red-500 mr-1.5"></span>Damaged
             </span>
             {% elif equipment.status == 'RETIRED' %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-600">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-600">
               <span class="w-2 h-2 rounded-full bg-gray-400 mr-1.5"></span>Retired
             </span>
             {% endif %}
@@ -109,7 +118,7 @@
             {% endif %}
           </div>
           {% if equipment.category %}
-          <p class="text-sm text-gray-500 flex items-center gap-2">Category:
+          <p class="text-sm text-slate-500 flex items-center gap-2">Category:
             <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium text-white"
                   style="background-color: {{ equipment.category.color }};">
               {{ equipment.category.name }}
@@ -145,7 +154,7 @@
               Move
             </a>
             <a href="{% url 'equipment:edit' equipment.pk %}"
-               class="inline-flex items-center px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
+               class="inline-flex items-center px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg border border-slate-300 transition-colors duration-150">
               <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
               </svg>
@@ -169,12 +178,12 @@
 
       <!-- Left: Image -->
       <div class="lg:col-span-1">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           {% if equipment.image %}
           <img src="{{ equipment.image.url }}" alt="{{ equipment.name }}" class="w-full h-64 object-cover">
           {% else %}
-          <div class="w-full h-64 bg-gray-100 flex items-center justify-center">
-            <svg class="w-20 h-20 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-full h-64 bg-slate-100 flex items-center justify-center">
+            <svg class="w-20 h-20 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
             </svg>
           </div>
@@ -187,58 +196,58 @@
 
         <!-- Description -->
         {% if equipment.description %}
-        <div class="sm:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Description</h3>
-          <p class="text-sm text-gray-700">{{ equipment.description }}</p>
+        <div class="sm:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Description</h3>
+          <p class="text-sm text-slate-700">{{ equipment.description }}</p>
         </div>
         {% endif %}
 
         <!-- Serial Number -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Serial Number</h3>
-          <p class="text-sm font-medium text-gray-900">{{ equipment.serial_number|default:"—" }}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Serial Number</h3>
+          <p class="text-sm font-medium text-slate-900">{{ equipment.serial_number|default:"—" }}</p>
         </div>
 
         <!-- Model -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Model Number</h3>
-          <p class="text-sm font-medium text-gray-900">{{ equipment.model_number|default:"—" }}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Model Number</h3>
+          <p class="text-sm font-medium text-slate-900">{{ equipment.model_number|default:"—" }}</p>
         </div>
 
         <!-- Manufacturer -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Manufacturer</h3>
-          <p class="text-sm font-medium text-gray-900">{{ equipment.manufacturer|default:"—" }}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Manufacturer</h3>
+          <p class="text-sm font-medium text-slate-900">{{ equipment.manufacturer|default:"—" }}</p>
         </div>
 
         <!-- Category -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Category</h3>
-          <p class="text-sm font-medium text-gray-900">{{ equipment.category.name|default:"—" }}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Category</h3>
+          <p class="text-sm font-medium text-slate-900">{{ equipment.category.name|default:"—" }}</p>
         </div>
 
         <!-- Location -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Location</h3>
-          <p class="text-sm font-medium text-gray-900">{{ equipment.location|default:"—" }}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Location</h3>
+          <p class="text-sm font-medium text-slate-900">{{ equipment.location|default:"—" }}</p>
         </div>
 
         <!-- Owner -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Owner</h3>
-          <p class="text-sm font-medium text-gray-900">{{ equipment.owner.full_name|default:"—" }}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Owner</h3>
+          <p class="text-sm font-medium text-slate-900">{{ equipment.owner.full_name|default:"—" }}</p>
         </div>
 
         <!-- Purchase Date -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Purchase Date</h3>
-          <p class="text-sm font-medium text-gray-900">{{ equipment.purchase_date|date:"M d, Y"|default:"—" }}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Purchase Date</h3>
+          <p class="text-sm font-medium text-slate-900">{{ equipment.purchase_date|date:"M d, Y"|default:"—" }}</p>
         </div>
 
         <!-- Purchase Price -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Purchase Price</h3>
-          <p class="text-sm font-medium text-gray-900">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Purchase Price</h3>
+          <p class="text-sm font-medium text-slate-900">
             {% if equipment.purchase_price %}${{ equipment.purchase_price }}{% else %}—{% endif %}
           </p>
         </div>
@@ -247,37 +256,37 @@
     </div>
 
     <!-- Tabs Section -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden" x-data="{ activeTab: 'calendar' }">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" x-data="{ activeTab: 'calendar' }">
       <!-- Tab Nav -->
-      <div class="border-b border-gray-200">
+      <div class="border-b border-slate-200">
         <nav class="flex overflow-x-auto -mb-px" aria-label="Tabs">
           <button @click="activeTab = 'reservation-history'"
-                  :class="activeTab === 'reservation-history' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                  :class="activeTab === 'reservation-history' ? 'border-indigo-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Reservation History
           </button>
           <button @click="activeTab = 'lifecycle'"
-                  :class="activeTab === 'lifecycle' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                  :class="activeTab === 'lifecycle' ? 'border-indigo-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Lifecycle
           </button>
           <button @click="activeTab = 'movements'"
-                  :class="activeTab === 'movements' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                  :class="activeTab === 'movements' ? 'border-indigo-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Movement History
           </button>
           <button @click="activeTab = 'incidents'"
-                  :class="activeTab === 'incidents' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                  :class="activeTab === 'incidents' ? 'border-indigo-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Incidents
           </button>
           <button @click="activeTab = 'maintenance'"
-                  :class="activeTab === 'maintenance' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                  :class="activeTab === 'maintenance' ? 'border-indigo-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Maintenance
           </button>
           <button @click="activeTab = 'calendar'"
-                  :class="activeTab === 'calendar' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                  :class="activeTab === 'calendar' ? 'border-indigo-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Availability
           </button>
@@ -289,34 +298,34 @@
 
         <!-- Reservation History Tab -->
         <div id="tab-reservation-history" x-show="activeTab === 'reservation-history'">
-          <h3 class="text-base font-semibold text-gray-900 mb-4">Reservation History</h3>
+          <h3 class="text-base font-semibold text-slate-900 mb-4">Reservation History</h3>
           {% if reservation_history %}
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-slate-200">
+              <thead class="bg-slate-50">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Reserved By</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Purpose</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Start</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">End</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Reserved By</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Purpose</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Start</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">End</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-100">
+              <tbody class="bg-white divide-y divide-slate-100">
                 {% for res in reservation_history %}
-                <tr class="hover:bg-gray-50">
-                  <td class="px-4 py-3 text-sm text-gray-900">{{ res.requester.full_name }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">{{ res.purpose|default:"—" }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ res.start_date|date:"M d, Y" }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ res.end_date|date:"M d, Y" }}</td>
+                <tr class="hover:bg-slate-50">
+                  <td class="px-4 py-3 text-sm text-slate-900">{{ res.requester.full_name }}</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 max-w-xs truncate">{{ res.purpose|default:"—" }}</td>
+                  <td class="px-4 py-3 text-sm text-slate-600">{{ res.start_date|date:"M d, Y" }}</td>
+                  <td class="px-4 py-3 text-sm text-slate-600">{{ res.end_date|date:"M d, Y" }}</td>
                   <td class="px-4 py-3">
                     {% if res.status == 'PENDING' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
-                    {% elif res.status == 'CONFIRMED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">Confirmed</span>
+                    {% elif res.status == 'CONFIRMED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-brand-100 text-brand-800">Confirmed</span>
                     {% elif res.status == 'ACTIVE' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
                     {% elif res.status == 'RETURN_PENDING' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">Return Pending</span>
                     {% elif res.status == 'RETURNED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Returned</span>
-                    {% elif res.status == 'CANCELLED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">Cancelled</span>
-                    {% elif res.status == 'EXPIRED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-400">Expired</span>
+                    {% elif res.status == 'CANCELLED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-500">Cancelled</span>
+                    {% elif res.status == 'EXPIRED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-400">Expired</span>
                     {% endif %}
                   </td>
                 </tr>
@@ -325,115 +334,115 @@
             </table>
           </div>
           {% else %}
-          <p class="text-sm text-gray-500 text-center py-8">No reservation history for this equipment.</p>
+          <p class="text-sm text-slate-500 text-center py-8">No reservation history for this equipment.</p>
           {% endif %}
         </div>
 
         <!-- Lifecycle Tab -->
         <div id="tab-lifecycle" x-show="activeTab === 'lifecycle'" style="display:none;">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-base font-semibold text-gray-900">Lifecycle Timeline</h3>
-            <a href="{% url 'equipment:lifecycle' equipment.pk %}" class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">View Full Timeline</a>
+            <h3 class="text-base font-semibold text-slate-900">Lifecycle Timeline</h3>
+            <a href="{% url 'equipment:lifecycle' equipment.pk %}" class="text-sm text-brand-600 hover:text-brand-700 font-medium">View Full Timeline</a>
           </div>
           {% if lifecycle_events %}
-          <ol class="relative border-l border-gray-200 ml-4">
+          <ol class="relative border-l border-slate-200 ml-4">
             {% for event in lifecycle_events %}
             <li class="mb-6 ml-6">
-              <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 ring-8 ring-white">
-                <svg class="w-3 h-3 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+              <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-brand-100 ring-8 ring-white">
+                <svg class="w-3 h-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clip-rule="evenodd"/>
                 </svg>
               </span>
-              <h4 class="text-sm font-semibold text-gray-900">{{ event.get_event_type_display }}</h4>
-              <time class="block text-xs text-gray-400 mb-1">{{ event.timestamp|date:"M d, Y H:i" }}</time>
-              <p class="text-sm text-gray-600">{{ event.description }}</p>
+              <h4 class="text-sm font-semibold text-slate-900">{{ event.get_event_type_display }}</h4>
+              <time class="block text-xs text-slate-400 mb-1">{{ event.timestamp|date:"M d, Y H:i" }}</time>
+              <p class="text-sm text-slate-600">{{ event.description }}</p>
               {% if event.performed_by %}
-              <p class="text-xs text-gray-400 mt-1">By {{ event.performed_by.full_name }}</p>
+              <p class="text-xs text-slate-400 mt-1">By {{ event.performed_by.full_name }}</p>
               {% endif %}
             </li>
             {% endfor %}
           </ol>
           {% else %}
-          <p class="text-sm text-gray-500 text-center py-8">No lifecycle events recorded.</p>
+          <p class="text-sm text-slate-500 text-center py-8">No lifecycle events recorded.</p>
           {% endif %}
         </div>
 
         <!-- Movement History Tab -->
         <div id="tab-movements" x-show="activeTab === 'movements'" style="display:none;">
-          <h3 class="text-base font-semibold text-gray-900 mb-4">Movement History</h3>
+          <h3 class="text-base font-semibold text-slate-900 mb-4">Movement History</h3>
           {% if movement_logs %}
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-slate-200">
+              <thead class="bg-slate-50">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">From</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">To</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Moved By</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Reason</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">From</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">To</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Moved By</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Reason</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-100">
+              <tbody class="bg-white divide-y divide-slate-100">
                 {% for log in movement_logs %}
-                <tr class="hover:bg-gray-50">
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ log.from_location|default:"—" }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-900 font-medium">{{ log.to_location|default:"—" }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ log.moved_by.full_name|default:"—" }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ log.reason|default:"—" }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ log.timestamp|date:"M d, Y" }}</td>
+                <tr class="hover:bg-slate-50">
+                  <td class="px-4 py-3 text-sm text-slate-600">{{ log.from_location|default:"—" }}</td>
+                  <td class="px-4 py-3 text-sm text-slate-900 font-medium">{{ log.to_location|default:"—" }}</td>
+                  <td class="px-4 py-3 text-sm text-slate-600">{{ log.moved_by.full_name|default:"—" }}</td>
+                  <td class="px-4 py-3 text-sm text-slate-600">{{ log.reason|default:"—" }}</td>
+                  <td class="px-4 py-3 text-sm text-slate-600">{{ log.timestamp|date:"M d, Y" }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
           {% else %}
-          <p class="text-sm text-gray-500 text-center py-8">No movement history recorded.</p>
+          <p class="text-sm text-slate-500 text-center py-8">No movement history recorded.</p>
           {% endif %}
         </div>
 
         <!-- Incidents Tab -->
         <div id="tab-incidents" x-show="activeTab === 'incidents'" style="display:none;">
-          <h3 class="text-base font-semibold text-gray-900 mb-4">Incident Reports</h3>
+          <h3 class="text-base font-semibold text-slate-900 mb-4">Incident Reports</h3>
           {% if incidents %}
           <div class="space-y-4">
             {% for incident in incidents %}
             <div class="border border-red-100 rounded-lg p-4 bg-red-50">
               <div class="flex items-start justify-between">
                 <div>
-                  <h4 class="text-sm font-semibold text-gray-900">{{ incident.title|default:"Incident" }}</h4>
-                  <p class="text-xs text-gray-500 mt-0.5">{{ incident.created_at|date:"M d, Y H:i" }} — {% if incident.reported_by %}{{ incident.reported_by.full_name }}{% else %}Unknown{% endif %}</p>
+                  <h4 class="text-sm font-semibold text-slate-900">{{ incident.title|default:"Incident" }}</h4>
+                  <p class="text-xs text-slate-500 mt-0.5">{{ incident.created_at|date:"M d, Y H:i" }} — {% if incident.reported_by %}{{ incident.reported_by.full_name }}{% else %}Unknown{% endif %}</p>
                 </div>
                 <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">{{ incident.get_severity_display|default:"Incident" }}</span>
               </div>
-              <p class="text-sm text-gray-700 mt-2">{{ incident.description }}</p>
+              <p class="text-sm text-slate-700 mt-2">{{ incident.description }}</p>
             </div>
             {% endfor %}
           </div>
           {% else %}
-          <p class="text-sm text-gray-500 text-center py-8">No incident reports for this equipment.</p>
+          <p class="text-sm text-slate-500 text-center py-8">No incident reports for this equipment.</p>
           {% endif %}
         </div>
 
         <!-- Maintenance Tab -->
         <div id="tab-maintenance" x-show="activeTab === 'maintenance'" style="display:none;">
-          <h3 class="text-base font-semibold text-gray-900 mb-4">Maintenance &amp; Calibration Logs</h3>
+          <h3 class="text-base font-semibold text-slate-900 mb-4">Maintenance &amp; Calibration Logs</h3>
           {% if maintenance_logs %}
           <div class="space-y-4">
             {% for log in maintenance_logs %}
             <div class="border border-orange-100 rounded-lg p-4 bg-orange-50">
               <div class="flex items-start justify-between">
                 <div>
-                  <h4 class="text-sm font-semibold text-gray-900">{{ log.get_maintenance_type_display|default:"Maintenance" }}</h4>
-                  <p class="text-xs text-gray-500 mt-0.5">{{ log.scheduled_date|date:"M d, Y" }} — {% if log.performed_by %}{{ log.performed_by.full_name }}{% else %}—{% endif %}</p>
+                  <h4 class="text-sm font-semibold text-slate-900">{{ log.get_maintenance_type_display|default:"Maintenance" }}</h4>
+                  <p class="text-xs text-slate-500 mt-0.5">{{ log.scheduled_date|date:"M d, Y" }} — {% if log.performed_by %}{{ log.performed_by.full_name }}{% else %}—{% endif %}</p>
                 </div>
                 <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">{{ log.get_status_display|default:"Maintenance" }}</span>
               </div>
-              <p class="text-sm text-gray-700 mt-2">{{ log.notes|default:log.description }}</p>
+              <p class="text-sm text-slate-700 mt-2">{{ log.notes|default:log.description }}</p>
             </div>
             {% endfor %}
           </div>
           {% else %}
-          <p class="text-sm text-gray-500 text-center py-8">No maintenance logs for this equipment.</p>
+          <p class="text-sm text-slate-500 text-center py-8">No maintenance logs for this equipment.</p>
           {% endif %}
         </div>
 
@@ -471,9 +480,9 @@ document.addEventListener('DOMContentLoaded', function() {
           const isActive = j === i;
           if (panel) panel.style.display = isActive ? 'block' : 'none';
           document.querySelectorAll('nav button')[j].classList.toggle('border-indigo-500', isActive);
-          document.querySelectorAll('nav button')[j].classList.toggle('text-indigo-600', isActive);
+          document.querySelectorAll('nav button')[j].classList.toggle('text-brand-600', isActive);
           document.querySelectorAll('nav button')[j].classList.toggle('border-transparent', !isActive);
-          document.querySelectorAll('nav button')[j].classList.toggle('text-gray-500', !isActive);
+          document.querySelectorAll('nav button')[j].classList.toggle('text-slate-500', !isActive);
         });
       });
     });

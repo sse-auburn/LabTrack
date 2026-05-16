@@ -4,18 +4,27 @@
 {% block page_title %}Waitlist{% endblock %}
 
 {% block content %}
+
+  <!-- Page Header Banner -->
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">Waitlist</h1>
+      </div>
+    </div>
+  </div>
 <div>
 
   <!-- Header -->
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Waitlist</h1>
-      <p class="mt-1 text-sm text-gray-500">
+      
+      <p class="mt-1 text-sm text-slate-500">
         {% if request.user.is_staff %}All waitlist entries{% else %}Your waitlist positions{% endif %}
       </p>
     </div>
     <a href="{% url 'reservations:list' %}"
-       class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+       class="inline-flex items-center px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
       View Reservations
     </a>
   </div>
@@ -23,39 +32,39 @@
   <!-- Stats (admin) -->
   {% if request.user.is_staff %}
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-white rounded-xl border border-gray-200 p-4">
-      <p class="text-xs text-gray-500 uppercase tracking-wider">Total Entries</p>
-      <p class="text-2xl font-bold text-gray-900 mt-1">{{ total_count|default:waitlist_entries.count }}</p>
+    <div class="bg-white rounded-xl border border-slate-200 p-4">
+      <p class="text-xs text-slate-500 uppercase tracking-wider">Total Entries</p>
+      <p class="text-2xl font-bold text-slate-900 mt-1">{{ total_count|default:waitlist_entries.count }}</p>
     </div>
-    <div class="bg-white rounded-xl border border-gray-200 p-4">
-      <p class="text-xs text-gray-500 uppercase tracking-wider">Waiting</p>
+    <div class="bg-white rounded-xl border border-slate-200 p-4">
+      <p class="text-xs text-slate-500 uppercase tracking-wider">Waiting</p>
       <p class="text-2xl font-bold text-yellow-600 mt-1">{{ waiting_count|default:"—" }}</p>
     </div>
-    <div class="bg-white rounded-xl border border-gray-200 p-4">
-      <p class="text-xs text-gray-500 uppercase tracking-wider">Notified</p>
+    <div class="bg-white rounded-xl border border-slate-200 p-4">
+      <p class="text-xs text-slate-500 uppercase tracking-wider">Notified</p>
       <p class="text-2xl font-bold text-green-600 mt-1">{{ notified_count|default:"—" }}</p>
     </div>
-    <div class="bg-white rounded-xl border border-gray-200 p-4">
-      <p class="text-xs text-gray-500 uppercase tracking-wider">Items Affected</p>
-      <p class="text-2xl font-bold text-gray-900 mt-1">{{ items_count|default:"—" }}</p>
+    <div class="bg-white rounded-xl border border-slate-200 p-4">
+      <p class="text-xs text-slate-500 uppercase tracking-wider">Items Affected</p>
+      <p class="text-2xl font-bold text-slate-900 mt-1">{{ items_count|default:"—" }}</p>
     </div>
   </div>
   {% endif %}
 
   <!-- Table -->
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-      <h2 class="text-sm font-semibold text-gray-700">Waitlist Entries</h2>
+  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-slate-700">Waitlist Entries</h2>
       {% if request.user.is_staff %}
       <form method="get" class="flex gap-2">
         <select name="notified"
-                class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
           <option value="">All</option>
           <option value="0" {% if request.GET.notified == '0' %}selected{% endif %}>Not Notified</option>
           <option value="1" {% if request.GET.notified == '1' %}selected{% endif %}>Notified</option>
         </select>
         <button type="submit"
-                class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
+                class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm hover:bg-slate-50">
           Filter
         </button>
       </form>
@@ -63,41 +72,41 @@
     </div>
 
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Item</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Position</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Item</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Position</th>
             {% if request.user.is_staff %}
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">User</th>
             {% endif %}
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Created Date</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Notes</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Created Date</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Notes</th>
             {% if request.user.is_staff %}
-            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
             {% endif %}
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-100">
+        <tbody class="bg-white divide-y divide-slate-100">
           {% for entry in waitlist_entries %}
-          <tr class="hover:bg-gray-50 transition">
+          <tr class="hover:bg-slate-50 transition">
             <td class="px-6 py-4">
-              <div class="text-sm font-medium text-gray-900">
+              <div class="text-sm font-medium text-slate-900">
                 {% if entry.equipment %}
                   <a href="{% url 'equipment:detail' entry.equipment.pk %}"
-                     class="hover:text-indigo-600">{{ entry.equipment.name }}</a>
-                  <span class="ml-1.5 text-xs text-gray-400">Equipment</span>
+                     class="hover:text-brand-600">{{ entry.equipment.name }}</a>
+                  <span class="ml-1.5 text-xs text-slate-400">Equipment</span>
                 {% elif entry.kit %}
                   <a href="{% url 'kits:detail' entry.kit.pk %}"
-                     class="hover:text-indigo-600">{{ entry.kit.name }}</a>
-                  <span class="ml-1.5 text-xs text-gray-400">Kit</span>
+                     class="hover:text-brand-600">{{ entry.kit.name }}</a>
+                  <span class="ml-1.5 text-xs text-slate-400">Kit</span>
                 {% endif %}
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span class="inline-flex items-center justify-center w-8 h-8 rounded-full
-                           {% if entry.position == 1 %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-700{% endif %}
+                           {% if entry.position == 1 %}bg-brand-600 text-white{% else %}bg-slate-100 text-slate-700{% endif %}
                            text-sm font-bold">
                 {{ entry.position }}
               </span>
@@ -105,19 +114,19 @@
             {% if request.user.is_staff %}
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center gap-2">
-                <div class="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-semibold text-indigo-700">
+                <div class="h-7 w-7 rounded-full bg-brand-100 flex items-center justify-center text-xs font-semibold text-brand-700">
                   {{ entry.user.username|slice:":1"|upper }}
                 </div>
                 <div>
-                  <p class="text-sm text-gray-900">{{ entry.user.get_full_name|default:entry.user.username }}</p>
-                  <p class="text-xs text-gray-400">{{ entry.user.email }}</p>
+                  <p class="text-sm text-slate-900">{{ entry.user.get_full_name|default:entry.user.username }}</p>
+                  <p class="text-xs text-slate-400">{{ entry.user.email }}</p>
                 </div>
               </div>
             </td>
             {% endif %}
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
               {{ entry.created_at|date:"M d, Y" }}
-              <p class="text-xs text-gray-400">{{ entry.created_at|timesince }} ago</p>
+              <p class="text-xs text-slate-400">{{ entry.created_at|timesince }} ago</p>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               {% if entry.notified %}
@@ -136,7 +145,7 @@
                 </span>
               {% endif %}
             </td>
-            <td class="px-6 py-4 text-sm text-gray-500">
+            <td class="px-6 py-4 text-sm text-slate-500">
               {{ entry.notes|default:"—"|truncatechars:40 }}
             </td>
             {% if request.user.is_staff %}
@@ -155,8 +164,8 @@
           {% empty %}
           <tr>
             <td colspan="{% if request.user.is_staff %}7{% else %}5{% endif %}"
-                class="px-6 py-12 text-center text-sm text-gray-400">
-              <svg class="mx-auto h-10 w-10 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="px-6 py-12 text-center text-sm text-slate-400">
+              <svg class="mx-auto h-10 w-10 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                       d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
               </svg>

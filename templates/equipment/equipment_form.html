@@ -1,7 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
+
+  <!-- Page Header Banner -->
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">{% if form.instance.pk %}Edit Equipment{% else %}Add New Equipment{% endif %}</h1>
+      </div>
+    </div>
+  </div>
+<div class="min-h-screen bg-slate-50">
   <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Page Header -->
@@ -9,20 +18,18 @@
       <nav class="flex mb-2" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-1">
           <li>
-            <a href="{% url 'equipment:list' %}" class="text-sm text-gray-500 hover:text-indigo-600 transition-colors">Equipment</a>
+            <a href="{% url 'equipment:list' %}" class="text-sm text-slate-500 hover:text-brand-600 transition-colors">Equipment</a>
           </li>
           <li class="flex items-center">
-            <svg class="w-4 h-4 text-gray-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-slate-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
-            <span class="text-sm text-gray-700">{% if form.instance.pk %}Edit {{ form.instance.name }}{% else %}Add Equipment{% endif %}</span>
+            <span class="text-sm text-slate-700">{% if form.instance.pk %}Edit {{ form.instance.name }}{% else %}Add Equipment{% endif %}</span>
           </li>
         </ol>
       </nav>
-      <h1 class="text-2xl font-bold text-gray-900">
-        {% if form.instance.pk %}Edit Equipment{% else %}Add New Equipment{% endif %}
-      </h1>
-      <p class="mt-1 text-sm text-gray-500">
+      
+      <p class="mt-1 text-sm text-slate-500">
         {% if form.instance.pk %}Update the details for {{ form.instance.name }}.{% else %}Fill in the details to add new equipment to the inventory.{% endif %}
       </p>
     </div>
@@ -47,18 +54,18 @@
         <div class="lg:col-span-2 space-y-6">
 
           <!-- Basic Information -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 class="text-base font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">Basic Information</h2>
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-base font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">Basic Information</h2>
             <div class="space-y-4">
 
               <!-- Name -->
               <div>
-                <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
                   Equipment Name <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="{{ form.name.html_name }}" id="{{ form.name.id_for_label }}"
                        value="{{ form.name.value|default:'' }}"
-                       class="w-full px-3 py-2 text-sm border {% if form.name.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                       class="w-full px-3 py-2 text-sm border {% if form.name.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500"
                        placeholder="e.g. Oscilloscope, Soldering Iron...">
                 {% for error in form.name.errors %}
                 <p class="mt-1 text-xs text-red-600">{{ error }}</p>
@@ -67,10 +74,10 @@
 
               <!-- Description -->
               <div>
-                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Description</label>
                 <textarea name="{{ form.description.html_name }}" id="{{ form.description.id_for_label }}"
                           rows="3"
-                          class="w-full px-3 py-2 text-sm border {% if form.description.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
+                          class="w-full px-3 py-2 text-sm border {% if form.description.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500 resize-none"
                           placeholder="Brief description of the equipment...">{{ form.description.value|default:'' }}</textarea>
                 {% for error in form.description.errors %}
                 <p class="mt-1 text-xs text-red-600">{{ error }}</p>
@@ -80,20 +87,20 @@
               <!-- Serial & Model (2 cols) -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label for="{{ form.serial_number.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Serial Number</label>
+                  <label for="{{ form.serial_number.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Serial Number</label>
                   <input type="text" name="{{ form.serial_number.html_name }}" id="{{ form.serial_number.id_for_label }}"
                          value="{{ form.serial_number.value|default:'' }}"
-                         class="w-full px-3 py-2 text-sm border {% if form.serial_number.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                         class="w-full px-3 py-2 text-sm border {% if form.serial_number.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500"
                          placeholder="SN-XXXXXXXX">
                   {% for error in form.serial_number.errors %}
                   <p class="mt-1 text-xs text-red-600">{{ error }}</p>
                   {% endfor %}
                 </div>
                 <div>
-                  <label for="{{ form.model_number.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Model Number</label>
+                  <label for="{{ form.model_number.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Model Number</label>
                   <input type="text" name="{{ form.model_number.html_name }}" id="{{ form.model_number.id_for_label }}"
                          value="{{ form.model_number.value|default:'' }}"
-                         class="w-full px-3 py-2 text-sm border {% if form.model_number.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                         class="w-full px-3 py-2 text-sm border {% if form.model_number.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500"
                          placeholder="Model ID">
                   {% for error in form.model_number.errors %}
                   <p class="mt-1 text-xs text-red-600">{{ error }}</p>
@@ -103,10 +110,10 @@
 
               <!-- Manufacturer -->
               <div>
-                <label for="{{ form.manufacturer.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Manufacturer</label>
+                <label for="{{ form.manufacturer.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Manufacturer</label>
                 <input type="text" name="{{ form.manufacturer.html_name }}" id="{{ form.manufacturer.id_for_label }}"
                        value="{{ form.manufacturer.value|default:'' }}"
-                       class="w-full px-3 py-2 text-sm border {% if form.manufacturer.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                       class="w-full px-3 py-2 text-sm border {% if form.manufacturer.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500"
                        placeholder="e.g. Tektronix, Fluke...">
                 {% for error in form.manufacturer.errors %}
                 <p class="mt-1 text-xs text-red-600">{{ error }}</p>
@@ -117,15 +124,15 @@
           </div>
 
           <!-- Classification -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 class="text-base font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">Classification</h2>
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-base font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">Classification</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
               <!-- Category -->
               <div>
-                <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Category <span class="text-red-500">*</span></label>
+                <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Category <span class="text-red-500">*</span></label>
                 <select name="{{ form.category.html_name }}" id="{{ form.category.id_for_label }}"
-                        class="w-full px-3 py-2 text-sm border {% if form.category.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                        class="w-full px-3 py-2 text-sm border {% if form.category.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500 bg-white">
                   <option value="">-- Select Category --</option>
                   {% for choice in form.category.field.queryset %}
                   <option value="{{ choice.pk }}" {% if form.category.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice.name }}</option>
@@ -138,9 +145,9 @@
 
               <!-- Location -->
               <div>
-                <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Location <span class="text-red-500">*</span></label>
+                <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Location <span class="text-red-500">*</span></label>
                 <select name="{{ form.location.html_name }}" id="{{ form.location.id_for_label }}"
-                        class="w-full px-3 py-2 text-sm border {% if form.location.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                        class="w-full px-3 py-2 text-sm border {% if form.location.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500 bg-white">
                   <option value="">-- Select Location --</option>
                   {% for choice in form.location.field.queryset %}
                   <option value="{{ choice.pk }}" {% if form.location.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice.name }}</option>
@@ -153,7 +160,7 @@
 
               <!-- Owner -->
               <div class="sm:col-span-2">
-                <label for="{{ form.owner.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Responsible Person <span class="text-red-500">*</span></label>
+                <label for="{{ form.owner.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Responsible Person <span class="text-red-500">*</span></label>
                 <p id="owner-warning" class="hidden text-xs text-amber-600 mt-1 mb-1">
                   <svg class="w-3.5 h-3.5 inline mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
@@ -161,7 +168,7 @@
                   Assigning to someone else will require admin approval before this equipment becomes visible.
                 </p>
                 <select name="{{ form.owner.html_name }}" id="{{ form.owner.id_for_label }}"
-                        class="w-full px-3 py-2 text-sm border {% if form.owner.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                        class="w-full px-3 py-2 text-sm border {% if form.owner.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500 bg-white">
                   <option value="">-- Select Person --</option>
                   {% for choice in form.owner.field.queryset %}
                   <option value="{{ choice.pk }}" {% if form.owner.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
@@ -174,9 +181,9 @@
 
               <!-- Status -->
               <div>
-                <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-red-500">*</span></label>
+                <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Status <span class="text-red-500">*</span></label>
                 <select name="{{ form.status.html_name }}" id="{{ form.status.id_for_label }}"
-                        class="w-full px-3 py-2 text-sm border {% if form.status.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                        class="w-full px-3 py-2 text-sm border {% if form.status.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500 bg-white">
                   <option value="AVAILABLE" {% if form.status.value == 'AVAILABLE' %}selected{% endif %}>Available</option>
                   <option value="BORROWED" {% if form.status.value == 'BORROWED' %}selected{% endif %}>Borrowed</option>
                   <option value="RESERVED" {% if form.status.value == 'RESERVED' %}selected{% endif %}>Reserved</option>
@@ -191,9 +198,9 @@
 
               <!-- Condition -->
               <div>
-                <label for="{{ form.condition.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Condition <span class="text-red-500">*</span></label>
+                <label for="{{ form.condition.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Condition <span class="text-red-500">*</span></label>
                 <select name="{{ form.condition.html_name }}" id="{{ form.condition.id_for_label }}"
-                        class="w-full px-3 py-2 text-sm border {% if form.condition.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                        class="w-full px-3 py-2 text-sm border {% if form.condition.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500 bg-white">
                   <option value="EXCELLENT" {% if form.condition.value == 'EXCELLENT' %}selected{% endif %}>Excellent</option>
                   <option value="GOOD" {% if form.condition.value == 'GOOD' %}selected{% endif %}>Good</option>
                   <option value="FAIR" {% if form.condition.value == 'FAIR' %}selected{% endif %}>Fair</option>
@@ -209,26 +216,26 @@
           </div>
 
           <!-- Purchase Info -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 class="text-base font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">Purchase Information</h2>
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-base font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">Purchase Information</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label for="{{ form.purchase_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Purchase Date</label>
+                <label for="{{ form.purchase_date.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Purchase Date</label>
                 <input type="date" name="{{ form.purchase_date.html_name }}" id="{{ form.purchase_date.id_for_label }}"
                        value="{{ form.purchase_date.value|date:'Y-m-d'|default:'' }}"
-                       class="w-full px-3 py-2 text-sm border {% if form.purchase_date.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                       class="w-full px-3 py-2 text-sm border {% if form.purchase_date.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500">
                 {% for error in form.purchase_date.errors %}
                 <p class="mt-1 text-xs text-red-600">{{ error }}</p>
                 {% endfor %}
               </div>
               <div>
-                <label for="{{ form.purchase_price.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Purchase Price ($)</label>
+                <label for="{{ form.purchase_price.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Purchase Price ($)</label>
                 <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
                   <input type="number" name="{{ form.purchase_price.html_name }}" id="{{ form.purchase_price.id_for_label }}"
                          value="{{ form.purchase_price.value|default:'' }}"
                          step="0.01" min="0"
-                         class="w-full pl-7 pr-3 py-2 text-sm border {% if form.purchase_price.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                         class="w-full pl-7 pr-3 py-2 text-sm border {% if form.purchase_price.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500"
                          placeholder="0.00">
                 </div>
                 {% for error in form.purchase_price.errors %}
@@ -239,11 +246,11 @@
           </div>
 
           <!-- Notes -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 class="text-base font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">Additional Notes</h2>
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-base font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">Additional Notes</h2>
             <textarea name="{{ form.notes.html_name }}" id="{{ form.notes.id_for_label }}"
                       rows="4"
-                      class="w-full px-3 py-2 text-sm border {% if form.notes.errors %}border-red-300 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
+                      class="w-full px-3 py-2 text-sm border {% if form.notes.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500 resize-none"
                       placeholder="Any additional notes about this equipment...">{{ form.notes.value|default:'' }}</textarea>
             {% for error in form.notes.errors %}
             <p class="mt-1 text-xs text-red-600">{{ error }}</p>
@@ -256,35 +263,35 @@
         <div class="lg:col-span-1 space-y-6">
 
           <!-- Image Upload -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 class="text-base font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">Equipment Image <span class="text-red-500">*</span></h2>
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-base font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">Equipment Image <span class="text-red-500">*</span></h2>
 
             <!-- Preview -->
             <div id="image-preview-container" class="mb-4">
               {% if form.instance.image %}
               <img id="image-preview" src="{{ form.instance.image.url }}" alt="Current image"
-                   class="w-full h-48 object-cover rounded-lg border border-gray-200">
+                   class="w-full h-48 object-cover rounded-lg border border-slate-200">
               {% else %}
-              <div id="image-placeholder" class="w-full h-48 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center">
-                <svg class="w-10 h-10 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div id="image-placeholder" class="w-full h-48 bg-slate-100 rounded-lg border-2 border-dashed border-slate-300 flex flex-col items-center justify-center">
+                <svg class="w-10 h-10 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
-                <p class="text-sm text-gray-400">No image · paste (Ctrl+V)</p>
+                <p class="text-sm text-slate-400">No image · paste (Ctrl+V)</p>
               </div>
-              <img id="image-preview" src="" alt="Preview" class="w-full h-48 object-cover rounded-lg border border-gray-200 hidden">
+              <img id="image-preview" src="" alt="Preview" class="w-full h-48 object-cover rounded-lg border border-slate-200 hidden">
               {% endif %}
             </div>
 
             <div class="flex gap-2">
               <label for="{{ form.image.id_for_label }}"
-                     class="cursor-pointer flex-1 text-center px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
+                     class="cursor-pointer flex-1 text-center px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg border border-slate-300 transition-colors duration-150">
                 <svg class="w-4 h-4 inline mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                 </svg>
                 Upload
               </label>
               <button type="button" id="camera-btn" onclick="openCamera()"
-                      class="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
+                      class="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg border border-slate-300 transition-colors duration-150">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -295,7 +302,7 @@
             <input type="file" name="{{ form.image.html_name }}" id="{{ form.image.id_for_label }}"
                    accept="image/*" class="sr-only"
                    onchange="previewImage(this)">
-            <p class="mt-2 text-xs text-gray-400 text-center">PNG, JPG, GIF up to 10MB · or paste (Ctrl+V)</p>
+            <p class="mt-2 text-xs text-slate-400 text-center">PNG, JPG, GIF up to 10MB · or paste (Ctrl+V)</p>
             {% for error in form.image.errors %}
             <p class="mt-1 text-xs text-red-600">{{ error }}</p>
             {% endfor %}
@@ -303,8 +310,8 @@
 
           <!-- Quick Info Card -->
           <div class="bg-indigo-50 rounded-xl border border-indigo-100 p-4">
-            <h3 class="text-sm font-semibold text-indigo-800 mb-2">Tips</h3>
-            <ul class="text-xs text-indigo-700 space-y-1">
+            <h3 class="text-sm font-semibold text-brand-800 mb-2">Tips</h3>
+            <ul class="text-xs text-brand-700 space-y-1">
               <li>• Category, Location, Responsible Person, and Image are required.</li>
               <li>• Set status to AVAILABLE unless the item is currently in use.</li>
               <li>• Assigning to someone else requires admin approval.</li>
@@ -315,20 +322,20 @@
       </div>
 
       <!-- Form Actions -->
-      <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+      <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-slate-200">
         {% if form.instance.pk %}
         <a href="{% url 'equipment:detail' form.instance.pk %}"
-           class="px-5 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
+           class="px-5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg border border-slate-300 transition-colors duration-150">
           Cancel
         </a>
         {% else %}
         <a href="{% url 'equipment:list' %}"
-           class="px-5 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
+           class="px-5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg border border-slate-300 transition-colors duration-150">
           Cancel
         </a>
         {% endif %}
         <button type="submit"
-                class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
           {% if form.instance.pk %}Save Changes{% else %}Add Equipment{% endif %}
         </button>
       </div>
@@ -342,8 +349,8 @@
      onclick="handleModalBackdrop(event)">
   <div class="bg-white rounded-xl shadow-xl p-4 w-full max-w-lg mx-4">
     <div class="flex items-center justify-between mb-3">
-      <h3 class="text-base font-semibold text-gray-900">Take Photo</h3>
-      <button type="button" onclick="closeCamera()" class="text-gray-400 hover:text-gray-600">
+      <h3 class="text-base font-semibold text-slate-900">Take Photo</h3>
+      <button type="button" onclick="closeCamera()" class="text-slate-400 hover:text-slate-600">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
         </svg>
@@ -352,11 +359,11 @@
     <video id="camera-video" autoplay playsinline class="w-full rounded-lg bg-black aspect-video"></video>
     <div class="flex gap-2 mt-3">
       <button type="button" onclick="closeCamera()"
-              class="flex-1 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300">
+              class="flex-1 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg border border-slate-300">
         Cancel
       </button>
       <button type="button" onclick="capturePhoto()"
-              class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg">
+              class="flex-1 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg">
         Capture
       </button>
     </div>

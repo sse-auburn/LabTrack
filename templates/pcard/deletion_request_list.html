@@ -6,26 +6,35 @@
 {% block page_title %}P-Card Deletion Requests{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
+
+  <!-- Page Header Banner -->
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">P-Card Deletion Requests</h1>
+      </div>
+    </div>
+  </div>
+<div class="min-h-screen bg-slate-50">
   <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900">Deletion Requests</h1>
-        <p class="mt-1 text-sm text-gray-500">Review and manage P-Card transaction deletion requests.</p>
+        
+        <p class="mt-1 text-sm text-slate-500">Review and manage P-Card transaction deletion requests.</p>
       </div>
       <a href="{% url 'pcard:list' %}"
-         class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
+         class="inline-flex items-center px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors">
         Back to P-Card
       </a>
     </div>
 
     <!-- Pending Requests -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
-      <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center gap-3">
         <span class="w-2 h-2 rounded-full bg-yellow-400 inline-block"></span>
-        <h3 class="text-base font-semibold text-gray-900">Pending Requests</h3>
+        <h3 class="text-base font-semibold text-slate-900">Pending Requests</h3>
         <span class="ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">
           {{ pending_requests|length }}
         </span>
@@ -47,7 +56,7 @@
             {% for req in pending_requests %}
             <tr class="hover:bg-slate-50 transition-colors">
               <td class="px-5 py-3">
-                <a href="{% url 'pcard:detail' req.transaction.pk %}" class="font-medium text-indigo-600 hover:text-indigo-700">
+                <a href="{% url 'pcard:detail' req.transaction.pk %}" class="font-medium text-brand-600 hover:text-brand-700">
                   #{{ req.transaction.pk }} — {{ req.transaction.transaction_date|date:"M j, Y" }}
                 </a>
                 <p class="text-xs text-slate-500 mt-0.5">${{ req.transaction.total_price }} · {{ req.transaction.item_count }} item{{ req.transaction.item_count|pluralize }}</p>
@@ -74,7 +83,7 @@
                     Approve
                   </a>
                   <a href="{% url 'pcard:deletion_request_reject' req.pk %}"
-                     class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium rounded-lg border border-gray-300 transition-colors"
+                     class="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium rounded-lg border border-slate-300 transition-colors"
                      onclick="return confirm('Reject deletion request for transaction #{{ req.transaction.pk }}?')">
                     Reject
                   </a>
@@ -97,9 +106,9 @@
     </div>
 
     <!-- Resolved Requests -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div class="px-5 py-4 border-b border-gray-100">
-        <h3 class="text-base font-semibold text-gray-900">Recently Resolved</h3>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-100">
+        <h3 class="text-base font-semibold text-slate-900">Recently Resolved</h3>
       </div>
 
       {% if resolved_requests %}

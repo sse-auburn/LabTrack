@@ -9,6 +9,15 @@
 {% endblock %}
 
 {% block content %}
+
+  <!-- Page Header Banner -->
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">User Profile</h1>
+      </div>
+    </div>
+  </div>
 <div class="max-w-4xl mx-auto space-y-6">
 
   <!-- ====== Profile Header Card ====== -->
@@ -311,7 +320,7 @@
                 {% elif reservation.status == 'RETURNED' %}bg-slate-100 text-slate-600
                 {% elif reservation.status == 'RETURN_PENDING' %}bg-orange-100 text-orange-700
                 {% elif reservation.status == 'PENDING' %}bg-yellow-100 text-yellow-700
-                {% elif reservation.status == 'CONFIRMED' %}bg-indigo-100 text-indigo-700
+                {% elif reservation.status == 'CONFIRMED' %}bg-brand-100 text-brand-700
                 {% elif reservation.status == 'CANCELLED' %}bg-red-100 text-red-700
                 {% else %}bg-slate-100 text-slate-600{% endif %}">
                 {{ reservation.get_status_display }}

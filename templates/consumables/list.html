@@ -4,13 +4,22 @@
 {% block page_title %}Consumables{% endblock %}
 
 {% block content %}
+
+  <!-- Page Header Banner -->
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">Consumables</h1>
+      </div>
+    </div>
+  </div>
 <div>
 
   <!-- Header -->
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Consumables</h1>
-      <p class="mt-1 text-sm text-gray-500">Track lab consumable stock levels</p>
+      
+      <p class="mt-1 text-sm text-slate-500">Track lab consumable stock levels</p>
     </div>
     <div class="flex gap-3">
       {% if request.user.is_staff %}
@@ -23,7 +32,7 @@
         Low Stock
       </a>
       <a href="{% url 'consumables:create' %}"
-         class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
+         class="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
@@ -34,18 +43,18 @@
   </div>
 
   <!-- Filters -->
-  <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+  <div class="bg-white rounded-xl border border-slate-200 p-4 mb-6">
     <form method="get" class="flex flex-wrap gap-3 items-end">
       <div class="flex-1 min-w-[200px]">
-        <label class="block text-xs font-medium text-gray-600 mb-1">Search</label>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Search</label>
         <input type="text" name="q" value="{{ request.GET.q }}"
                placeholder="Search by name or supplier..."
-               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+               class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
       </div>
       <div>
-        <label class="block text-xs font-medium text-gray-600 mb-1">Category</label>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Category</label>
         <select name="category"
-                class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
           <option value="">All Categories</option>
           {% for cat in categories %}
             <option value="{{ cat.pk }}" {% if request.GET.category == cat.pk|stringformat:"s" %}selected{% endif %}>
@@ -55,9 +64,9 @@
         </select>
       </div>
       <div>
-        <label class="block text-xs font-medium text-gray-600 mb-1">Stock Status</label>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Stock Status</label>
         <select name="stock"
-                class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
           <option value="">All</option>
           <option value="low" {% if request.GET.stock == 'low' %}selected{% endif %}>Low Stock</option>
           <option value="out" {% if request.GET.stock == 'out' %}selected{% endif %}>Out of Stock</option>
@@ -65,11 +74,11 @@
         </select>
       </div>
       <button type="submit"
-              class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
+              class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition">
         Filter
       </button>
       <a href="{% url 'consumables:list' %}"
-         class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50 transition">
+         class="px-4 py-2 border border-slate-300 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition">
         Clear
       </a>
     </form>
@@ -91,42 +100,42 @@
   {% endif %}
 
   <!-- Table -->
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Quantity / Unit</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Threshold</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Quantity / Unit</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Threshold</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-100">
+        <tbody class="bg-white divide-y divide-slate-100">
           {% for consumable in consumables %}
-          <tr class="hover:bg-gray-50 transition {% if consumable.quantity == 0 %}bg-red-50{% elif consumable.is_low_stock %}bg-orange-50{% endif %}">
+          <tr class="hover:bg-slate-50 transition {% if consumable.quantity == 0 %}bg-red-50{% elif consumable.is_low_stock %}bg-orange-50{% endif %}">
             <td class="px-6 py-4">
-              <div class="text-sm font-medium text-gray-900">
-                <a href="{% url 'consumables:detail' consumable.pk %}" class="hover:text-indigo-600">
+              <div class="text-sm font-medium text-slate-900">
+                <a href="{% url 'consumables:detail' consumable.pk %}" class="hover:text-brand-600">
                   {{ consumable.name }}
                 </a>
               </div>
               {% if consumable.supplier %}
-              <div class="text-xs text-gray-400 mt-0.5">{{ consumable.supplier }}</div>
+              <div class="text-xs text-slate-400 mt-0.5">{{ consumable.supplier }}</div>
               {% endif %}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
               {{ consumable.category.name|default:"—" }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <span class="text-sm font-semibold {% if consumable.quantity == 0 %}text-red-600{% elif consumable.is_low_stock %}text-orange-600{% else %}text-gray-900{% endif %}">
+              <span class="text-sm font-semibold {% if consumable.quantity == 0 %}text-red-600{% elif consumable.is_low_stock %}text-orange-600{% else %}text-slate-900{% endif %}">
                 {{ consumable.quantity }}
               </span>
-              <span class="text-xs text-gray-400 ml-1">{{ consumable.get_unit_display }}</span>
+              <span class="text-xs text-slate-400 ml-1">{{ consumable.get_unit_display }}</span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
               {{ consumable.low_stock_threshold }} {{ consumable.get_unit_display }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
@@ -150,12 +159,12 @@
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
               <div class="flex items-center justify-end gap-2">
                 <a href="{% url 'consumables:log_usage' consumable.pk %}"
-                   class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">Log Usage</a>
+                   class="text-xs text-brand-600 hover:text-brand-800 font-medium">Log Usage</a>
                 {% if request.user.is_staff %}
                 <a href="{% url 'consumables:restock' consumable.pk %}"
                    class="text-xs text-green-600 hover:text-green-800 font-medium">Restock</a>
                 <a href="{% url 'consumables:edit' consumable.pk %}"
-                   class="text-xs text-gray-500 hover:text-gray-700">Edit</a>
+                   class="text-xs text-slate-500 hover:text-slate-700">Edit</a>
                 <a href="{% url 'consumables:delete' consumable.pk %}"
                    class="text-xs text-red-600 hover:text-red-800 font-medium">Delete</a>
                 {% endif %}
@@ -164,14 +173,14 @@
           </tr>
           {% empty %}
           <tr>
-            <td colspan="6" class="px-6 py-12 text-center text-sm text-gray-400">
-              <svg class="mx-auto h-10 w-10 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <td colspan="6" class="px-6 py-12 text-center text-sm text-slate-400">
+              <svg class="mx-auto h-10 w-10 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                       d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
               </svg>
               No consumables found.
               {% if request.user.is_staff %}
-              <a href="{% url 'consumables:create' %}" class="text-indigo-600 hover:underline ml-1">Add one.</a>
+              <a href="{% url 'consumables:create' %}" class="text-brand-600 hover:underline ml-1">Add one.</a>
               {% endif %}
             </td>
           </tr>
@@ -182,16 +191,16 @@
 
     <!-- Pagination -->
     {% if is_paginated %}
-    <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 flex items-center justify-between">
-      <p class="text-sm text-gray-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+    <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex items-center justify-between">
+      <p class="text-sm text-slate-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
       <div class="flex gap-2">
         {% if page_obj.has_previous %}
           <a href="?page={{ page_obj.previous_page_number }}"
-             class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-100">Previous</a>
+             class="px-3 py-1 border border-slate-300 rounded text-sm hover:bg-slate-100">Previous</a>
         {% endif %}
         {% if page_obj.has_next %}
           <a href="?page={{ page_obj.next_page_number }}"
-             class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-100">Next</a>
+             class="px-3 py-1 border border-slate-300 rounded text-sm hover:bg-slate-100">Next</a>
         {% endif %}
       </div>
     </div>

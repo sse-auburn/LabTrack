@@ -2,8 +2,19 @@
 
 {% block title %}Delete Incident – SSELabTrack{% endblock %}
 
+{% block page_title %}Delete Incident{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+
+  <!-- Page Header Banner -->
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">Delete Incident</h1>
+      </div>
+    </div>
+  </div>
+<div class="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
   <div class="max-w-md w-full">
     <div class="bg-white rounded-xl shadow-sm border border-red-200 overflow-hidden">
       <div class="bg-red-50 px-6 py-5 border-b border-red-100">
@@ -14,34 +25,34 @@
             </svg>
           </div>
           <div>
-            <h1 class="text-lg font-bold text-gray-900">Delete Incident</h1>
+            
             <p class="text-sm text-red-600">This action cannot be undone</p>
           </div>
         </div>
       </div>
 
       <div class="px-6 py-6">
-        <p class="text-gray-700 text-sm mb-4">
+        <p class="text-slate-700 text-sm mb-4">
           Are you sure you want to delete the incident
-          <span class="font-semibold text-gray-900">"{{ incident.title }}"</span>?
+          <span class="font-semibold text-slate-900">"{{ incident.title }}"</span>?
         </p>
 
-        <div class="bg-gray-50 rounded-lg p-4 mb-5 text-sm space-y-1.5">
+        <div class="bg-slate-50 rounded-lg p-4 mb-5 text-sm space-y-1.5">
           <div class="flex justify-between">
-            <span class="text-gray-500">Equipment</span>
-            <span class="font-medium text-gray-700">{{ incident.equipment.name }}</span>
+            <span class="text-slate-500">Equipment</span>
+            <span class="font-medium text-slate-700">{{ incident.equipment.name }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-500">Severity</span>
-            <span class="font-medium text-gray-700">{{ incident.get_severity_display }}</span>
+            <span class="text-slate-500">Severity</span>
+            <span class="font-medium text-slate-700">{{ incident.get_severity_display }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-500">Status</span>
-            <span class="font-medium text-gray-700">{{ incident.get_status_display }}</span>
+            <span class="text-slate-500">Status</span>
+            <span class="font-medium text-slate-700">{{ incident.get_status_display }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-500">Reported By</span>
-            <span class="font-medium text-gray-700">{{ incident.reported_by.full_name|default:incident.reported_by.username }}</span>
+            <span class="text-slate-500">Reported By</span>
+            <span class="font-medium text-slate-700">{{ incident.reported_by.full_name|default:incident.reported_by.username }}</span>
           </div>
         </div>
 
@@ -49,7 +60,7 @@
           {% csrf_token %}
           <div class="flex gap-3">
             <a href="{% url 'incidents:list' %}"
-               class="flex-1 text-center px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
+               class="flex-1 text-center px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg border border-slate-300 transition-colors duration-150">
               Cancel
             </a>
             <button type="submit"

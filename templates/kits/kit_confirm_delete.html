@@ -1,18 +1,27 @@
 {% extends 'base.html' %}
 {% block title %}Confirm – SSELabTrack{% endblock %}
 {% block content %}
+
+  <!-- Page Header Banner -->
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">Confirm</h1>
+      </div>
+    </div>
+  </div>
 <div class="max-w-md mx-auto">
   <div class="bg-white rounded-xl shadow-sm border border-red-200 p-8 text-center">
     <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
       <svg class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
     </div>
-    <h2 class="text-xl font-bold text-gray-900 mb-2">Delete "{{ kit.name }}"?</h2>
-    <p class="text-sm text-gray-500 mb-6">This will permanently delete the kit and remove all its items. This action cannot be undone.</p>
+    <h2 class="text-xl font-bold text-slate-900 mb-2">Delete "{{ kit.name }}"?</h2>
+    <p class="text-sm text-slate-500 mb-6">This will permanently delete the kit and remove all its items. This action cannot be undone.</p>
     <form method="post">
       {% csrf_token %}
       <div class="flex gap-3 justify-center">
         <button type="submit" class="px-5 py-2.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700">Confirm</button>
-        <a href="javascript:history.back()" class="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50">Cancel</a>
+        <a href="javascript:history.back()" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50">Cancel</a>
       </div>
     </form>
   </div>

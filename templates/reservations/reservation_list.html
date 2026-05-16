@@ -7,7 +7,7 @@
 <div>
 
   <!-- Page Header Banner -->
-  <div class="bg-gradient-to-r from-brand-600 to-brand-800 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight">Reservations</h1>
@@ -40,12 +40,12 @@
   </div>
 
   <!-- Filter Bar -->
-  <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+  <div class="bg-white rounded-xl border border-slate-200 p-4 mb-6">
     <form method="get" class="flex flex-wrap gap-3 items-end">
       <div>
-        <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Status</label>
         <select name="status"
-                class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
           <option value="">All Statuses</option>
           <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>Pending</option>
           <option value="CONFIRMED" {% if request.GET.status == 'CONFIRMED' %}selected{% endif %}>Confirmed</option>
@@ -57,80 +57,80 @@
         </select>
       </div>
       <div>
-        <label class="block text-xs font-medium text-gray-600 mb-1">From</label>
+        <label class="block text-xs font-medium text-slate-600 mb-1">From</label>
         <input type="date" name="from"
                value="{{ request.GET.from }}"
-               class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+               class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
       </div>
       <div>
-        <label class="block text-xs font-medium text-gray-600 mb-1">To</label>
+        <label class="block text-xs font-medium text-slate-600 mb-1">To</label>
         <input type="date" name="to"
                value="{{ request.GET.to }}"
-               class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+               class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
       </div>
       <button type="submit"
-              class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
+              class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition">
         Filter
       </button>
       <a href="{% url 'reservations:list' %}"
-         class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50 transition">
+         class="px-4 py-2 border border-slate-300 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition">
         Clear
       </a>
     </form>
   </div>
 
   <!-- Table -->
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
           <tr>
             {% if request.user.is_staff %}
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">User</th>
             {% endif %}
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Item</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Start Date</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">End Date</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Created</th>
-            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Item</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Start Date</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">End Date</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Created</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-100">
+        <tbody class="bg-white divide-y divide-slate-100">
           {% for reservation in reservations %}
-          <tr class="hover:bg-gray-50 transition">
+          <tr class="hover:bg-slate-50 transition">
             {% if request.user.is_staff %}
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center gap-2">
-                <div class="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-semibold text-indigo-700">
+                <div class="h-7 w-7 rounded-full bg-brand-100 flex items-center justify-center text-xs font-semibold text-brand-700">
                   {{ reservation.requester.get_initials|default:reservation.requester.username|slice:":1"|upper }}
                 </div>
-                <span class="text-sm text-gray-900">{{ reservation.requester.get_full_name|default:reservation.requester.username }}</span>
+                <span class="text-sm text-slate-900">{{ reservation.requester.get_full_name|default:reservation.requester.username }}</span>
               </div>
             </td>
             {% endif %}
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">
+              <div class="text-sm font-medium text-slate-900">
                 {% if reservation.equipment %}
                   {{ reservation.equipment.name }}
-                  <span class="text-xs text-gray-400 ml-1">Equipment</span>
+                  <span class="text-xs text-slate-400 ml-1">Equipment</span>
                 {% elif reservation.kit %}
                   {{ reservation.kit.name }}
-                  <span class="text-xs text-gray-400 ml-1">Kit</span>
+                  <span class="text-xs text-slate-400 ml-1">Kit</span>
                 {% endif %}
               </div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
               {{ reservation.start_date|date:"M d, Y" }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
               {{ reservation.end_date|date:"M d, Y" }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               {% if reservation.status == 'PENDING' %}
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
               {% elif reservation.status == 'CONFIRMED' %}
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">Confirmed</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800">Confirmed</span>
               {% elif reservation.status == 'ACTIVE' %}
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
               {% elif reservation.status == 'RETURN_PENDING' %}
@@ -140,16 +140,16 @@
               {% elif reservation.status == 'CANCELLED' %}
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Cancelled</span>
               {% elif reservation.status == 'EXPIRED' %}
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Expired</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">Expired</span>
               {% endif %}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
               {{ reservation.created_at|date:"M d, Y" }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
               <div class="flex items-center justify-end gap-2">
                 <a href="{% url 'reservations:detail' reservation.pk %}"
-                   class="text-indigo-600 hover:text-indigo-800 font-medium">View</a>
+                   class="text-brand-600 hover:text-brand-800 font-medium">View</a>
                 {% if user.is_admin or reservation.requester == user %}
                 <a href="{% url 'reservations:delete' reservation.pk %}"
                    class="text-red-600 hover:text-red-800 font-medium">Delete</a>
@@ -160,13 +160,13 @@
           {% empty %}
           <tr>
             <td colspan="{% if request.user.is_staff %}7{% else %}6{% endif %}"
-                class="px-6 py-12 text-center text-sm text-gray-400">
-              <svg class="mx-auto h-10 w-10 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="px-6 py-12 text-center text-sm text-slate-400">
+              <svg class="mx-auto h-10 w-10 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
               </svg>
               No reservations found.
-              <a href="{% url 'reservations:create' %}" class="text-indigo-600 hover:underline ml-1">Make one now.</a>
+              <a href="{% url 'reservations:create' %}" class="text-brand-600 hover:underline ml-1">Make one now.</a>
             </td>
           </tr>
           {% endfor %}
@@ -176,18 +176,18 @@
 
     <!-- Pagination -->
     {% if is_paginated %}
-    <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 flex items-center justify-between">
-      <p class="text-sm text-gray-600">
+    <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex items-center justify-between">
+      <p class="text-sm text-slate-600">
         Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
       </p>
       <div class="flex gap-2">
         {% if page_obj.has_previous %}
           <a href="?page={{ page_obj.previous_page_number }}"
-             class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-100">Previous</a>
+             class="px-3 py-1 border border-slate-300 rounded text-sm hover:bg-slate-100">Previous</a>
         {% endif %}
         {% if page_obj.has_next %}
           <a href="?page={{ page_obj.next_page_number }}"
-             class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-100">Next</a>
+             class="px-3 py-1 border border-slate-300 rounded text-sm hover:bg-slate-100">Next</a>
         {% endif %}
       </div>
     </div>

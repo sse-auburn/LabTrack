@@ -1,31 +1,42 @@
 {% extends 'base.html' %}
 {% block title %}Restock – {{ consumable.name }} – SSELabTrack{% endblock %}
+
+{% block page_title %}Restock Consumable{% endblock %}
 {% block content %}
+
+  <!-- Page Header Banner -->
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">Restock Consumable</h1>
+      </div>
+    </div>
+  </div>
 <div class="max-w-lg mx-auto space-y-6">
-  <h1 class="text-2xl font-bold text-gray-900">Restock Consumable</h1>
+  
   <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between">
     <div>
       <p class="text-sm font-semibold text-green-900">{{ consumable.name }}</p>
       <p class="text-xs text-green-600">Current stock: {{ consumable.quantity }} {{ consumable.get_unit_display }}</p>
     </div>
   </div>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
     <form method="post" novalidate>
       {% csrf_token %}
       <div class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Quantity to Add <span class="text-red-500">*</span></label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Quantity to Add <span class="text-red-500">*</span></label>
           {{ form.quantity_to_add }}
           {% if form.quantity_to_add.errors %}<p class="mt-1 text-xs text-red-600">{{ form.quantity_to_add.errors.0 }}</p>{% endif %}
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Notes</label>
           {{ form.notes }}
         </div>
       </div>
       <div class="mt-6 flex gap-3">
         <button type="submit" class="px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">Restock</button>
-        <a href="{% url 'consumables:detail' consumable.pk %}" class="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50">Cancel</a>
+        <a href="{% url 'consumables:detail' consumable.pk %}" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50">Cancel</a>
       </div>
     </form>
   </div>

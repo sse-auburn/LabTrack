@@ -3,22 +3,31 @@
 {% block page_title %}Reservation Detail{% endblock %}
 
 {% block content %}
+
+  <!-- Page Header Banner -->
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">Reservation Detail</h1>
+      </div>
+    </div>
+  </div>
 <div class="max-w-3xl mx-auto">
 
   <!-- Breadcrumb -->
-  <nav class="text-sm text-gray-500 mb-4">
-    <a href="{% url 'reservations:list' %}" class="hover:text-indigo-600">Reservations</a>
+  <nav class="text-sm text-slate-500 mb-4">
+    <a href="{% url 'reservations:list' %}" class="hover:text-brand-600">Reservations</a>
     <span class="mx-2">/</span>
-    <span class="text-gray-700">Reservation #{{ reservation.pk }}</span>
+    <span class="text-slate-700">Reservation #{{ reservation.pk }}</span>
   </nav>
 
   <!-- Header -->
   <div class="flex items-start justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">
+      <h1 class="text-2xl font-bold text-slate-900">
         {% if reservation.equipment %}{{ reservation.equipment.name }}{% elif reservation.kit %}{{ reservation.kit.name }}{% endif %}
       </h1>
-      <p class="mt-1 text-sm text-gray-500">
+      <p class="mt-1 text-sm text-slate-500">
         Reserved by {{ reservation.requester.full_name|default:reservation.requester.username }}
       </p>
     </div>
@@ -26,7 +35,7 @@
       {% if reservation.status == 'PENDING' %}
         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">Pending</span>
       {% elif reservation.status == 'CONFIRMED' %}
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">Confirmed</span>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800">Confirmed</span>
       {% elif reservation.status == 'ACTIVE' %}
         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800">Active — In Your Possession</span>
       {% elif reservation.status == 'RETURN_PENDING' %}
@@ -36,53 +45,53 @@
       {% elif reservation.status == 'CANCELLED' %}
         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">Cancelled</span>
       {% elif reservation.status == 'EXPIRED' %}
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-600">Expired</span>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-600">Expired</span>
       {% endif %}
     </div>
   </div>
 
   <!-- Detail Card -->
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden mb-6">
-    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-      <h2 class="text-sm font-semibold text-gray-700">Reservation Details</h2>
+  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden mb-6">
+    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+      <h2 class="text-sm font-semibold text-slate-700">Reservation Details</h2>
     </div>
-    <dl class="divide-y divide-gray-100">
+    <dl class="divide-y divide-slate-100">
       <!-- Item -->
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
-        <dt class="text-sm font-medium text-gray-500">Item</dt>
-        <dd class="col-span-2 text-sm text-gray-900">
+        <dt class="text-sm font-medium text-slate-500">Item</dt>
+        <dd class="col-span-2 text-sm text-slate-900">
           {% if reservation.equipment %}
             <a href="{% url 'equipment:detail' reservation.equipment.pk %}"
-               class="text-indigo-600 hover:underline font-medium">
+               class="text-brand-600 hover:underline font-medium">
               {{ reservation.equipment.name }}
             </a>
-            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">Equipment</span>
+            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-600">Equipment</span>
           {% elif reservation.kit %}
             <a href="{% url 'kits:detail' reservation.kit.pk %}"
-               class="text-indigo-600 hover:underline font-medium">
+               class="text-brand-600 hover:underline font-medium">
               {{ reservation.kit.name }}
             </a>
-            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">Kit</span>
+            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-600">Kit</span>
           {% endif %}
         </dd>
       </div>
 
       <!-- Start Date -->
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
-        <dt class="text-sm font-medium text-gray-500">Start Date</dt>
-        <dd class="col-span-2 text-sm text-gray-900">{{ reservation.start_date|date:"l, F j, Y" }}</dd>
+        <dt class="text-sm font-medium text-slate-500">Start Date</dt>
+        <dd class="col-span-2 text-sm text-slate-900">{{ reservation.start_date|date:"l, F j, Y" }}</dd>
       </div>
 
       <!-- End Date -->
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
-        <dt class="text-sm font-medium text-gray-500">End Date</dt>
-        <dd class="col-span-2 text-sm text-gray-900">{{ reservation.end_date|date:"l, F j, Y" }}</dd>
+        <dt class="text-sm font-medium text-slate-500">End Date</dt>
+        <dd class="col-span-2 text-sm text-slate-900">{{ reservation.end_date|date:"l, F j, Y" }}</dd>
       </div>
 
       <!-- Duration -->
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
-        <dt class="text-sm font-medium text-gray-500">Duration</dt>
-        <dd class="col-span-2 text-sm text-gray-900">
+        <dt class="text-sm font-medium text-slate-500">Duration</dt>
+        <dd class="col-span-2 text-sm text-slate-900">
           {{ reservation.end_date|timeuntil:reservation.start_date }}
         </dd>
       </div>
@@ -90,49 +99,49 @@
       <!-- Purpose -->
       {% if reservation.purpose %}
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
-        <dt class="text-sm font-medium text-gray-500">Purpose</dt>
-        <dd class="col-span-2 text-sm text-gray-900 whitespace-pre-line">{{ reservation.purpose }}</dd>
+        <dt class="text-sm font-medium text-slate-500">Purpose</dt>
+        <dd class="col-span-2 text-sm text-slate-900 whitespace-pre-line">{{ reservation.purpose }}</dd>
       </div>
       {% endif %}
 
       <!-- Requester -->
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
-        <dt class="text-sm font-medium text-gray-500">Requested By</dt>
-        <dd class="col-span-2 text-sm text-gray-900">
+        <dt class="text-sm font-medium text-slate-500">Requested By</dt>
+        <dd class="col-span-2 text-sm text-slate-900">
           {{ reservation.requester.full_name|default:reservation.requester.username }}
-          <span class="text-gray-400 ml-1">({{ reservation.requester.email }})</span>
+          <span class="text-slate-400 ml-1">({{ reservation.requester.email }})</span>
         </dd>
       </div>
 
       {% if reservation.returned_date %}
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
-        <dt class="text-sm font-medium text-gray-500">Returned On</dt>
-        <dd class="col-span-2 text-sm text-gray-900">{{ reservation.returned_date|date:"F j, Y \a\t g:i A" }}</dd>
+        <dt class="text-sm font-medium text-slate-500">Returned On</dt>
+        <dd class="col-span-2 text-sm text-slate-900">{{ reservation.returned_date|date:"F j, Y \a\t g:i A" }}</dd>
       </div>
       {% endif %}
       {% if reservation.return_condition %}
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
-        <dt class="text-sm font-medium text-gray-500">Return Condition</dt>
-        <dd class="col-span-2 text-sm text-gray-900">{{ reservation.return_condition }}</dd>
+        <dt class="text-sm font-medium text-slate-500">Return Condition</dt>
+        <dd class="col-span-2 text-sm text-slate-900">{{ reservation.return_condition }}</dd>
       </div>
       {% endif %}
       {% if reservation.return_notes %}
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
-        <dt class="text-sm font-medium text-gray-500">Return Notes</dt>
-        <dd class="col-span-2 text-sm text-gray-900 whitespace-pre-line">{{ reservation.return_notes }}</dd>
+        <dt class="text-sm font-medium text-slate-500">Return Notes</dt>
+        <dd class="col-span-2 text-sm text-slate-900 whitespace-pre-line">{{ reservation.return_notes }}</dd>
       </div>
       {% endif %}
       {% if reservation.return_approved_by %}
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
-        <dt class="text-sm font-medium text-gray-500">Approved By</dt>
-        <dd class="col-span-2 text-sm text-gray-900">{{ reservation.return_approved_by.full_name }}</dd>
+        <dt class="text-sm font-medium text-slate-500">Approved By</dt>
+        <dd class="col-span-2 text-sm text-slate-900">{{ reservation.return_approved_by.full_name }}</dd>
       </div>
       {% endif %}
 
       <!-- Created At -->
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
-        <dt class="text-sm font-medium text-gray-500">Created</dt>
-        <dd class="col-span-2 text-sm text-gray-900">{{ reservation.created_at|date:"F j, Y \a\t g:i A" }}</dd>
+        <dt class="text-sm font-medium text-slate-500">Created</dt>
+        <dd class="col-span-2 text-sm text-slate-900">{{ reservation.created_at|date:"F j, Y \a\t g:i A" }}</dd>
       </div>
     </dl>
   </div>
@@ -179,7 +188,7 @@
 
     {% if reservation.status in 'CONFIRMED,ACTIVE' and reservation.requester == request.user %}
     <a href="{% url 'reservations:return' reservation.pk %}"
-       class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
+       class="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition">
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
@@ -218,7 +227,7 @@
     </a>
     {% endif %}
     <a href="{% url 'reservations:list' %}"
-       class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50 transition">
+       class="inline-flex items-center px-4 py-2 border border-slate-300 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition">
       Back to List
     </a>
   </div>

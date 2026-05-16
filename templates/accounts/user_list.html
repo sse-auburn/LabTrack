@@ -9,12 +9,17 @@
 {% endblock %}
 
 {% block content %}
-<div>
 
-<!-- ====== Page header ====== -->
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+  <!-- Page Header Banner -->
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">User Management</h1>
+      </div>
+      
+    </div>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
   <div>
-    <h2 class="text-xl font-bold text-slate-800">All Users</h2>
     <p class="text-sm text-slate-500 mt-0.5">
       Manage lab members and their access roles.
     </p>
@@ -43,6 +48,8 @@
     </span>
   </div>
 </div>
+  </div>
+<div>
 
 <!-- ====== Filter + Search bar ====== -->
 <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-4 mb-6">

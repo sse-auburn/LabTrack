@@ -2,8 +2,19 @@
 
 {% block title %}Delete Notification – SSELabTrack{% endblock %}
 
+{% block page_title %}Delete Notification{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+
+  <!-- Page Header Banner -->
+  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">Delete Notification</h1>
+      </div>
+    </div>
+  </div>
+<div class="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
   <div class="max-w-md w-full">
     <div class="bg-white rounded-xl shadow-sm border border-red-200 overflow-hidden">
       <div class="bg-red-50 px-6 py-5 border-b border-red-100">
@@ -14,29 +25,29 @@
             </svg>
           </div>
           <div>
-            <h1 class="text-lg font-bold text-gray-900">Delete Notification</h1>
+            
             <p class="text-sm text-red-600">This action cannot be undone</p>
           </div>
         </div>
       </div>
 
       <div class="px-6 py-6">
-        <p class="text-gray-700 text-sm mb-4">
+        <p class="text-slate-700 text-sm mb-4">
           Are you sure you want to delete this notification?
         </p>
 
-        <div class="bg-gray-50 rounded-lg p-4 mb-5 text-sm space-y-1.5">
+        <div class="bg-slate-50 rounded-lg p-4 mb-5 text-sm space-y-1.5">
           <div class="flex justify-between">
-            <span class="text-gray-500">Title</span>
-            <span class="font-medium text-gray-700">{{ notification.title }}</span>
+            <span class="text-slate-500">Title</span>
+            <span class="font-medium text-slate-700">{{ notification.title }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-500">Recipient</span>
-            <span class="font-medium text-gray-700">{{ notification.recipient.full_name|default:notification.recipient.username }}</span>
+            <span class="text-slate-500">Recipient</span>
+            <span class="font-medium text-slate-700">{{ notification.recipient.full_name|default:notification.recipient.username }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-500">Created</span>
-            <span class="font-medium text-gray-700">{{ notification.created_at }}</span>
+            <span class="text-slate-500">Created</span>
+            <span class="font-medium text-slate-700">{{ notification.created_at }}</span>
           </div>
         </div>
 
@@ -44,7 +55,7 @@
           {% csrf_token %}
           <div class="flex gap-3">
             <a href="{% url 'notifications:list' %}"
-               class="flex-1 text-center px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors duration-150">
+               class="flex-1 text-center px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg border border-slate-300 transition-colors duration-150">
               Cancel
             </a>
             <button type="submit"

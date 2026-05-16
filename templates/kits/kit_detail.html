@@ -7,15 +7,15 @@
 <div>
 
   <!-- Breadcrumb -->
-  <nav class="text-sm text-gray-500 mb-4">
-    <a href="{% url 'kits:list' %}" class="hover:text-indigo-600">Kits</a>
+  <nav class="text-sm text-slate-500 mb-4">
+    <a href="{% url 'kits:list' %}" class="hover:text-brand-600">Kits</a>
     <span class="mx-2">/</span>
-    <span class="text-gray-700">{{ kit.name }}</span>
+    <span class="text-slate-700">{{ kit.name }}</span>
   </nav>
 
   <!-- Kit Header -->
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden mb-6">
-    <div class="bg-gradient-to-r from-brand-600 to-brand-800 px-6 py-8">
+  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden mb-6">
+    <div class="bg-indigo-700 px-6 py-8">
       <div class="flex items-start justify-between">
         <div>
           <div class="flex items-center gap-3 mb-2">
@@ -65,7 +65,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-wrap gap-3">
+    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-wrap gap-3">
       <a href="{% url 'reservations:create' %}?kit={{ kit.pk }}"
          class="inline-flex items-center px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 transition">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,7 +76,7 @@
       </a>
       {% if kit.created_by == request.user or user.is_admin %}
       <a href="{% url 'kits:edit' kit.pk %}"
-         class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+         class="inline-flex items-center px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -84,7 +84,7 @@
         Edit Kit
       </a>
       <a href="{% url 'kits:add_item' kit.pk %}"
-         class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+         class="inline-flex items-center px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
@@ -106,33 +106,33 @@
 
     <!-- Equipment Items -->
     <div class="lg:col-span-2">
-      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 class="text-base font-semibold text-gray-900">Equipment Items</h2>
-          <span class="text-sm text-gray-500">{{ kit.items.count }} item{{ kit.items.count|pluralize }}</span>
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-slate-900">Equipment Items</h2>
+          <span class="text-sm text-slate-500">{{ kit.items.count }} item{{ kit.items.count|pluralize }}</span>
         </div>
-        <div class="divide-y divide-gray-100">
+        <div class="divide-y divide-slate-100">
           {% for kit_item in kit.items.all %}
-          <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition">
+          <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition">
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
                 </svg>
               </div>
               <div>
                 <a href="{% url 'equipment:detail' kit_item.equipment.pk %}"
-                   class="text-sm font-medium text-gray-900 hover:text-indigo-600">
+                   class="text-sm font-medium text-slate-900 hover:text-brand-600">
                   {{ kit_item.equipment.name }}
                 </a>
                 {% if kit_item.notes %}
-                <p class="text-xs text-gray-400 mt-0.5">{{ kit_item.notes }}</p>
+                <p class="text-xs text-slate-400 mt-0.5">{{ kit_item.notes }}</p>
                 {% endif %}
               </div>
             </div>
             <div class="flex items-center gap-3">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-brand-700">
                 ×{{ kit_item.quantity }}
               </span>
               <!-- Equipment Status -->
@@ -153,10 +153,10 @@
             </div>
           </div>
           {% empty %}
-          <div class="px-6 py-10 text-center text-sm text-gray-400">
+          <div class="px-6 py-10 text-center text-sm text-slate-400">
             No items in this kit yet.
             {% if kit.created_by == request.user %}
-            <a href="{% url 'kits:add_item' kit.pk %}" class="text-indigo-600 hover:underline ml-1">Add one.</a>
+            <a href="{% url 'kits:add_item' kit.pk %}" class="text-brand-600 hover:underline ml-1">Add one.</a>
             {% endif %}
           </div>
           {% endfor %}
@@ -166,34 +166,34 @@
 
     <!-- Sidebar: History -->
     <div class="space-y-6">
-      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 class="text-base font-semibold text-gray-900">Reservation History</h2>
-          <a href="{% url 'reservations:list' %}?kit={{ kit.pk }}" class="text-xs text-indigo-600 hover:underline">View all</a>
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-slate-900">Reservation History</h2>
+          <a href="{% url 'reservations:list' %}?kit={{ kit.pk }}" class="text-xs text-brand-600 hover:underline">View all</a>
         </div>
-        <div class="divide-y divide-gray-100">
+        <div class="divide-y divide-slate-100">
           {% for r in reservation_history|slice:":6" %}
           <div class="px-4 py-3">
             <div class="flex items-start justify-between">
               <div>
-                <p class="text-xs font-medium text-gray-800">{{ r.requester.full_name|default:r.requester.username }}</p>
-                <p class="text-xs text-gray-400 mt-0.5">{{ r.start_date|date:"M d" }} – {{ r.end_date|date:"M d, Y" }}</p>
+                <p class="text-xs font-medium text-slate-800">{{ r.requester.full_name|default:r.requester.username }}</p>
+                <p class="text-xs text-slate-400 mt-0.5">{{ r.start_date|date:"M d" }} – {{ r.end_date|date:"M d, Y" }}</p>
               </div>
               {% if r.status == 'ACTIVE' %}
                 <span class="text-xs text-emerald-600 font-medium">Active</span>
               {% elif r.status == 'CONFIRMED' %}
-                <span class="text-xs text-indigo-600 font-medium">Confirmed</span>
+                <span class="text-xs text-brand-600 font-medium">Confirmed</span>
               {% elif r.status == 'RETURNED' %}
                 <span class="text-xs text-green-600 font-medium">Returned</span>
               {% elif r.status == 'RETURN_PENDING' %}
                 <span class="text-xs text-orange-600 font-medium">Return Pending</span>
               {% else %}
-                <span class="text-xs text-gray-500 font-medium">{{ r.get_status_display }}</span>
+                <span class="text-xs text-slate-500 font-medium">{{ r.get_status_display }}</span>
               {% endif %}
             </div>
           </div>
           {% empty %}
-          <div class="px-4 py-8 text-center text-sm text-gray-400">No reservation history yet.</div>
+          <div class="px-4 py-8 text-center text-sm text-slate-400">No reservation history yet.</div>
           {% endfor %}
         </div>
       </div>
@@ -201,7 +201,7 @@
   </div>
 
   <!-- Availability Calendar (full width) -->
-  <div class="mt-6 bg-white rounded-xl border border-gray-200 p-6">
+  <div class="mt-6 bg-white rounded-xl border border-slate-200 p-6">
     {% include 'partials/_availability_calendar.html' %}
   </div>
 
