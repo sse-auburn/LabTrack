@@ -2,6 +2,7 @@
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -42,8 +43,13 @@ def reservation_list_view(request):
     if to_date:
         qs = qs.filter(end_date__lte=to_date)
 
+    paginator = Paginator(qs.order_by('-start_date'), 25)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
     return render(request, 'reservations/reservation_list.html', {
-        'reservations': qs,
+        'reservations': page_obj,
+        'page_obj': page_obj,
+        'is_paginated': paginator.num_pages > 1,
         'status_filter': status_filter,
         'from_date': from_date,
         'to_date': to_date,

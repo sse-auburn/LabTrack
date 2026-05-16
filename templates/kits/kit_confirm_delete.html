@@ -6,8 +6,8 @@
     <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
       <svg class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
     </div>
-    <h2 class="text-xl font-bold text-gray-900 mb-2">Are you sure?</h2>
-    <p class="text-sm text-gray-500 mb-6">This action cannot be undone.</p>
+    <h2 class="text-xl font-bold text-gray-900 mb-2">Delete "{{ kit.name }}"?</h2>
+    <p class="text-sm text-gray-500 mb-6">This will permanently delete the kit and remove all its items. This action cannot be undone.</p>
     <form method="post">
       {% csrf_token %}
       <div class="flex gap-3 justify-center">

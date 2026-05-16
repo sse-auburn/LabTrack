@@ -198,12 +198,16 @@ def project_edit_view(request, pk):
 
 @login_required
 def project_delete_view(request, pk):
-    """Delete a project (admin only)."""
-    if not _is_admin(request.user):
-        messages.error(request, 'Only admins can delete projects.')
-        return redirect('projects:list')
-
+    """Delete a project (project lead or admin)."""
     project = get_object_or_404(Project, pk=pk)
+
+    is_lead = project.lead == request.user or project.project_members.filter(
+        user=request.user, role='LEAD'
+    ).exists()
+
+    if not _is_admin(request.user) and not is_lead:
+        messages.error(request, 'Only the project lead or an admin can delete this project.')
+        return redirect('projects:detail', pk=project.pk)
 
     if request.method == 'POST':
         project_name = project.name

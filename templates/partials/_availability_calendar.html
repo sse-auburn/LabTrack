@@ -74,10 +74,11 @@
 
   function cellStyle(evs) {
     if (!evs.length) return '';
-    const borrowActive = evs.some(e => e.type === 'borrow' && e.status !== 'PENDING');
+    const ACTIVE_BORROW = ['APPROVED', 'ACTIVE', 'RETURN_PENDING', 'OVERDUE'];
+    const borrowActive  = evs.some(e => e.type === 'borrow' && ACTIVE_BORROW.includes(e.status));
     const borrowPending = evs.some(e => e.type === 'borrow' && e.status === 'PENDING');
-    const resConfirmed = evs.some(e => e.type === 'reservation' && e.status === 'CONFIRMED');
-    const resPending   = evs.some(e => e.type === 'reservation' && e.status === 'PENDING');
+    const resConfirmed  = evs.some(e => e.type === 'reservation' && e.status === 'CONFIRMED');
+    const resPending    = evs.some(e => e.type === 'reservation' && e.status === 'PENDING');
     if (borrowActive)  return 'bg-amber-300 text-amber-900';
     if (borrowPending) return 'bg-yellow-200 text-yellow-900';
     if (resConfirmed)  return 'bg-indigo-300 text-indigo-900';

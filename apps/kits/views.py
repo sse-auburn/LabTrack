@@ -44,11 +44,13 @@ def kit_detail_view(request, pk):
         'borrower', 'approved_by'
     ).order_by('-requested_date')[:20]
 
-    # Calendar events
+    # Calendar events — kit-level borrows/reservations + per-item equipment borrows/reservations
+    from apps.borrowing.models import BorrowRequest as _BR
+    from apps.reservations.models import Reservation as _Res
     cal_events = []
-    for b in kit.borrow_requests.filter(
-        status__in=['PENDING', 'APPROVED', 'ACTIVE', 'RETURN_PENDING']
-    ).select_related('borrower'):
+    borrow_statuses = ['APPROVED', 'ACTIVE', 'RETURN_PENDING', 'OVERDUE']
+
+    for b in kit.borrow_requests.filter(status__in=borrow_statuses).select_related('borrower'):
         cal_events.append({
             'start': b.requested_date.date().isoformat(),
             'end': b.due_date.isoformat(),
@@ -57,6 +59,26 @@ def kit_detail_view(request, pk):
             'label': b.borrower.full_name if b.borrower else '',
         })
     for r in kit.reservations.filter(status__in=['PENDING', 'CONFIRMED']).select_related('requester'):
+        cal_events.append({
+            'start': r.start_date.isoformat(),
+            'end': r.end_date.isoformat(),
+            'type': 'reservation',
+            'status': r.status,
+            'label': r.requester.full_name if r.requester else '',
+        })
+
+    # Include individual equipment borrows/reservations so items borrowed outside
+    # of this kit still appear as busy (they block the kit from being borrowed).
+    eq_pks = list(kit.items.values_list('equipment__pk', flat=True))
+    for b in _BR.objects.filter(equipment_id__in=eq_pks, status__in=borrow_statuses).select_related('borrower'):
+        cal_events.append({
+            'start': b.requested_date.date().isoformat(),
+            'end': b.due_date.isoformat(),
+            'type': 'borrow',
+            'status': b.status,
+            'label': b.borrower.full_name if b.borrower else '',
+        })
+    for r in _Res.objects.filter(equipment_id__in=eq_pks, status__in=['PENDING', 'CONFIRMED']).select_related('requester'):
         cal_events.append({
             'start': r.start_date.isoformat(),
             'end': r.end_date.isoformat(),

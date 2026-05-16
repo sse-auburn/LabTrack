@@ -60,6 +60,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def full_name(self):
         return f"{self.first_name} {self.last_name}".strip() or self.username
 
+    @property
+    def get_initials(self):
+        if self.first_name and self.last_name:
+            return f"{self.first_name[0]}{self.last_name[0]}".upper()
+        if self.first_name:
+            return self.first_name[0].upper()
+        return self.username[0].upper()
+
     def __str__(self):
         name = f"{self.first_name} {self.last_name}".strip()
         return f"{name} ({self.username})" if name else self.username
