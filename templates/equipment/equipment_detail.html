@@ -245,10 +245,10 @@
     </div>
 
     <!-- Tabs Section -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden" x-data="{ activeTab: 'calendar' }">
       <!-- Tab Nav -->
       <div class="border-b border-gray-200">
-        <nav class="flex overflow-x-auto -mb-px" aria-label="Tabs" x-data="{ activeTab: 'calendar' }">
+        <nav class="flex overflow-x-auto -mb-px" aria-label="Tabs">
           <button @click="activeTab = 'borrow-history'"
                   :class="activeTab === 'borrow-history' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
@@ -283,7 +283,7 @@
       </div>
 
       <!-- Tab Panels -->
-      <div class="p-6" x-data="{ activeTab: 'calendar' }">
+      <div class="p-6">
 
         <!-- Borrow History Tab (default visible without JS) -->
         <div id="tab-borrow-history" x-show="activeTab === 'borrow-history'">
@@ -464,13 +464,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Fallback plain JS tabs if Alpine not present
   const navButtons = document.querySelectorAll('nav button[\\@click]');
   if (!window.Alpine) {
-    // Show borrow history by default
-    document.getElementById('tab-borrow-history').style.display = 'block';
-    ['tab-lifecycle','tab-movements','tab-incidents','tab-maintenance'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = 'none';
+    // Show calendar by default
+    const allTabNames = ['borrow-history','lifecycle','movements','incidents','maintenance','calendar'];
+    allTabNames.forEach(name => {
+      const el = document.getElementById('tab-' + name);
+      if (el) el.style.display = name === 'calendar' ? 'block' : 'none';
     });
-    const tabNames = ['borrow-history','lifecycle','movements','incidents','maintenance','calendar'];
+    const tabNames = allTabNames;
     document.querySelectorAll('nav button').forEach((btn, i) => {
       btn.addEventListener('click', function() {
         tabNames.forEach((name, j) => {
