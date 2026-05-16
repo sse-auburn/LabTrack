@@ -1,5 +1,7 @@
 """Views for the kits app."""
 
+import json
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
@@ -13,12 +15,21 @@ from apps.notifications.utils import notify_admins
 @login_required
 def kit_list_view(request):
     """List kits: split into the user's own and everyone else's."""
+    from django.db.models import Q as _Q
+    search = request.GET.get('q', '').strip()
     base_qs = Kit.objects.filter(is_active=True).prefetch_related('items__equipment').select_related('created_by')
     my_kits = base_qs.filter(created_by=request.user)
     shared_kits = base_qs.filter(is_shared=True).exclude(created_by=request.user)
+    if search:
+        sq = _Q(name__icontains=search) | _Q(description__icontains=search)
+        if search.isdigit():
+            sq |= _Q(pk=int(search))
+        my_kits = my_kits.filter(sq)
+        shared_kits = shared_kits.filter(sq)
     return render(request, 'kits/kit_list.html', {
         'my_kits': my_kits,
         'shared_kits': shared_kits,
+        'search': search,
     })
 
 
@@ -33,9 +44,31 @@ def kit_detail_view(request, pk):
         'borrower', 'approved_by'
     ).order_by('-requested_date')[:20]
 
+    # Calendar events
+    cal_events = []
+    for b in kit.borrow_requests.filter(
+        status__in=['PENDING', 'APPROVED', 'ACTIVE', 'RETURN_PENDING']
+    ).select_related('borrower'):
+        cal_events.append({
+            'start': b.requested_date.date().isoformat(),
+            'end': b.due_date.isoformat(),
+            'type': 'borrow',
+            'status': b.status,
+            'label': b.borrower.full_name if b.borrower else '',
+        })
+    for r in kit.reservations.filter(status__in=['PENDING', 'CONFIRMED']).select_related('requester'):
+        cal_events.append({
+            'start': r.start_date.isoformat(),
+            'end': r.end_date.isoformat(),
+            'type': 'reservation',
+            'status': r.status,
+            'label': r.requester.full_name if r.requester else '',
+        })
+
     return render(request, 'kits/kit_detail.html', {
         'kit': kit,
         'borrow_history': borrow_history,
+        'calendar_events_json': json.dumps(cal_events),
     })
 
 

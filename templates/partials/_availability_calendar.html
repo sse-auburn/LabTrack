@@ -1,0 +1,150 @@
+<!-- Availability Calendar — expects `calendar_events_json` in context -->
+<div class="select-none">
+  <!-- Controls -->
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-base font-semibold text-gray-900">Availability Calendar</h3>
+    <div class="flex items-center gap-2">
+      <button id="cal-prev"
+              class="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <span id="cal-month-label" class="text-sm font-semibold text-gray-700 w-36 text-center"></span>
+      <button id="cal-next"
+              class="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="flex flex-wrap gap-4 mb-4 text-xs text-gray-500">
+    <span class="flex items-center gap-1.5">
+      <span class="inline-block w-3 h-3 rounded bg-amber-300"></span>Borrowed
+    </span>
+    <span class="flex items-center gap-1.5">
+      <span class="inline-block w-3 h-3 rounded bg-yellow-200"></span>Borrow Pending
+    </span>
+    <span class="flex items-center gap-1.5">
+      <span class="inline-block w-3 h-3 rounded bg-indigo-300"></span>Reserved
+    </span>
+    <span class="flex items-center gap-1.5">
+      <span class="inline-block w-3 h-3 rounded bg-blue-100 border border-blue-200"></span>Reservation Pending
+    </span>
+  </div>
+
+  <!-- Day-of-week header -->
+  <div class="grid grid-cols-7 gap-1 mb-1">
+    {% for d in "SMTWTFS" %}
+    <div class="text-center text-xs font-semibold text-gray-400 py-1">{{ d }}</div>
+    {% endfor %}
+  </div>
+
+  <!-- Grid -->
+  <div id="cal-grid" class="grid grid-cols-7 gap-1"></div>
+
+  <!-- Event detail panel -->
+  <div id="cal-detail" class="hidden mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-700 space-y-1"></div>
+</div>
+
+<script id="calendar-events-data" type="application/json">{{ calendar_events_json|safe }}</script>
+<script>
+(function () {
+  const raw = document.getElementById('calendar-events-data');
+  if (!raw) return;
+  let events;
+  try { events = JSON.parse(raw.textContent); } catch(e) { events = []; }
+
+  const today = new Date();
+  let year = today.getFullYear();
+  let month = today.getMonth(); // 0-indexed
+
+  const MONTHS = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function toIso(y, m, d) { return `${y}-${pad(m+1)}-${pad(d)}`; }
+
+  function eventsForDay(iso) {
+    return events.filter(e => e.start <= iso && e.end >= iso);
+  }
+
+  function cellStyle(evs) {
+    if (!evs.length) return '';
+    const borrowActive = evs.some(e => e.type === 'borrow' && e.status !== 'PENDING');
+    const borrowPending = evs.some(e => e.type === 'borrow' && e.status === 'PENDING');
+    const resConfirmed = evs.some(e => e.type === 'reservation' && e.status === 'CONFIRMED');
+    const resPending   = evs.some(e => e.type === 'reservation' && e.status === 'PENDING');
+    if (borrowActive)  return 'bg-amber-300 text-amber-900';
+    if (borrowPending) return 'bg-yellow-200 text-yellow-900';
+    if (resConfirmed)  return 'bg-indigo-300 text-indigo-900';
+    if (resPending)    return 'bg-blue-100 text-blue-900';
+    return '';
+  }
+
+  function render() {
+    document.getElementById('cal-month-label').textContent = `${MONTHS[month]} ${year}`;
+    const grid = document.getElementById('cal-grid');
+    const detail = document.getElementById('cal-detail');
+    grid.innerHTML = '';
+    detail.className = 'hidden mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-700 space-y-1';
+
+    const firstDow = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevDays = new Date(year, month, 0).getDate();
+    const todayIso = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+
+    const cells = [];
+    for (let i = firstDow - 1; i >= 0; i--)
+      cells.push({ day: prevDays - i, cur: false });
+    for (let d = 1; d <= daysInMonth; d++)
+      cells.push({ day: d, cur: true });
+    const tail = (7 - (cells.length % 7)) % 7;
+    for (let d = 1; d <= tail; d++)
+      cells.push({ day: d, cur: false });
+
+    cells.forEach(({ day, cur }) => {
+      const iso = cur ? toIso(year, month, day) : null;
+      const evs = cur ? eventsForDay(iso) : [];
+      const isToday = iso === todayIso;
+
+      const cell = document.createElement('div');
+      cell.className = [
+        'relative flex flex-col items-center justify-center rounded-lg text-xs py-2',
+        cur ? (evs.length ? cellStyle(evs) + ' cursor-pointer font-semibold' : 'hover:bg-gray-100 text-gray-700 cursor-default') : 'text-gray-300 cursor-default',
+        isToday ? 'ring-2 ring-inset ring-indigo-500' : '',
+      ].filter(Boolean).join(' ');
+
+      cell.textContent = day;
+
+      if (cur && evs.length) {
+        cell.addEventListener('click', () => {
+          detail.className = 'mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-700 space-y-1';
+          detail.innerHTML = `<p class="font-semibold text-gray-800 mb-1">${MONTHS[month]} ${day}, ${year}</p>` +
+            evs.map(e => {
+              const icon = e.type === 'borrow' ? '📋' : '📅';
+              const typeLabel = e.type === 'borrow' ? 'Borrow' : 'Reservation';
+              return `<p>${icon} <span class="font-medium">${typeLabel}</span> — ${e.label || 'Unknown'} <span class="text-gray-400">(${e.status})</span> · ${e.start} → ${e.end}</p>`;
+            }).join('');
+        });
+      }
+
+      grid.appendChild(cell);
+    });
+  }
+
+  document.getElementById('cal-prev').addEventListener('click', () => {
+    if (month === 0) { month = 11; year--; } else { month--; }
+    render();
+  });
+  document.getElementById('cal-next').addEventListener('click', () => {
+    if (month === 11) { month = 0; year++; } else { month++; }
+    render();
+  });
+
+  render();
+})();
+</script>

@@ -34,6 +34,7 @@ def borrow_list_view(request):
     Members see only their own; admins see all. Supports ?status= filter.
     """
     status_filter = request.GET.get('status', '')
+    search = request.GET.get('q', '').strip()
 
     if _is_admin(request.user):
         qs = BorrowRequest.objects.select_related(
@@ -53,6 +54,19 @@ def borrow_list_view(request):
     if status_filter:
         qs = qs.filter(status=status_filter)
 
+    if search:
+        from django.db.models import Q as _Q
+        sq = (
+            _Q(equipment__name__icontains=search)
+            | _Q(kit__name__icontains=search)
+            | _Q(borrower__first_name__icontains=search)
+            | _Q(borrower__last_name__icontains=search)
+            | _Q(purpose__icontains=search)
+        )
+        if search.isdigit():
+            sq |= _Q(pk=int(search))
+        qs = qs.filter(sq)
+
     paginator = Paginator(qs, 20)
     page_obj = paginator.get_page(request.GET.get('page'))
 
@@ -60,6 +74,7 @@ def borrow_list_view(request):
         'page_obj': page_obj,
         'borrow_list': page_obj,
         'status_filter': status_filter,
+        'search': search,
         'status_choices': BorrowRequest.STATUS_CHOICES,
         'pending_count': pending_count,
         'overdue_count': overdue_count,

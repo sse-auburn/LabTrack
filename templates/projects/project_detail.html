@@ -34,7 +34,7 @@
         </div>
         <!-- Action Buttons -->
         <div class="flex items-center gap-2 flex-shrink-0 ml-4">
-          {% if request.user == project.lead or request.user.is_staff %}
+          {% if request.user == project.lead or user.is_admin %}
           <a href="{% url 'projects:edit' project.pk %}"
              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50 transition">
             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,6 +51,8 @@
             </svg>
             Add Member
           </a>
+          {% endif %}
+          {% if user.is_admin %}
           <a href="{% url 'projects:delete' project.pk %}"
              class="inline-flex items-center px-3 py-1.5 bg-red-50 border border-red-300 text-red-700 rounded-lg text-sm hover:bg-red-100 transition">
             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +145,7 @@
           <div class="px-5 py-8 text-center text-sm text-gray-400">No members yet.</div>
           {% endfor %}
         </div>
-        {% if request.user == project.lead or request.user.is_staff %}
+        {% if request.user == project.lead or user.is_admin %}
         <div class="px-5 py-3 border-t border-gray-100">
           <a href="{% url 'projects:member_add' project.pk %}"
              class="text-xs text-indigo-600 hover:underline font-medium">

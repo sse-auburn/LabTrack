@@ -1,5 +1,7 @@
 """Views for the equipment app."""
 
+import json
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -56,13 +58,16 @@ def equipment_list_view(request):
     condition = request.GET.get('condition', '').strip()
 
     if search:
-        queryset = queryset.filter(
+        q_filter = (
             Q(name__icontains=search)
             | Q(serial_number__icontains=search)
             | Q(model_number__icontains=search)
             | Q(manufacturer__icontains=search)
             | Q(description__icontains=search)
         )
+        if search.isdigit():
+            q_filter |= Q(pk=int(search))
+        queryset = queryset.filter(q_filter)
     if category_id:
         queryset = queryset.filter(category_id=category_id)
     if location_id:
@@ -158,6 +163,30 @@ def equipment_detail_view(request, pk):
     # Form for adding a lifecycle note inline
     lifecycle_form = LifecycleEventForm(initial={'equipment': equipment})
 
+    # Calendar events (borrows + reservations)
+    from apps.reservations.models import Reservation
+    cal_events = []
+    for b in equipment.borrow_requests.filter(
+        status__in=['PENDING', 'APPROVED', 'ACTIVE', 'RETURN_PENDING']
+    ).select_related('borrower'):
+        cal_events.append({
+            'start': b.requested_date.date().isoformat(),
+            'end': b.due_date.isoformat(),
+            'type': 'borrow',
+            'status': b.status,
+            'label': b.borrower.full_name if b.borrower else '',
+        })
+    for r in Reservation.objects.filter(
+        equipment=equipment, status__in=['PENDING', 'CONFIRMED']
+    ).select_related('requester'):
+        cal_events.append({
+            'start': r.start_date.isoformat(),
+            'end': r.end_date.isoformat(),
+            'type': 'reservation',
+            'status': r.status,
+            'label': r.requester.full_name if r.requester else '',
+        })
+
     return render(request, 'equipment/equipment_detail.html', {
         'equipment': equipment,
         'borrow_history': borrow_history,
@@ -167,6 +196,7 @@ def equipment_detail_view(request, pk):
         'maintenance_logs': maintenance_logs,
         'lifecycle_form': lifecycle_form,
         'can_approve': (is_admin or request.user == equipment.owner) and equipment.approval_status == 'PENDING',
+        'calendar_events_json': json.dumps(cal_events),
     })
 
 

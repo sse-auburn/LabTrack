@@ -274,6 +274,11 @@
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Maintenance
           </button>
+          <button @click="activeTab = 'calendar'"
+                  :class="activeTab === 'calendar' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                  class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
+            Availability
+          </button>
         </nav>
       </div>
 
@@ -439,6 +444,11 @@
           {% endif %}
         </div>
 
+        <!-- Availability Calendar Tab -->
+        <div id="tab-calendar" x-show="activeTab === 'calendar'" style="display:none;">
+          {% include 'partials/_availability_calendar.html' %}
+        </div>
+
       </div>
     </div>
 
@@ -460,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
     });
-    const tabNames = ['borrow-history','lifecycle','movements','incidents','maintenance'];
+    const tabNames = ['borrow-history','lifecycle','movements','incidents','maintenance','calendar'];
     document.querySelectorAll('nav button').forEach((btn, i) => {
       btn.addEventListener('click', function() {
         tabNames.forEach((name, j) => {

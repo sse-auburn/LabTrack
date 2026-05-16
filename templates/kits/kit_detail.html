@@ -71,6 +71,14 @@
         </svg>
         Borrow Kit
       </a>
+      <a href="{% url 'reservations:create' %}?kit={{ kit.pk }}"
+         class="inline-flex items-center px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 transition">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        Reserve Kit
+      </a>
       {% if kit.created_by == request.user or user.is_admin %}
       <a href="{% url 'kits:edit' kit.pk %}"
          class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
@@ -161,32 +169,29 @@
       </div>
     </div>
 
-    <!-- Sidebar: Borrow History -->
-    <div>
+    <!-- Sidebar: History -->
+    <div class="space-y-6">
       <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
           <h2 class="text-base font-semibold text-gray-900">Borrow History</h2>
+          <a href="{% url 'borrowing:list' %}?kit={{ kit.pk }}" class="text-xs text-indigo-600 hover:underline">View all</a>
         </div>
         <div class="divide-y divide-gray-100">
-          {% for res in kit.reservations.all|slice:":8" %}
+          {% for b in borrow_history|slice:":6" %}
           <div class="px-4 py-3">
             <div class="flex items-start justify-between">
               <div>
-                <p class="text-xs font-medium text-gray-800">
-                  {{ res.requester.full_name|default:res.requester.username }}
-                </p>
-                <p class="text-xs text-gray-400 mt-0.5">
-                  {{ res.start_date|date:"M d" }} – {{ res.end_date|date:"M d, Y" }}
-                </p>
+                <p class="text-xs font-medium text-gray-800">{{ b.borrower.full_name|default:b.borrower.username }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">Due {{ b.due_date|date:"M d, Y" }}</p>
               </div>
-              {% if res.status == 'CONFIRMED' %}
-                <span class="text-xs text-green-600 font-medium">Active</span>
-              {% elif res.status == 'COMPLETED' %}
-                <span class="text-xs text-blue-600 font-medium">Done</span>
-              {% elif res.status == 'CANCELLED' %}
-                <span class="text-xs text-red-500 font-medium">Cancelled</span>
+              {% if b.status == 'ACTIVE' or b.status == 'APPROVED' %}
+                <span class="text-xs text-amber-600 font-medium">Active</span>
+              {% elif b.status == 'RETURNED' %}
+                <span class="text-xs text-green-600 font-medium">Returned</span>
+              {% elif b.status == 'OVERDUE' %}
+                <span class="text-xs text-red-600 font-medium">Overdue</span>
               {% else %}
-                <span class="text-xs text-gray-500 font-medium">{{ res.get_status_display }}</span>
+                <span class="text-xs text-gray-500 font-medium">{{ b.get_status_display }}</span>
               {% endif %}
             </div>
           </div>
@@ -194,16 +199,14 @@
           <div class="px-4 py-8 text-center text-sm text-gray-400">No borrow history yet.</div>
           {% endfor %}
         </div>
-        {% if kit.reservations.count > 8 %}
-        <div class="px-4 py-3 border-t border-gray-100 text-center">
-          <a href="{% url 'reservations:list' %}?kit={{ kit.pk }}"
-             class="text-xs text-indigo-600 hover:underline">
-            View all {{ kit.reservations.count }} reservations
-          </a>
-        </div>
-        {% endif %}
       </div>
     </div>
   </div>
+
+  <!-- Availability Calendar (full width) -->
+  <div class="mt-6 bg-white rounded-xl border border-gray-200 p-6">
+    {% include 'partials/_availability_calendar.html' %}
+  </div>
+
 </div>
 {% endblock %}

@@ -199,7 +199,9 @@
                   {% endif %}
                   <div class="min-w-0">
                     <p class="font-semibold text-gray-900 truncate group-hover:text-indigo-600 transition-colors">{{ item.name }}</p>
-                    {% if item.serial_number %}<p class="text-xs text-gray-400 truncate">S/N: {{ item.serial_number }}</p>{% endif %}
+                    <p class="text-xs text-gray-400 truncate">
+                      #{{ item.pk }}{% if item.serial_number %} &bull; S/N: {{ item.serial_number }}{% endif %}
+                    </p>
                   </div>
                 </a>
               </td>
@@ -308,6 +310,7 @@
             <div class="flex items-start justify-between gap-2">
               <a href="{% url 'equipment:detail' item.pk %}" class="flex-1">
                 <h3 class="text-sm font-semibold text-white leading-tight line-clamp-2 hover:underline">{{ item.name }}</h3>
+                <p class="text-xs text-white/50">#{{ item.pk }}</p>
               </a>
               {% if item.category %}
               <span class="shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white border border-white/30"

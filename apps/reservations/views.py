@@ -218,7 +218,12 @@ def reservation_create_view(request):
             return redirect('reservations:detail', pk=reservation.pk)
     else:
         equipment_id = request.GET.get('equipment')
-        initial = {'equipment': equipment_id} if equipment_id else {}
+        kit_id = request.GET.get('kit')
+        initial = {}
+        if equipment_id:
+            initial['equipment'] = equipment_id
+        elif kit_id:
+            initial['kit'] = kit_id
         form = ReservationForm(initial=initial)
 
     return render(request, 'reservations/reservation_form.html', {'form': form})
