@@ -18,6 +18,7 @@ from apps.accounts.forms import (
 from apps.accounts.models import CustomUser, UserProfile
 from apps.activity.utils import log_activity
 from apps.notifications.utils import notify, notify_admins
+from apps.borrowing.models import BorrowRequest
 
 
 # ---------------------------------------------------------------------------
@@ -122,9 +123,14 @@ def logout_view(request):
 def profile_view(request):
     """Display the current user's profile."""
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    borrows = BorrowRequest.objects.filter(borrower=request.user)
     return render(request, 'accounts/profile.html', {
         'profile': profile,
         'profile_user': request.user,
+        'total_borrows': borrows.count(),
+        'active_borrows': borrows.filter(status__in=['ACTIVE', 'RETURN_PENDING']).count(),
+        'pending_borrows': borrows.filter(status='PENDING').count(),
+        'overdue_borrows': borrows.filter(status='OVERDUE').count(),
     })
 
 

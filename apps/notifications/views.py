@@ -50,7 +50,8 @@ def mark_read_view(request, pk):
         ).count()
         return JsonResponse({'success': True, 'unread_count': unread_count})
 
-    return redirect('notifications:list')
+    next_url = request.POST.get('next') or request.GET.get('next')
+    return redirect(next_url if next_url and next_url.startswith('/') else 'notifications:list')
 
 
 @login_required
@@ -64,7 +65,8 @@ def mark_all_read_view(request):
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return JsonResponse({'success': True, 'marked_count': updated})
 
-    return redirect('notifications:list')
+    next_url = request.POST.get('next') or request.GET.get('next')
+    return redirect(next_url if next_url and next_url.startswith('/') else 'notifications:list')
 
 
 @login_required

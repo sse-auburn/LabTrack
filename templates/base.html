@@ -316,7 +316,13 @@
               <div class="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
                 <p class="text-sm font-semibold text-slate-800">Notifications</p>
                 {% if unread_notification_count and unread_notification_count > 0 %}
-                <span class="text-xs text-brand-600 font-medium">{{ unread_notification_count }} new</span>
+                <form method="post" action="{% url 'notifications:mark_all_read' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="next" value="{{ request.path }}">
+                  <button type="submit" class="text-xs text-brand-600 hover:text-brand-800 font-medium transition-colors">
+                    Mark all read
+                  </button>
+                </form>
                 {% endif %}
               </div>
               <div class="overflow-y-auto flex-1">
@@ -349,7 +355,20 @@
                       <p class="text-[11px] text-slate-400 mt-0.5">{{ n.created_at|timesince }} ago</p>
                     </div>
                     {% if not n.is_read %}
-                    <span class="w-2 h-2 bg-brand-500 rounded-full flex-shrink-0 mt-1.5"></span>
+                    <div class="flex flex-col items-center gap-1 flex-shrink-0">
+                      <span class="w-2 h-2 bg-brand-500 rounded-full"></span>
+                      <form method="post" action="{% url 'notifications:mark_read' n.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button type="submit" title="Mark as read"
+                          class="p-0.5 text-slate-300 hover:text-slate-500 transition-colors"
+                          onclick="event.stopPropagation()">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                          </svg>
+                        </button>
+                      </form>
+                    </div>
                     {% endif %}
                   </div>
                 </a>
@@ -508,7 +527,7 @@
     </header>
 
     <!-- ====== MAIN CONTENT ====== -->
-    <main class="flex-1 p-4 sm:p-6">
+    <main class="flex-1 p-4 sm:p-6 bg-gray-50">
 
       <!-- Breadcrumbs slot -->
       {% block breadcrumbs %}{% endblock %}

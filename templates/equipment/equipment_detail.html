@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ equipment.name }} – Equipment{% endblock %}
+{% block page_title %}{{ equipment.name }}{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-gray-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div>
+  <div>
 
     <!-- Breadcrumb -->
     <nav class="flex mb-6" aria-label="Breadcrumb">
