@@ -3,7 +3,7 @@
 from datetime import date, timedelta
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import redirect, render
 
 from apps.activity.models import ActivityLog
@@ -52,9 +52,10 @@ def dashboard_home_view(request):
 
     upcoming_reservations = Reservation.objects.filter(
         requester=user,
-        status='CONFIRMED',
-        start_date__gte=today,
-        start_date__lte=week_ahead,
+        status__in=['CONFIRMED', 'PENDING'],
+    ).filter(
+        Q(start_date__gte=today, start_date__lte=week_ahead) |
+        Q(start_date__lte=today, end_date__gte=today)
     ).select_related('equipment', 'kit').order_by('start_date')
 
     recent_notifications = Notification.objects.filter(
