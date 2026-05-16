@@ -248,12 +248,7 @@
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <!-- Tab Nav -->
       <div class="border-b border-gray-200">
-        <nav class="flex overflow-x-auto -mb-px" aria-label="Tabs" x-data="{ activeTab: 'borrow-history' }">
-          <button @click="activeTab = 'calendar'"
-                  :class="activeTab === 'calendar' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                  class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
-            Availability
-          </button>
+        <nav class="flex overflow-x-auto -mb-px" aria-label="Tabs" x-data="{ activeTab: 'calendar' }">
           <button @click="activeTab = 'borrow-history'"
                   :class="activeTab === 'borrow-history' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
@@ -279,11 +274,16 @@
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Maintenance
           </button>
+          <button @click="activeTab = 'calendar'"
+                  :class="activeTab === 'calendar' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                  class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
+            Availability
+          </button>
         </nav>
       </div>
 
       <!-- Tab Panels -->
-      <div class="p-6" x-data="{ activeTab: 'borrow-history' }">
+      <div class="p-6" x-data="{ activeTab: 'calendar' }">
 
         <!-- Borrow History Tab (default visible without JS) -->
         <div id="tab-borrow-history" x-show="activeTab === 'borrow-history'">
