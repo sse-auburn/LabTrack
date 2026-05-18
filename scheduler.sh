@@ -27,11 +27,11 @@ run_daily() {
 
 while true; do
     now=$(date -u +%s)
-    today_8am=$(date -u -d 'today 08:00' +%s)
+    today_8am=$(date -u -d 'today 11:00' +%s)
     if [ "$now" -lt "$today_8am" ]; then
         next_run=$today_8am
     else
-        next_run=$(date -u -d 'tomorrow 08:00' +%s)
+        next_run=$(date -u -d 'tomorrow 11:00' +%s)
     fi
     sleep_secs=$((next_run - now))
     echo "==> [scheduler] Next run in ${sleep_secs}s at $(date -u -d "@${next_run}" '+%Y-%m-%d %H:%M UTC')"
