@@ -7,6 +7,10 @@ set -euo pipefail
 # Migrates the MySQL database from the Docker container (source) to the
 # external MySQL server defined in .env (target).
 #
+# This script does NOT stop the old stack first. It extracts data while the
+# source is running, loads it into the target, and then pauses for your
+# verification before completing the cutover.
+#
 # Usage:
 #   chmod +x migrate_db.sh
 #   ./migrate_db.sh [OPTIONS]
@@ -161,7 +165,7 @@ echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}   LabTrack Database Migration Tool     ${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
-echo -e "Source: ${YELLOW}Docker MySQL container${NC}"
+echo -e "Source: ${YELLOW}Docker MySQL container (left running)${NC}"
 echo -e "Target: ${YELLOW}${TARGET_HOST}:${TARGET_PORT}/${TARGET_DB}${NC}"
 echo -e "User:   ${YELLOW}${TARGET_USER}${NC}"
 echo -e "Drop:   ${YELLOW}${DROP_TARGET}${NC}"
@@ -173,18 +177,15 @@ if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
-# ---------------------------------------------------------------------------
-# Step 1: Stop running application containers
-# ---------------------------------------------------------------------------
-echo ""
-echo -e "${YELLOW}[1/8] Stopping application containers...${NC}"
-${DOCKER_COMPOSE} -f docker-compose.yml -f docker-compose.mysql.yml down 2>/dev/null || true
-echo -e "${GREEN}        Done.${NC}"
+# ############################################################################
+# PHASE 1: Extract and Load (non-destructive)
+# ############################################################################
 
 # ---------------------------------------------------------------------------
-# Step 2: Start source database container
+# Step 1: Ensure source database is running
 # ---------------------------------------------------------------------------
-echo -e "${YELLOW}[2/8] Starting source database container...${NC}"
+echo ""
+echo -e "${YELLOW}[1/6] Ensuring source database container is running...${NC}"
 ${DOCKER_COMPOSE} -f docker-compose.yml -f docker-compose.mysql.yml up -d db
 
 echo -e "${YELLOW}        Waiting for MySQL to be ready...${NC}"
@@ -196,29 +197,26 @@ for i in {1..60}; do
     fi
     if [ $i -eq 60 ]; then
         echo -e "${RED}        MySQL failed to start within 60 seconds.${NC}"
-        ${DOCKER_COMPOSE} -f docker-compose.yml -f docker-compose.mysql.yml down
         exit 1
     fi
     sleep 1
 done
 
 # ---------------------------------------------------------------------------
-# Step 3: Dump the source database
+# Step 2: Dump the source database
 # ---------------------------------------------------------------------------
-echo -e "${YELLOW}[3/8] Dumping source database '${SRC_DB_NAME}'...${NC}"
+echo -e "${YELLOW}[2/6] Dumping source database '${SRC_DB_NAME}'...${NC}"
 
 if ! ${DOCKER_COMPOSE} -f docker-compose.yml -f docker-compose.mysql.yml exec -T db \
     mysqldump -u root -p"${SRC_ROOT_PASSWORD}" \
     --single-transaction --routines --triggers \
     "${SRC_DB_NAME}" > "${DUMP_FILE}"; then
     echo -e "${RED}        Dump failed. Is the root password correct?${NC}"
-    ${DOCKER_COMPOSE} -f docker-compose.yml -f docker-compose.mysql.yml down
     exit 1
 fi
 
 if [ ! -s "${DUMP_FILE}" ]; then
     echo -e "${RED}        Error: Dump file is empty.${NC}"
-    ${DOCKER_COMPOSE} -f docker-compose.yml -f docker-compose.mysql.yml down
     exit 1
 fi
 
@@ -226,16 +224,9 @@ DUMP_SIZE=$(du -sh "${DUMP_FILE}" | cut -f1)
 echo -e "${GREEN}        Dump complete: ${DUMP_FILE} (${DUMP_SIZE})${NC}"
 
 # ---------------------------------------------------------------------------
-# Step 4: Stop source database container
+# Step 3: Test target connection
 # ---------------------------------------------------------------------------
-echo -e "${YELLOW}[4/8] Stopping source database container...${NC}"
-${DOCKER_COMPOSE} -f docker-compose.yml -f docker-compose.mysql.yml down
-echo -e "${GREEN}        Done.${NC}"
-
-# ---------------------------------------------------------------------------
-# Step 5: Test target connection
-# ---------------------------------------------------------------------------
-echo -e "${YELLOW}[5/8] Testing connection to target database...${NC}"
+echo -e "${YELLOW}[3/6] Testing connection to target database...${NC}"
 if ! docker run --rm -i mysql:8.0 mysql -h "${TARGET_HOST}" -P "${TARGET_PORT}" \
     -u "${TARGET_USER}" -p"${TARGET_PASS}" \
     -e "SELECT 1;" > /dev/null 2>&1; then
@@ -248,9 +239,9 @@ fi
 echo -e "${GREEN}        Connection successful.${NC}"
 
 # ---------------------------------------------------------------------------
-# Step 6: Prepare target database
+# Step 4: Prepare target database
 # ---------------------------------------------------------------------------
-echo -e "${YELLOW}[6/8] Preparing target database...${NC}"
+echo -e "${YELLOW}[4/6] Preparing target database...${NC}"
 
 if [ "$DROP_TARGET" = true ]; then
     echo -e "${YELLOW}        Dropping existing database (if exists)...${NC}"
@@ -270,9 +261,9 @@ fi
 echo -e "${GREEN}        Target database ready.${NC}"
 
 # ---------------------------------------------------------------------------
-# Step 7: Import dump to target
+# Step 5: Import dump to target
 # ---------------------------------------------------------------------------
-echo -e "${YELLOW}[7/8] Importing dump to target database...${NC}"
+echo -e "${YELLOW}[5/6] Importing dump to target database...${NC}"
 if ! docker run --rm -i -v "${SCRIPT_DIR}/${DUMP_FILE}:/dump.sql:ro" mysql:8.0 \
     bash -c "mysql -h ${TARGET_HOST} -P ${TARGET_PORT} -u ${TARGET_USER} -p'${TARGET_PASS}' ${TARGET_DB} < /dump.sql"; then
     echo -e "${RED}        Error: Import failed.${NC}"
@@ -282,10 +273,10 @@ fi
 echo -e "${GREEN}        Import complete.${NC}"
 
 # ---------------------------------------------------------------------------
-# Step 8: Verify import
+# Step 6: Verify import
 # ---------------------------------------------------------------------------
 if [ "$SKIP_VERIFY" = false ]; then
-    echo -e "${YELLOW}[8/8] Verifying import...${NC}"
+    echo -e "${YELLOW}[6/6] Verifying import...${NC}"
     
     TABLE_COUNT=$(docker run --rm -i mysql:8.0 mysql -h "${TARGET_HOST}" -P "${TARGET_PORT}" \
         -u "${TARGET_USER}" -p"${TARGET_PASS}" "${TARGET_DB}" -N -s \
@@ -302,25 +293,53 @@ if [ "$SKIP_VERIFY" = false ]; then
         echo -e "${RED}        Warning: No tables found in target database!${NC}"
     fi
 else
-    echo -e "${YELLOW}[8/8] Verification skipped.${NC}"
+    echo -e "${YELLOW}[6/6] Verification skipped.${NC}"
 fi
 
-# ---------------------------------------------------------------------------
-# Step 9: Redeploy application
-# ---------------------------------------------------------------------------
 echo ""
-echo -e "${YELLOW}[FINAL] Redeploying application with external database...${NC}"
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN}   Phase 1 complete: Data migrated      ${NC}"
+echo -e "${GREEN}========================================${NC}"
+echo ""
+echo -e "The old Docker database is still running.${NC}"
+echo -e "Dump file: ${YELLOW}${DUMP_FILE}${NC}"
+echo ""
+
+# ############################################################################
+# PHASE 2: Cutover (waits for your confirmation)
+# ############################################################################
+
+echo -e "${YELLOW}Press Enter to cut over to the new database...${NC}"
+read -p "(This will stop the old stack and redeploy with the external DB) "
+
+echo ""
+echo -e "${YELLOW}[CUT-OVER] Stopping old stack...${NC}"
+${DOCKER_COMPOSE} -f docker-compose.yml -f docker-compose.mysql.yml down
+
+echo -e "${YELLOW}[CUT-OVER] Starting new stack with external database...${NC}"
 ${DOCKER_COMPOSE} -f docker-compose.yml up -d --build
 
 echo ""
 echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}   Migration completed successfully!    ${NC}"
+echo -e "${GREEN}   Cutover complete!                    ${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
-echo -e "Dump file preserved at: ${YELLOW}${DUMP_FILE}${NC}"
-echo -e "Remove it when ready:   ${YELLOW}rm ${DUMP_FILE}${NC}"
+
+# ############################################################################
+# PHASE 3: Cleanup (waits for your confirmation)
+# ############################################################################
+
+echo -e "${YELLOW}Press Enter to clean up old Docker volume and dump file...${NC}"
+read -p "(Or Ctrl+C to keep them for now) "
+
+echo -e "${YELLOW}[CLEANUP] Removing old Docker volume...${NC}"
+docker volume rm labtrack_mysql_data 2>/dev/null || echo -e "${YELLOW}        Volume not found or already removed.${NC}"
+
+echo -e "${YELLOW}[CLEANUP] Removing dump file...${NC}"
+rm -f "${DUMP_FILE}"
+
 echo ""
-echo -e "${BLUE}Rollback (if needed):${NC}"
-echo "  ${DOCKER_COMPOSE} -f docker-compose.yml down"
-echo "  ${DOCKER_COMPOSE} -f docker-compose.yml -f docker-compose.mysql.yml up -d"
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN}   Migration fully complete!            ${NC}"
+echo -e "${GREEN}========================================${NC}"
 echo ""
