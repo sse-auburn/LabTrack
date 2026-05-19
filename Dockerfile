@@ -50,11 +50,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Runtime system deps (MySQL client library + Pillow image libs)
+# Runtime system deps (MySQL client library + Pillow image libs + timezone data)
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libmariadb3 \
         libjpeg62-turbo \
         zlib1g \
+        tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy installed packages from builder

@@ -39,6 +39,7 @@ services:
       - .env
     environment:
       REDIS_URL: redis://redis:6379/0
+      TZ: America/Chicago
     volumes:
       - media_data:/app/media
     entrypoint: ["/scheduler.sh"]

@@ -14,31 +14,60 @@
   </nav>
 
   <!-- Kit Header -->
-  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden mb-6">
-    <div class="bg-auburn-blue px-6 py-8">
-      <div class="flex items-start justify-between">
-        <div>
-          <div class="flex items-center gap-3 mb-2">
-            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-              </svg>
-            </div>
-            <div>
-              <h1 class="text-2xl font-bold text-white">{{ kit.name }}</h1>
-              <p class="text-white/80 text-sm">
-                {{ kit.items.count }} item{{ kit.items.count|pluralize }} in this kit
-              </p>
-            </div>
+  <div class="overflow-hidden mb-6">
+
+  <!-- HEADER -->
+  <div class="px-6 py-8 ">
+    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+
+      <!-- LEFT CONTENT -->
+      <div>
+        <div class="flex items-center gap-3 mb-2">
+
+          <div class="w-12 h-12 bg-auburn-orange/10 rounded-2xl flex items-center justify-center">
+            <svg class="w-6 h-6 text-auburn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
           </div>
-          {% if kit.description %}
-          <p class="text-auburn-bluePale text-sm max-w-2xl mt-3">{{ kit.description }}</p>
-          {% endif %}
+
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900">
+              {{ kit.name }}
+            </h1>
+
+            <p class="text-slate-500 text-sm">
+              {{ kit.items.count }} item{{ kit.items.count|pluralize }} in this kit
+            </p>
+          </div>
+
         </div>
-        <div class="flex gap-2">
+
+        {% if kit.description %}
+        <p class="text-slate-600 text-sm max-w-2xl mt-3">
+          {{ kit.description }}
+        </p>
+        {% endif %}
+
+        <div class="mt-4 flex items-center gap-4 text-xs text-slate-400">
+          <span>
+            Created by {{ kit.created_by.full_name|default:kit.created_by.username|default:"System" }}
+          </span>
+
+          <span>•</span>
+
+          <span>{{ kit.created_at|date:"F j, Y" }}</span>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE -->
+      <div class="flex flex-col items-start lg:items-end gap-4">
+
+        <!-- STATUS BADGES -->
+        <div class="flex flex-wrap gap-2 justify-end">
+
           {% if kit.is_shared %}
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-auburn-orange/10 text-auburn-orange border border-auburn-orange/20">
             <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -46,63 +75,68 @@
             Shared
           </span>
           {% else %}
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
             Personal
           </span>
           {% endif %}
+
           {% if not kit.is_active %}
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200">
             Inactive
           </span>
           {% endif %}
         </div>
-      </div>
-      <div class="mt-4 flex items-center gap-4 text-xs text-auburn-bluePale">
-        <span>Created by {{ kit.created_by.full_name|default:kit.created_by.username|default:"System" }}</span>
-        <span>•</span>
-        <span>{{ kit.created_at|date:"F j, Y" }}</span>
-      </div>
-    </div>
 
-    <!-- Action Buttons -->
-    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-wrap gap-3">
-      <a href="{% url 'reservations:create' %}?kit={{ kit.pk }}"
-         class="inline-flex items-center px-4 py-2 bg-auburn-bluePale hover:bg-auburn-bluePale text-auburn-blue text-sm font-medium rounded-lg border border-auburn-bluePale transition">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-        </svg>
-        Reserve Kit
-      </a>
-      {% if kit.created_by == request.user or user.is_admin %}
-      <a href="{% url 'kits:edit' kit.pk %}"
-         class="inline-flex items-center px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-        </svg>
-        Edit Kit
-      </a>
-      <a href="{% url 'kits:add_item' kit.pk %}"
-         class="inline-flex items-center px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
-        Add Item
-      </a>
-      <a href="{% url 'kits:delete' kit.pk %}"
-         class="inline-flex items-center px-4 py-2 border border-red-300 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 transition">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-        </svg>
-        Delete Kit
-      </a>
-      {% endif %}
+        <!-- ACTION BUTTONS -->
+        <div class="flex flex-wrap justify-end gap-3">
+
+          <a href="{% url 'reservations:create' %}?kit={{ kit.pk }}"
+             class="inline-flex items-center px-4 py-2 bg-auburn-orange hover:bg-auburn-orange/90 text-white text-sm font-medium rounded-xl transition">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            Reserve Kit
+          </a>
+
+          {% if kit.created_by == request.user or user.is_admin %}
+
+          <a href="{% url 'kits:edit' kit.pk %}"
+             class="inline-flex items-center px-4 py-2 border border-auburn-orange text-auburn-orange rounded-xl text-sm font-medium hover:bg-auburn-orange hover:text-white transition">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            Edit Kit
+          </a>
+
+          <a href="{% url 'kits:add_item' kit.pk %}"
+             class="inline-flex items-center px-4 py-2 border border-auburn-orange text-auburn-orange rounded-xl text-sm font-medium hover:bg-auburn-orange hover:text-white transition">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Item
+          </a>
+
+          <a href="{% url 'kits:delete' kit.pk %}"
+             class="inline-flex items-center px-4 py-2 border border-red-300 text-red-600 rounded-xl text-sm font-medium hover:bg-red-600 hover:text-white transition">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            Delete Kit
+          </a>
+
+          {% endif %}
+        </div>
+
+      </div>
     </div>
   </div>
+</div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     <!-- Equipment Items -->
     <div class="lg:col-span-2">

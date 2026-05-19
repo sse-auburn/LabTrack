@@ -13,7 +13,9 @@ from django.db.models import Max
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
+from apps.activity.models import ActivityLog
 from apps.activity.utils import log_activity
+from apps.notifications.models import Notification
 from apps.notifications.utils import notify_admins
 
 from apps.public import models, forms
@@ -34,6 +36,15 @@ def cms_dashboard_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
 
+    recent_notifications = Notification.objects.filter(
+        recipient=request.user,
+        is_read=False,
+    ).order_by('-created_at')[:5]
+
+    cms_activity = ActivityLog.objects.filter(
+        action__in=['CMS_CREATED', 'CMS_UPDATED', 'CMS_DELETED'],
+    ).select_related('actor').order_by('-timestamp')[:10]
+
     context = {
         'counts': {
             'publications': models.Publication.objects.count(),
@@ -48,7 +59,9 @@ def cms_dashboard_view(request):
             'contact_messages': models.ContactMessage.objects.count(),
             'highlights': models.HomepageHighlight.objects.count(),
             'alumni': models.Alumni.objects.count(),
-        }
+        },
+        'recent_notifications': recent_notifications,
+        'cms_activity': cms_activity,
     }
     return render(request, 'cms/dashboard.html', context)
 

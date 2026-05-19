@@ -211,7 +211,7 @@
 
   <!-- MAIN CONTENT -->
   <main class="flex-1 px-4 py-6 min-w-0 bg-slate-50 overflow-y-auto rounded-l-[1.5rem] h-full">
-    {% include 'partials/_messages.html' %}
+    {% block cms_messages %}{% include 'partials/_messages.html' %}{% endblock %}
     {% block cms_content %}{% endblock %}
   </main>
 
