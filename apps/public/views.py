@@ -23,6 +23,8 @@ def _highlight_has_image(hl):
     """Return True if the highlight's content object has an image."""
     if hl.highlight_type == 'PROJECT' and hl.project and hl.project.image:
         return True
+    if hl.highlight_type == 'NEWS' and hl.news_item and hl.news_item.image:
+        return True
     return False
 
 

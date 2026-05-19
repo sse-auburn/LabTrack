@@ -1,0 +1,268 @@
+{% extends 'cms/base.html' %}
+
+{% block title %}Homepage Highlights{% endblock %}
+
+{% block cms_content %}
+<div class="space-y-8">
+
+  <!-- Current Highlights -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div>
+        <h2 class="text-lg font-bold text-slate-800">Current Highlights</h2>
+        <p class="text-xs text-slate-500 mt-0.5">{{ items|length }} item{{ items|length|pluralize }} on the homepage</p>
+      </div>
+    </div>
+
+    {% if items %}
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-slate-50 text-slate-600 font-medium">
+          <tr>
+            <th class="px-4 py-3 w-10"></th>
+            <th class="px-6 py-3">Type</th>
+            <th class="px-6 py-3">Content</th>
+            <th class="px-6 py-3">Order</th>
+            <th class="px-6 py-3">Active</th>
+            <th class="px-6 py-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="highlight-sortable" class="divide-y divide-slate-100">
+          {% for item in items %}
+          <tr class="hover:bg-slate-50 transition cursor-move" data-id="{{ item.pk }}">
+            <td class="px-4 py-3 text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
+            </td>
+            <td class="px-6 py-3">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                {% if item.highlight_type == 'PROJECT' %}bg-brand-100 text-brand-700
+                {% elif item.highlight_type == 'PUBLICATION' %}bg-auburn-bluePale text-auburn-blue
+                {% elif item.highlight_type == 'NEWS' %}bg-yellow-100 text-yellow-700
+                {% else %}bg-red-100 text-red-700{% endif %}">
+                {{ item.get_highlight_type_display }}
+              </span>
+            </td>
+            <td class="px-6 py-3 text-slate-700">{{ item.content_object|default:"—"|truncatechars:60 }}</td>
+            <td class="px-6 py-3 text-slate-700 order-cell">{{ item.order }}</td>
+            <td class="px-6 py-3">
+              {% if item.is_active %}
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-xs font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span> Yes
+                </span>
+              {% else %}
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> No
+                </span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-3 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <a href="{% url 'public_cms:cms_homepagehighlight_edit' item.pk %}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-medium text-brand-700 bg-brand-50 hover:bg-brand-100 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  Edit
+                </a>
+                <a href="{% url 'public_cms:cms_homepagehighlight_delete' item.pk %}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  Delete
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div id="reorder-toast" class="hidden fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg bg-slate-800 text-white text-sm shadow-lg transition-opacity duration-300">
+      Order saved
+    </div>
+    {% else %}
+    <div class="px-6 py-10 text-center">
+      <p class="text-slate-500 text-sm">No highlights yet. Add some from the sections below.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Available Items -->
+  <div>
+    <h2 class="text-lg font-bold text-slate-800 mb-4">Available Items</h2>
+
+    <!-- Projects -->
+    {% if available_projects %}
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+      <div class="px-6 py-3 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+        <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+        <h3 class="text-sm font-semibold text-slate-700">Projects</h3>
+        <span class="ml-auto text-xs text-slate-500">{{ available_projects|length }} available</span>
+      </div>
+      <div class="divide-y divide-slate-100">
+        {% for project in available_projects %}
+        <div class="px-6 py-3 flex items-center justify-between hover:bg-slate-50 transition">
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-slate-800 truncate">{{ project.title }}</p>
+            <p class="text-xs text-slate-500 truncate">{{ project.description|striptags|truncatechars:80 }}</p>
+          </div>
+          <form method="post" action="{% url 'public_cms:cms_homepagehighlight_list' %}" class="flex-shrink-0 ml-4">
+            {% csrf_token %}
+            <input type="hidden" name="highlight_type" value="PROJECT">
+            <input type="hidden" name="object_id" value="{{ project.pk }}">
+            <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium text-white bg-brand-600 hover:bg-brand-700 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Add
+            </button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Publications -->
+    {% if available_publications %}
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+      <div class="px-6 py-3 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+        <svg class="w-4 h-4 text-auburn-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        <h3 class="text-sm font-semibold text-slate-700">Publications</h3>
+        <span class="ml-auto text-xs text-slate-500">{{ available_publications|length }} available</span>
+      </div>
+      <div class="divide-y divide-slate-100">
+        {% for pub in available_publications %}
+        <div class="px-6 py-3 flex items-center justify-between hover:bg-slate-50 transition">
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-slate-800 truncate">{{ pub.title|default:"Untitled" }}</p>
+            <p class="text-xs text-slate-500 truncate">{{ pub.authors|truncatechars:80 }} {% if pub.year %}· {{ pub.year }}{% endif %}</p>
+          </div>
+          <form method="post" action="{% url 'public_cms:cms_homepagehighlight_list' %}" class="flex-shrink-0 ml-4">
+            {% csrf_token %}
+            <input type="hidden" name="highlight_type" value="PUBLICATION">
+            <input type="hidden" name="object_id" value="{{ pub.pk }}">
+            <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium text-white bg-brand-600 hover:bg-brand-700 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Add
+            </button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- News Items -->
+    {% if available_news %}
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+      <div class="px-6 py-3 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+        <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+        <h3 class="text-sm font-semibold text-slate-700">News Items</h3>
+        <span class="ml-auto text-xs text-slate-500">{{ available_news|length }} available</span>
+      </div>
+      <div class="divide-y divide-slate-100">
+        {% for news in available_news %}
+        <div class="px-6 py-3 flex items-center justify-between hover:bg-slate-50 transition">
+          <div class="min-w-0 flex items-center gap-3">
+            {% if news.image %}
+            <div class="w-10 h-10 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden">
+              <img src="{{ news.image.url }}" alt="" class="w-full h-full object-cover">
+            </div>
+            {% endif %}
+            <div>
+              <p class="text-sm font-medium text-slate-800 truncate">{{ news.title }}</p>
+              <p class="text-xs text-slate-500 truncate">{{ news.content|striptags|truncatechars:80 }}</p>
+            </div>
+          </div>
+          <form method="post" action="{% url 'public_cms:cms_homepagehighlight_list' %}" class="flex-shrink-0 ml-4">
+            {% csrf_token %}
+            <input type="hidden" name="highlight_type" value="NEWS">
+            <input type="hidden" name="object_id" value="{{ news.pk }}">
+            <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium text-white bg-brand-600 hover:bg-brand-700 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Add
+            </button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Job Openings -->
+    {% if available_jobs %}
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+      <div class="px-6 py-3 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        <h3 class="text-sm font-semibold text-slate-700">Job Openings</h3>
+        <span class="ml-auto text-xs text-slate-500">{{ available_jobs|length }} available</span>
+      </div>
+      <div class="divide-y divide-slate-100">
+        {% for job in available_jobs %}
+        <div class="px-6 py-3 flex items-center justify-between hover:bg-slate-50 transition">
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-slate-800 truncate">{{ job.title }}</p>
+            <p class="text-xs text-slate-500 truncate">{{ job.description|striptags|truncatechars:80 }}</p>
+          </div>
+          <form method="post" action="{% url 'public_cms:cms_homepagehighlight_list' %}" class="flex-shrink-0 ml-4">
+            {% csrf_token %}
+            <input type="hidden" name="highlight_type" value="JOB">
+            <input type="hidden" name="object_id" value="{{ job.pk }}">
+            <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium text-white bg-brand-600 hover:bg-brand-700 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Add
+            </button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if not available_projects and not available_publications and not available_news and not available_jobs %}
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center">
+      <p class="text-slate-500 text-sm">All available items are already highlighted.</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script>
+  const tbody = document.getElementById('highlight-sortable');
+  if (tbody) {
+    Sortable.create(tbody, {
+      handle: 'tr',
+      animation: 150,
+      onEnd: function () {
+        const rows = tbody.querySelectorAll('tr');
+        const ids = Array.from(rows).map(row => row.dataset.id);
+        // Update visible order numbers
+        rows.forEach((row, index) => {
+          const orderCell = row.querySelector('.order-cell');
+          if (orderCell) orderCell.textContent = index;
+        });
+        // Send to server
+        fetch("{% url 'public_cms:cms_homepagehighlight_reorder' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}',
+          },
+          body: JSON.stringify({ ids: ids }),
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            const toast = document.getElementById('reorder-toast');
+            toast.classList.remove('hidden');
+            toast.style.opacity = '1';
+            setTimeout(() => {
+              toast.style.opacity = '0';
+              setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 2000);
+          }
+        })
+        .catch(err => console.error('Reorder failed:', err));
+      },
+    });
+  }
+</script>
+{% endblock %}

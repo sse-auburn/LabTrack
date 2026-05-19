@@ -10,6 +10,7 @@ import json
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
@@ -31,10 +32,10 @@ def _is_admin(user):
 
 @login_required
 def cms_dashboard_view(request):
-    """CMS dashboard showing counts of all public website content."""
-    if not _is_admin(request.user):
-        messages.error(request, 'Admin access required.')
-        return redirect('dashboard:home')
+    """CMS dashboard showing counts of public website content.
+    Admins see everything; members see only content they can manage.
+    """
+    is_admin = _is_admin(request.user)
 
     recent_notifications = Notification.objects.filter(
         recipient=request.user,
@@ -45,13 +46,15 @@ def cms_dashboard_view(request):
         action__in=['CMS_CREATED', 'CMS_UPDATED', 'CMS_DELETED'],
     ).select_related('actor').order_by('-timestamp')[:10]
 
-    context = {
-        'counts': {
-            'publications': models.Publication.objects.count(),
-            'blog_posts': models.BlogPost.objects.count(),
-            'news_items': models.NewsItem.objects.count(),
+    counts = {
+        'publications': models.Publication.objects.count(),
+        'blog_posts': models.BlogPost.objects.count(),
+        'news_items': models.NewsItem.objects.count(),
+        'public_projects': models.PublicProject.objects.count(),
+    }
 
-            'public_projects': models.PublicProject.objects.count(),
+    if is_admin:
+        counts.update({
             'homepage_stats': models.HomepageStat.objects.count(),
             'job_openings': models.JobOpening.objects.count(),
             'sponsors': models.Sponsor.objects.count(),
@@ -59,9 +62,13 @@ def cms_dashboard_view(request):
             'contact_messages': models.ContactMessage.objects.count(),
             'highlights': models.HomepageHighlight.objects.count(),
             'alumni': models.Alumni.objects.count(),
-        },
+        })
+
+    context = {
+        'counts': counts,
         'recent_notifications': recent_notifications,
         'cms_activity': cms_activity,
+        'is_admin': is_admin,
     }
     return render(request, 'cms/dashboard.html', context)
 
@@ -192,9 +199,6 @@ def researchdomain_delete_view(request, pk):
 
 @login_required
 def publication_list_view(request):
-    if not _is_admin(request.user):
-        messages.error(request, 'Admin access required.')
-        return redirect('dashboard:home')
     items = models.Publication.objects.all()
     return render(request, 'cms/list.html', {
         'items': items,
@@ -209,9 +213,6 @@ def publication_list_view(request):
 
 @login_required
 def publication_create_view(request):
-    if not _is_admin(request.user):
-        messages.error(request, 'Admin access required.')
-        return redirect('dashboard:home')
     form = forms.PublicationForm(request.POST or None, request.FILES or None)
     if form.is_valid():
         obj = form.save()
@@ -242,9 +243,6 @@ def publication_create_view(request):
 
 @login_required
 def publication_edit_view(request, pk):
-    if not _is_admin(request.user):
-        messages.error(request, 'Admin access required.')
-        return redirect('dashboard:home')
     item = get_object_or_404(models.Publication, pk=pk)
     form = forms.PublicationForm(request.POST or None, request.FILES or None, instance=item)
     if form.is_valid():
@@ -487,9 +485,6 @@ def blogpost_delete_view(request, pk):
 
 @login_required
 def newsitem_list_view(request):
-    if not _is_admin(request.user):
-        messages.error(request, 'Admin access required.')
-        return redirect('dashboard:home')
     items = models.NewsItem.objects.all()
     return render(request, 'cms/list.html', {
         'items': items,
@@ -504,9 +499,6 @@ def newsitem_list_view(request):
 
 @login_required
 def newsitem_create_view(request):
-    if not _is_admin(request.user):
-        messages.error(request, 'Admin access required.')
-        return redirect('dashboard:home')
     form = forms.NewsItemForm(request.POST or None, request.FILES or None)
     if form.is_valid():
         obj = form.save()
@@ -537,9 +529,6 @@ def newsitem_create_view(request):
 
 @login_required
 def newsitem_edit_view(request, pk):
-    if not _is_admin(request.user):
-        messages.error(request, 'Admin access required.')
-        return redirect('dashboard:home')
     item = get_object_or_404(models.NewsItem, pk=pk)
     form = forms.NewsItemForm(request.POST or None, request.FILES or None, instance=item)
     if form.is_valid():
@@ -844,16 +833,72 @@ def homepagehighlight_list_view(request):
     if not _is_admin(request.user):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
-    items = models.HomepageHighlight.objects.all()
-    return render(request, 'cms/list.html', {
+
+    # Quick-add from available items
+    if request.method == 'POST':
+        htype = request.POST.get('highlight_type')
+        obj_id = request.POST.get('object_id')
+        if htype and obj_id:
+            mapping = {
+                'PROJECT': 'project_id',
+                'PUBLICATION': 'publication_id',
+                'NEWS': 'news_item_id',
+                'JOB': 'job_opening_id',
+            }
+            fk_field = mapping.get(htype)
+            if fk_field:
+                max_order = models.HomepageHighlight.objects.aggregate(
+                    max_order=Max('order')
+                )['max_order'] or 0
+                models.HomepageHighlight.objects.create(
+                    highlight_type=htype,
+                    **{fk_field: obj_id},
+                    order=max_order + 1,
+                    is_active=True,
+                )
+                messages.success(request, 'Highlight added.')
+        return redirect('public_cms:cms_homepagehighlight_list')
+
+    items = models.HomepageHighlight.objects.all().select_related(
+        'project', 'publication', 'news_item', 'job_opening'
+    ).order_by('order')
+
+    # Find already-highlighted IDs per type
+    highlighted_projects = set(items.filter(highlight_type='PROJECT').values_list('project_id', flat=True))
+    highlighted_publications = set(items.filter(highlight_type='PUBLICATION').values_list('publication_id', flat=True))
+    highlighted_news = set(items.filter(highlight_type='NEWS').values_list('news_item_id', flat=True))
+    highlighted_jobs = set(items.filter(highlight_type='JOB').values_list('job_opening_id', flat=True))
+
+    available_projects = models.PublicProject.objects.exclude(id__in=highlighted_projects).order_by('title')
+    available_publications = models.Publication.objects.exclude(id__in=highlighted_publications).order_by('-year', 'title')
+    available_news = models.NewsItem.objects.exclude(id__in=highlighted_news).order_by('-published_at', '-created_at')
+    available_jobs = models.JobOpening.objects.exclude(id__in=highlighted_jobs).order_by('title')
+
+    return render(request, 'cms/homepagehighlight_list.html', {
         'items': items,
-        'model_name': 'Homepage Highlight',
-        'model_name_plural': 'Homepage Highlights',
-        'create_url': 'public_cms:cms_homepagehighlight_create',
-        'edit_url': 'public_cms:cms_homepagehighlight_edit',
-        'delete_url': 'public_cms:cms_homepagehighlight_delete',
-        'list_fields': ['highlight_type', 'content_object', 'order', 'is_active'],
+        'available_projects': available_projects,
+        'available_publications': available_publications,
+        'available_news': available_news,
+        'available_jobs': available_jobs,
     })
+
+
+@login_required
+def homepagehighlight_reorder_view(request):
+    if not _is_admin(request.user):
+        return JsonResponse({'error': 'Admin access required.'}, status=403)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required.'}, status=405)
+    try:
+        data = json.loads(request.body)
+        ids = data.get('ids', [])
+        if not ids:
+            return JsonResponse({'error': 'No IDs provided.'}, status=400)
+        for index, pk in enumerate(ids):
+            models.HomepageHighlight.objects.filter(pk=pk).update(order=index)
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
 
 @login_required

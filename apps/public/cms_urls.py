@@ -43,6 +43,7 @@ urlpatterns = [
 
     # Homepage Highlights
     path('homepage-highlights/', cms_views.homepagehighlight_list_view, name='cms_homepagehighlight_list'),
+    path('homepage-highlights/reorder/', cms_views.homepagehighlight_reorder_view, name='cms_homepagehighlight_reorder'),
     path('homepage-highlights/create/', cms_views.homepagehighlight_create_view, name='cms_homepagehighlight_create'),
     path('homepage-highlights/<int:pk>/edit/', cms_views.homepagehighlight_edit_view, name='cms_homepagehighlight_edit'),
     path('homepage-highlights/<int:pk>/delete/', cms_views.homepagehighlight_delete_view, name='cms_homepagehighlight_delete'),

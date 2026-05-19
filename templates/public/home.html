@@ -130,7 +130,7 @@
           <div class="p-6 flex-1 flex flex-col">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-auburn-orange/10 text-auburn-orange text-xs font-semibold w-fit mb-3">Project</span>
             <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ hl.project.title }}</h3>
-            <div class="text-slate-600 text-sm leading-relaxed line-clamp-3">{{ hl.project.description|safe }}</div>
+            <div class="text-slate-600 text-sm leading-relaxed line-clamp-3">{{ hl.project.description|striptags|truncatechars:200 }}</div>
           </div>
         </a>
         {% elif hl.highlight_type == 'PUBLICATION' and hl.publication %}
@@ -144,10 +144,15 @@
         </a>
         {% elif hl.highlight_type == 'NEWS' and hl.news_item %}
         <a href="{% url 'public:news_detail' hl.news_item.pk %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
+          {% if hl.news_item.image %}
+          <div class="h-48 bg-auburn-blue/5 flex items-center justify-center overflow-hidden">
+            <img src="{{ hl.news_item.image.url }}" alt="{{ hl.news_item.title }}" class="h-full w-full object-cover group-hover:scale-105 transition duration-500">
+          </div>
+          {% endif %}
           <div class="p-6 flex-1 flex flex-col">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-xs font-semibold w-fit mb-3">News</span>
             <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ hl.news_item.title }}</h3>
-            <div class="text-slate-600 text-sm leading-relaxed line-clamp-3">{{ hl.news_item.content|safe }}</div>
+            <div class="text-slate-600 text-sm leading-relaxed line-clamp-3">{{ hl.news_item.content|striptags|truncatechars:200 }}</div>
           </div>
         </a>
         {% elif hl.highlight_type == 'JOB' and hl.job_opening %}
@@ -155,7 +160,7 @@
           <div class="p-6 flex-1 flex flex-col">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold w-fit mb-3">Open Position</span>
             <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ hl.job_opening.title }}</h3>
-            <div class="text-slate-600 text-sm leading-relaxed line-clamp-3">{{ hl.job_opening.description|safe }}</div>
+            <div class="text-slate-600 text-sm leading-relaxed line-clamp-3">{{ hl.job_opening.description|striptags|truncatechars:200 }}</div>
           </div>
         </a>
         {% endif %}
