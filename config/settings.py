@@ -378,7 +378,6 @@ CKEDITOR_5_CONFIGS = {
     },
 }
 
-CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 CKEDITOR_5_UPLOAD_PATH = "uploads/"
 CKEDITOR_5_ALLOW_ALL_FILE_TYPES = True
 CKEDITOR_5_IMAGE_FILE_TYPES = ["jpg", "jpeg", "png", "gif", "webp"]

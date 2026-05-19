@@ -38,7 +38,7 @@ def cms_dashboard_view(request):
             'publications': models.Publication.objects.count(),
             'blog_posts': models.BlogPost.objects.count(),
             'news_items': models.NewsItem.objects.count(),
-            'gallery_items': models.GalleryItem.objects.count(),
+
             'public_projects': models.PublicProject.objects.count(),
             'homepage_stats': models.HomepageStat.objects.count(),
             'job_openings': models.JobOpening.objects.count(),
@@ -493,7 +493,7 @@ def newsitem_create_view(request):
     if not _is_admin(request.user):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
-    form = forms.NewsItemForm(request.POST or None)
+    form = forms.NewsItemForm(request.POST or None, request.FILES or None)
     if form.is_valid():
         obj = form.save()
         log_activity(
@@ -527,7 +527,7 @@ def newsitem_edit_view(request, pk):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     item = get_object_or_404(models.NewsItem, pk=pk)
-    form = forms.NewsItemForm(request.POST or None, instance=item)
+    form = forms.NewsItemForm(request.POST or None, request.FILES or None, instance=item)
     if form.is_valid():
         obj = form.save()
         log_activity(
@@ -588,128 +588,6 @@ def newsitem_delete_view(request, pk):
         'item': item,
         'model_name': 'News Item',
         'list_url': 'public_cms:cms_newsitem_list',
-    })
-
-
-# ── GalleryItem CRUD ─────────────────────────────────────────────────────────
-
-@login_required
-def galleryitem_list_view(request):
-    if not _is_admin(request.user):
-        messages.error(request, 'Admin access required.')
-        return redirect('dashboard:home')
-    items = models.GalleryItem.objects.all()
-    return render(request, 'public/cms/list.html', {
-        'items': items,
-        'model_name': 'Gallery Item',
-        'model_name_plural': 'Gallery Items',
-        'create_url': 'public_cms:cms_galleryitem_create',
-        'edit_url': 'public_cms:cms_galleryitem_edit',
-        'delete_url': 'public_cms:cms_galleryitem_delete',
-        'list_fields': ['title', 'category', 'is_featured', 'order'],
-    })
-
-
-@login_required
-def galleryitem_create_view(request):
-    if not _is_admin(request.user):
-        messages.error(request, 'Admin access required.')
-        return redirect('dashboard:home')
-    form = forms.GalleryItemForm(request.POST or None, request.FILES or None)
-    if form.is_valid():
-        obj = form.save()
-        log_activity(
-            actor=request.user,
-            action='CMS_CREATED',
-            description=f'Gallery Item "{obj}" was created by {request.user.full_name}.',
-            content_type_label='galleryitem',
-            object_id=obj.pk,
-            object_repr=str(obj),
-            request=request,
-        )
-        notify_admins(
-            title='Gallery Item Created',
-            message=f'Gallery Item "{obj}" was created by {request.user.full_name}.',
-            level='success',
-            link='public_cms:cms_galleryitem_list',
-            category='system',
-        )
-        messages.success(request, 'Gallery item created.')
-        return redirect('public_cms:cms_galleryitem_list')
-    return render(request, 'public/cms/form.html', {
-        'form': form,
-        'model_name': 'Gallery Item',
-        'list_url': 'public_cms:cms_galleryitem_list',
-    })
-
-
-@login_required
-def galleryitem_edit_view(request, pk):
-    if not _is_admin(request.user):
-        messages.error(request, 'Admin access required.')
-        return redirect('dashboard:home')
-    item = get_object_or_404(models.GalleryItem, pk=pk)
-    form = forms.GalleryItemForm(request.POST or None, request.FILES or None, instance=item)
-    if form.is_valid():
-        obj = form.save()
-        log_activity(
-            actor=request.user,
-            action='CMS_UPDATED',
-            description=f'Gallery Item "{obj}" was updated by {request.user.full_name}.',
-            content_type_label='galleryitem',
-            object_id=obj.pk,
-            object_repr=str(obj),
-            request=request,
-        )
-        notify_admins(
-            title='Gallery Item Updated',
-            message=f'Gallery Item "{obj}" was updated by {request.user.full_name}.',
-            level='info',
-            link='public_cms:cms_galleryitem_list',
-            category='system',
-        )
-        messages.success(request, 'Gallery item updated.')
-        return redirect('public_cms:cms_galleryitem_list')
-    return render(request, 'public/cms/form.html', {
-        'form': form,
-        'model_name': 'Gallery Item',
-        'list_url': 'public_cms:cms_galleryitem_list',
-        'delete_url': 'public_cms:cms_galleryitem_delete',
-    })
-
-
-@login_required
-def galleryitem_delete_view(request, pk):
-    if not _is_admin(request.user):
-        messages.error(request, 'Admin access required.')
-        return redirect('dashboard:home')
-    item = get_object_or_404(models.GalleryItem, pk=pk)
-    if request.method == 'POST':
-        name = str(item)
-        pk_val = item.pk
-        item.delete()
-        log_activity(
-            actor=request.user,
-            action='CMS_DELETED',
-            description=f'Gallery Item "{name}" was deleted by {request.user.full_name}.',
-            content_type_label='galleryitem',
-            object_id=pk_val,
-            object_repr=name,
-            request=request,
-        )
-        notify_admins(
-            title='Gallery Item Deleted',
-            message=f'Gallery Item "{name}" was deleted by {request.user.full_name}.',
-            level='warning',
-            link='public_cms:cms_galleryitem_list',
-            category='system',
-        )
-        messages.success(request, 'Gallery item deleted.')
-        return redirect('public_cms:cms_galleryitem_list')
-    return render(request, 'public/cms/confirm_delete.html', {
-        'item': item,
-        'model_name': 'Gallery Item',
-        'list_url': 'public_cms:cms_galleryitem_list',
     })
 
 

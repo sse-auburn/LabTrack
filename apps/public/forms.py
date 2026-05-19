@@ -114,21 +114,6 @@ class NewsItemForm(forms.ModelForm):
         }
 
 
-class GalleryItemForm(forms.ModelForm):
-    class Meta:
-        model = models.GalleryItem
-        fields = ['title', 'caption', 'image', 'video_url', 'category', 'is_featured', 'order', 'is_active']
-        widgets = {
-            'title': forms.TextInput(attrs=_text_input()),
-            'image': forms.ClearableFileInput(attrs=_file_input()),
-            'video_url': forms.URLInput(attrs=_text_input({'placeholder': 'YouTube or other video URL'})),
-            'category': forms.Select(attrs=_select()),
-            'is_featured': forms.CheckboxInput(attrs=_checkbox()),
-            'order': forms.NumberInput(attrs=_text_input()),
-            'is_active': forms.CheckboxInput(attrs=_checkbox()),
-        }
-
-
 class PublicProjectForm(forms.ModelForm):
     class Meta:
         model = models.PublicProject
@@ -167,7 +152,7 @@ class HomepageHighlightForm(forms.ModelForm):
         model = models.HomepageHighlight
         fields = [
             'highlight_type', 'project', 'publication',
-            'news_item', 'gallery_item', 'job_opening',
+            'news_item', 'job_opening',
             'is_active',
         ]
         widgets = {
@@ -175,7 +160,6 @@ class HomepageHighlightForm(forms.ModelForm):
             'project': forms.Select(attrs=_select()),
             'publication': forms.Select(attrs=_select()),
             'news_item': forms.Select(attrs=_select()),
-            'gallery_item': forms.Select(attrs=_select()),
             'job_opening': forms.Select(attrs=_select()),
             'is_active': forms.CheckboxInput(attrs=_checkbox()),
         }
@@ -187,7 +171,6 @@ class HomepageHighlightForm(forms.ModelForm):
             'PROJECT': 'project',
             'PUBLICATION': 'publication',
             'NEWS': 'news_item',
-            'GALLERY': 'gallery_item',
             'JOB': 'job_opening',
         }
         field = mapping.get(htype)

@@ -322,13 +322,10 @@
         </div>
         <div class="px-5 py-3 flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-slate-800">News & Gallery</p>
-            <p class="text-xs text-slate-500">{{ counts.news_items }} news, {{ counts.gallery_items }} gallery</p>
+            <p class="text-sm font-medium text-slate-800">News</p>
+            <p class="text-xs text-slate-500">{{ counts.news_items }} items</p>
           </div>
-          <div class="flex items-center gap-2">
-            <a href="{% url 'public_cms:cms_newsitem_list' %}" class="text-xs font-medium text-brand-600 hover:underline">News</a>
-            <a href="{% url 'public_cms:cms_galleryitem_list' %}" class="text-xs font-medium text-brand-600 hover:underline">Gallery</a>
-          </div>
+          <a href="{% url 'public_cms:cms_newsitem_list' %}" class="text-xs font-medium text-brand-600 hover:underline">Manage</a>
         </div>
         <div class="px-5 py-3 flex items-center justify-between">
           <div>

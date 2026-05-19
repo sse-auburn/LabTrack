@@ -189,14 +189,6 @@ class NewsItemAdmin(admin.ModelAdmin):
     date_hierarchy = 'published_at'
 
 
-@admin.register(models.GalleryItem)
-class GalleryItemAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'is_featured', 'order', 'is_active')
-    list_editable = ('is_featured', 'order', 'is_active')
-    list_filter = ('category', 'is_featured', 'is_active')
-    search_fields = ('title', 'caption')
-
-
 @admin.register(models.Alumni)
 class AlumniAdmin(admin.ModelAdmin):
     list_display = ('name', 'position', 'start_date', 'end_date', 'current_affiliation', 'order', 'is_active')

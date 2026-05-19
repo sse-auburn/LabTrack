@@ -240,33 +240,6 @@ class NewsItem(models.Model):
         return self.title
 
 
-class GalleryItem(models.Model):
-    """A photo or video in the lab gallery."""
-    CATEGORY_CHOICES = [
-        ('EVENT', 'Lab Event'),
-        ('EQUIPMENT', 'Equipment'),
-        ('FIELD', 'Field Work'),
-        ('TEAM', 'Team'),
-        ('OTHER', 'Other'),
-    ]
-
-    title = models.CharField(max_length=200)
-    caption = CKEditor5Field(blank=True)
-    image = models.ImageField(upload_to='public/gallery/', blank=True, null=True)
-    video_url = models.URLField(blank=True, help_text='YouTube or other video link')
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='OTHER')
-    is_featured = models.BooleanField(default=False)
-    order = models.PositiveIntegerField(default=0)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-is_featured', 'order', '-created_at']
-
-    def __str__(self):
-        return self.title
-
-
 class PageSection(models.Model):
     """Editable content sections for static pages."""
 
@@ -316,7 +289,6 @@ class HomepageHighlight(models.Model):
         ('PROJECT', 'Project'),
         ('PUBLICATION', 'Publication'),
         ('NEWS', 'News'),
-        ('GALLERY', 'Gallery'),
         ('JOB', 'Job'),
     ]
 
@@ -324,7 +296,6 @@ class HomepageHighlight(models.Model):
     project = models.ForeignKey(PublicProject, on_delete=models.CASCADE, blank=True, null=True)
     publication = models.ForeignKey(Publication, on_delete=models.CASCADE, blank=True, null=True)
     news_item = models.ForeignKey(NewsItem, on_delete=models.CASCADE, blank=True, null=True)
-    gallery_item = models.ForeignKey(GalleryItem, on_delete=models.CASCADE, blank=True, null=True)
     job_opening = models.ForeignKey(JobOpening, on_delete=models.CASCADE, blank=True, null=True)
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -336,7 +307,7 @@ class HomepageHighlight(models.Model):
     def content_object(self):
         return (
             self.project or self.publication or self.news_item
-            or self.gallery_item or self.job_opening
+            or self.job_opening
         )
 
     def __str__(self):

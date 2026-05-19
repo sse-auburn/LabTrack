@@ -29,12 +29,6 @@ urlpatterns = [
     path('news-items/<int:pk>/edit/', cms_views.newsitem_edit_view, name='cms_newsitem_edit'),
     path('news-items/<int:pk>/delete/', cms_views.newsitem_delete_view, name='cms_newsitem_delete'),
 
-    # Gallery Items
-    path('gallery-items/', cms_views.galleryitem_list_view, name='cms_galleryitem_list'),
-    path('gallery-items/create/', cms_views.galleryitem_create_view, name='cms_galleryitem_create'),
-    path('gallery-items/<int:pk>/edit/', cms_views.galleryitem_edit_view, name='cms_galleryitem_edit'),
-    path('gallery-items/<int:pk>/delete/', cms_views.galleryitem_delete_view, name='cms_galleryitem_delete'),
-
     # Public Projects
     path('public-projects/', cms_views.publicproject_list_view, name='cms_publicproject_list'),
     path('public-projects/create/', cms_views.publicproject_create_view, name='cms_publicproject_create'),

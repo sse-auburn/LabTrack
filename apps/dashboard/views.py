@@ -150,7 +150,6 @@ def admin_panel_view(request):
         'publications': public_models.Publication.objects.count(),
         'blog_posts': public_models.BlogPost.objects.count(),
         'news_items': public_models.NewsItem.objects.count(),
-        'gallery_items': public_models.GalleryItem.objects.count(),
         'public_projects': public_models.PublicProject.objects.count(),
         'research_domains': public_models.ResearchDomain.objects.count(),
         'job_openings': public_models.JobOpening.objects.count(),

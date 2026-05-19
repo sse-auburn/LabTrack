@@ -23,15 +23,13 @@ def _highlight_has_image(hl):
     """Return True if the highlight's content object has an image."""
     if hl.highlight_type == 'PROJECT' and hl.project and hl.project.image:
         return True
-    if hl.highlight_type == 'GALLERY' and hl.gallery_item and hl.gallery_item.image:
-        return True
     return False
 
 
 def home_view(request):
     stats = models.HomepageStat.objects.filter(is_active=True)
     highlights = list(models.HomepageHighlight.objects.filter(is_active=True).select_related(
-        'project', 'publication', 'news_item', 'gallery_item', 'job_opening'
+        'project', 'publication', 'news_item', 'job_opening'
     ).order_by('order'))
     # Image-bearing cards first, then others; preserve original order within each group
     highlights.sort(key=lambda h: (0 if _highlight_has_image(h) else 1, h.order))
@@ -244,17 +242,4 @@ def news_detail_view(request, pk):
     return render(request, 'public/news_detail.html', {'item': item})
 
 
-# ── Gallery ──────────────────────────────────────────────────────────────────
 
-def gallery_view(request):
-    """Photo and video gallery."""
-    category = request.GET.get('category')
-    items = models.GalleryItem.objects.filter(is_active=True)
-    if category:
-        items = items.filter(category=category)
-    categories = dict(models.GalleryItem.CATEGORY_CHOICES)
-    return render(request, 'public/gallery.html', {
-        'items': items,
-        'categories': categories,
-        'selected_category': category,
-    })
