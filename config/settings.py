@@ -263,10 +263,31 @@ CKEDITOR_5_CONFIGS = {
             "|",
             "blockQuote",
             "imageUpload",
+            "insertImage",
             "|",
             "undo",
             "redo",
         ],
+        "image": {
+            "toolbar": [
+                "imageTextAlternative",
+                "|",
+                "imageStyle:alignLeft",
+                "imageStyle:alignRight",
+                "imageStyle:alignCenter",
+                "imageStyle:side",
+                "|",
+                "toggleImageCaption",
+                "imageTextAlternative",
+            ],
+            "styles": [
+                "full",
+                "side",
+                "alignLeft",
+                "alignRight",
+                "alignCenter",
+            ],
+        },
     },
     "extends": {
         "blockToolbar": [
@@ -361,6 +382,7 @@ CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 CKEDITOR_5_UPLOAD_PATH = "uploads/"
 CKEDITOR_5_ALLOW_ALL_FILE_TYPES = True
 CKEDITOR_5_IMAGE_FILE_TYPES = ["jpg", "jpeg", "png", "gif", "webp"]
+CKEDITOR_5_FILE_UPLOAD_PERMISSION = "authenticated"
 
 
 # ---------------------------------------------------------------------------

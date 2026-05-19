@@ -12,7 +12,10 @@
 
     <article>
       <p class="text-sm text-slate-400 font-medium mb-3">{{ item.published_at|date:"F j, Y"|default:"" }}</p>
-      <h1 class="text-3xl sm:text-4xl font-bold text-auburn-blue mb-8">{{ item.title }}</h1>
+      <h1 class="text-3xl sm:text-4xl font-bold text-auburn-blue mb-6">{{ item.title }}</h1>
+      {% if item.image %}
+        <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-full rounded-xl mb-8 object-cover max-h-96">
+      {% endif %}
       <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed">
         {{ item.content|safe }}
       </div>

@@ -229,6 +229,7 @@ class NewsItem(models.Model):
     """A short news announcement or update."""
     title = models.CharField(max_length=300)
     content = CKEditor5Field()
+    image = models.ImageField(upload_to='public/news/', blank=True, null=True)
     published_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

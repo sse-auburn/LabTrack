@@ -107,7 +107,7 @@ class BlogPostForm(forms.ModelForm):
 class NewsItemForm(forms.ModelForm):
     class Meta:
         model = models.NewsItem
-        fields = ['title', 'content', 'published_at']
+        fields = ['title', 'content', 'image', 'published_at']
         widgets = {
             'title': forms.TextInput(attrs=_text_input()),
             'published_at': forms.DateTimeInput(attrs=_datetime()),
