@@ -186,27 +186,58 @@
 {% endif %}
 
 <!-- Sponsors -->
-<section class="py-16 bg-white border-t border-slate-100">
+<section class="py-16 bg-slate-50 border-t border-slate-100">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <p class="text-center text-sm font-semibold text-slate-400 uppercase tracking-widest mb-8">Supported By</p>
-    <div class="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+    <div class="text-center mb-10">
+      <p class="text-sm font-semibold text-slate-400 uppercase tracking-widest">Supported By</p>
+      <h2 class="text-2xl font-bold text-auburn-blue mt-2">Our Funding Partners</h2>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {% for sponsor in sponsors %}
+      <div class="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-md transition flex flex-col">
+        <div class="h-24 flex items-center justify-center mb-4">
+          {% if sponsor.logo %}
+            <img src="{{ sponsor.logo.url }}" alt="{{ sponsor.name }}" class="max-h-full max-w-full object-contain">
+          {% else %}
+            <span class="text-xl font-bold text-slate-300">{{ sponsor.name }}</span>
+          {% endif %}
+        </div>
+        <h3 class="text-lg font-bold text-auburn-blue text-center mb-2">{{ sponsor.name }}</h3>
+        {% if sponsor.description %}
+          <div class="text-sm text-slate-600 text-center line-clamp-3 mb-4 flex-1">{{ sponsor.description|striptags|truncatechars:140 }}</div>
+        {% endif %}
         {% if sponsor.website_link %}
-          <a href="{{ sponsor.website_link }}" target="_blank" class="opacity-70 hover:opacity-100 transition">
-        {% else %}
-          <span class="opacity-70">
+          <a href="{{ sponsor.website_link }}" target="_blank" rel="noopener noreferrer" class="mt-auto inline-flex items-center justify-center gap-1.5 text-sm font-semibold text-auburn-orange hover:text-auburn-orangeDark transition">
+            Visit Website
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
         {% endif %}
-        {% if sponsor.logo %}
-          <img src="{{ sponsor.logo.url }}" alt="{{ sponsor.name }}" class="h-12 md:h-14 object-contain">
-        {% else %}
-          <span class="text-lg font-bold text-slate-400">{{ sponsor.name }}</span>
-        {% endif %}
-        {% if sponsor.website_link %}</a>{% else %}</span>{% endif %}
+      </div>
       {% empty %}
-        <span class="text-lg font-bold text-slate-400">NSF</span>
-        <span class="text-lg font-bold text-slate-400">USDA NIFA</span>
-        <span class="text-lg font-bold text-slate-400">Auburn University</span>
-        <span class="text-lg font-bold text-slate-400">Alabama Dept. of Agriculture</span>
+        <div class="bg-white rounded-xl border border-slate-200 p-6 text-center">
+          <div class="h-24 flex items-center justify-center mb-4">
+            <span class="text-xl font-bold text-slate-300">NSF</span>
+          </div>
+          <h3 class="text-lg font-bold text-auburn-blue">National Science Foundation</h3>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6 text-center">
+          <div class="h-24 flex items-center justify-center mb-4">
+            <span class="text-xl font-bold text-slate-300">USDA NIFA</span>
+          </div>
+          <h3 class="text-lg font-bold text-auburn-blue">USDA NIFA</h3>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6 text-center">
+          <div class="h-24 flex items-center justify-center mb-4">
+            <span class="text-xl font-bold text-slate-300">Auburn University</span>
+          </div>
+          <h3 class="text-lg font-bold text-auburn-blue">Auburn University</h3>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6 text-center">
+          <div class="h-24 flex items-center justify-center mb-4">
+            <span class="text-xl font-bold text-slate-300">Alabama Dept. of Agriculture</span>
+          </div>
+          <h3 class="text-lg font-bold text-auburn-blue">Alabama Dept. of Agriculture</h3>
+        </div>
       {% endfor %}
     </div>
   </div>
