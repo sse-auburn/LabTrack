@@ -168,16 +168,15 @@ class HomepageHighlightForm(forms.ModelForm):
         fields = [
             'highlight_type', 'project', 'publication',
             'news_item', 'gallery_item', 'job_opening',
-            'order', 'is_active',
+            'is_active',
         ]
         widgets = {
-            'highlight_type': forms.Select(attrs=_select()),
+            'highlight_type': forms.Select(attrs=_select({'x-model': 'highlightType'})),
             'project': forms.Select(attrs=_select()),
             'publication': forms.Select(attrs=_select()),
             'news_item': forms.Select(attrs=_select()),
             'gallery_item': forms.Select(attrs=_select()),
             'job_opening': forms.Select(attrs=_select()),
-            'order': forms.NumberInput(attrs=_text_input()),
             'is_active': forms.CheckboxInput(attrs=_checkbox()),
         }
 
@@ -194,6 +193,10 @@ class HomepageHighlightForm(forms.ModelForm):
         field = mapping.get(htype)
         if field and not cleaned.get(field):
             self.add_error(field, f'Select a {htype.lower().replace("_", " ")} for this highlight.')
+        # Clear unrelated FK fields so only the selected type's FK is saved
+        for ft, fk in mapping.items():
+            if ft != htype:
+                cleaned[fk] = None
         return cleaned
 
 

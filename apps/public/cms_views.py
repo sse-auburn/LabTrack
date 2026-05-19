@@ -617,10 +617,14 @@ def homepagehighlight_create_view(request):
         return redirect('dashboard:home')
     form = forms.HomepageHighlightForm(request.POST or None)
     if form.is_valid():
-        form.save()
+        highlight = form.save(commit=False)
+        highlight.order = (models.HomepageHighlight.objects.aggregate(
+            max_order=models.Max('order')
+        )['max_order'] or 0) + 1
+        highlight.save()
         messages.success(request, 'Homepage highlight created.')
         return redirect('public_cms:cms_homepagehighlight_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'public/cms/highlight_form.html', {
         'form': form,
         'model_name': 'Homepage Highlight',
         'list_url': 'public_cms:cms_homepagehighlight_list',
@@ -638,7 +642,7 @@ def homepagehighlight_edit_view(request, pk):
         form.save()
         messages.success(request, 'Homepage highlight updated.')
         return redirect('public_cms:cms_homepagehighlight_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'public/cms/highlight_form.html', {
         'form': form,
         'model_name': 'Homepage Highlight',
         'list_url': 'public_cms:cms_homepagehighlight_list',
