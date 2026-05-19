@@ -120,6 +120,7 @@ class ProfileUpdateForm(forms.ModelForm):
         model = UserProfile
         fields = (
             'position', 'phone', 'department', 'student_id', 'bio', 'avatar',
+            'start_date', 'end_date',
             'google_scholar', 'linkedin', 'github', 'personal_website',
             'in_app_notifications', 'email_notifications',
             'notify_borrowing', 'notify_reservations', 'notify_incidents',

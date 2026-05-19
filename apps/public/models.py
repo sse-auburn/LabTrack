@@ -341,3 +341,38 @@ class HomepageHighlight(models.Model):
     def __str__(self):
         obj = self.content_object
         return f"{self.get_highlight_type_display()} — {obj}"
+
+
+class Alumni(models.Model):
+    """An alumnus who may not have a user account in the system."""
+    POSITION_CHOICES = [
+        ('PI', 'Principal Investigator'),
+        ('POSTDOC', 'Postdoctoral Researcher'),
+        ('PHD', 'Ph.D. Student'),
+        ('MS', 'M.S. Student'),
+        ('UNDERGRAD', 'Undergraduate Student'),
+        ('STAFF', 'Research Staff'),
+        ('VISITOR', 'Visiting Researcher'),
+    ]
+
+    name = models.CharField(max_length=200)
+    email = models.EmailField(blank=True)
+    position = models.CharField(max_length=20, choices=POSITION_CHOICES, blank=True)
+    start_date = models.DateField(blank=True, null=True, help_text='When they joined the lab')
+    end_date = models.DateField(blank=True, null=True, help_text='When they left the lab')
+    current_affiliation = models.CharField(max_length=200, blank=True, help_text='Current job/university')
+    photo = models.ImageField(upload_to='alumni/', blank=True, null=True)
+    bio = models.TextField(blank=True)
+    google_scholar = models.URLField(blank=True)
+    linkedin = models.URLField(blank=True)
+    github = models.URLField(blank=True)
+    personal_website = models.URLField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order', 'name']
+        verbose_name_plural = 'Alumni'
+
+    def __str__(self):
+        return self.name

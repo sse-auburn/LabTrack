@@ -277,6 +277,32 @@ class PageSectionForm(forms.ModelForm):
         }
 
 
+class AlumniForm(forms.ModelForm):
+    class Meta:
+        model = models.Alumni
+        fields = [
+            'name', 'email', 'position', 'start_date', 'end_date',
+            'current_affiliation', 'photo', 'bio',
+            'google_scholar', 'linkedin', 'github', 'personal_website',
+            'order', 'is_active',
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs=_text_input({'placeholder': 'Full name'})),
+            'email': forms.EmailInput(attrs=_text_input({'placeholder': 'email@example.com'})),
+            'position': forms.Select(attrs=_select()),
+            'start_date': forms.DateInput(attrs={**_text_input(), 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={**_text_input(), 'type': 'date'}),
+            'current_affiliation': forms.TextInput(attrs=_text_input({'placeholder': 'Current job or university'})),
+            'bio': forms.Textarea(attrs={**_text_input(), 'rows': 4, 'placeholder': 'Short bio...'}),
+            'google_scholar': forms.URLInput(attrs=_text_input()),
+            'linkedin': forms.URLInput(attrs=_text_input()),
+            'github': forms.URLInput(attrs=_text_input()),
+            'personal_website': forms.URLInput(attrs=_text_input()),
+            'order': forms.NumberInput(attrs=_text_input()),
+            'is_active': forms.CheckboxInput(attrs=_checkbox()),
+        }
+
+
 class ContactMessageForm(forms.ModelForm):
     class Meta:
         model = models.ContactMessage

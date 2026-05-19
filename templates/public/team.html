@@ -128,7 +128,7 @@
   </div>
 </section>
 
-<!-- ── Team Members ───────────────────────────────────────────────────────── -->
+<!-- ── Team Members ─────────────────────────────────────────── -->
 <section class="py-20 bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-12">
@@ -159,6 +159,11 @@
             <div>
               <h3 class="font-bold text-auburn-blue">{{ member.full_name }}</h3>
               {% if member.profile.position %}<p class="text-sm text-slate-500">{{ member.profile.get_position_display }}</p>{% endif %}
+              {% if member.profile.start_date %}
+                <p class="text-xs text-slate-400 mt-0.5">
+                  {{ member.profile.start_date|date:"M Y" }} – {% if member.profile.end_date %}{{ member.profile.end_date|date:"M Y" }}{% else %}Present{% endif %}
+                </p>
+              {% endif %}
             </div>
           </div>
           {% if member.profile.bio %}
@@ -206,11 +211,11 @@
     {% endfor %}
 
     <!-- Alumni -->
-    {% if alumni %}
+    {% if alumni_users or alumni_records %}
     <div class="mt-16">
       <h3 class="text-xl font-bold text-auburn-blue mb-6 border-b border-slate-200 pb-2">Alumni</h3>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {% for member in alumni %}
+        {% for member in alumni_users %}
         <div class="flex items-center gap-4 p-4 rounded-lg border border-slate-200 bg-white">
           {% if member.profile.avatar %}
             <img src="{{ member.profile.avatar.url }}" alt="{{ member.full_name }}" class="w-12 h-12 rounded-full object-cover">
@@ -222,6 +227,32 @@
           <div>
             <h4 class="font-bold text-auburn-blue">{{ member.full_name }}</h4>
             {% if member.profile.position %}<p class="text-sm text-slate-500">{{ member.profile.get_position_display }}</p>{% endif %}
+            {% if member.profile.start_date %}
+              <p class="text-xs text-slate-400 mt-0.5">
+                {{ member.profile.start_date|date:"M Y" }} – {% if member.profile.end_date %}{{ member.profile.end_date|date:"M Y" }}{% else %}Present{% endif %}
+              </p>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+        {% for member in alumni_records %}
+        <div class="flex items-center gap-4 p-4 rounded-lg border border-slate-200 bg-white">
+          {% if member.photo %}
+            <img src="{{ member.photo.url }}" alt="{{ member.name }}" class="w-12 h-12 rounded-full object-cover">
+          {% else %}
+            <div class="w-12 h-12 rounded-full bg-auburn-bluePale flex items-center justify-center">
+              <span class="text-auburn-blue font-bold">{{ member.name|first }}</span>
+            </div>
+          {% endif %}
+          <div>
+            <h4 class="font-bold text-auburn-blue">{{ member.name }}</h4>
+            {% if member.position %}<p class="text-sm text-slate-500">{{ member.get_position_display }}</p>{% endif %}
+            {% if member.current_affiliation %}<p class="text-xs text-slate-400">{{ member.current_affiliation }}</p>{% endif %}
+            {% if member.start_date %}
+              <p class="text-xs text-slate-400 mt-0.5">
+                {{ member.start_date|date:"M Y" }} – {% if member.end_date %}{{ member.end_date|date:"M Y" }}{% else %}Present{% endif %}
+              </p>
+            {% endif %}
           </div>
         </div>
         {% endfor %}

@@ -64,6 +64,10 @@ class ActivityLog(models.Model):
         ('PROJECT_CREATED', 'Project Created'),
         ('PROJECT_UPDATED', 'Project Updated'),
         ('PROJECT_DELETED', 'Project Deleted'),
+        # CMS
+        ('CMS_CREATED', 'CMS Item Created'),
+        ('CMS_UPDATED', 'CMS Item Updated'),
+        ('CMS_DELETED', 'CMS Item Deleted'),
         # Generic
         ('OTHER', 'Other'),
     ]

@@ -195,3 +195,11 @@ class GalleryItemAdmin(admin.ModelAdmin):
     list_editable = ('is_featured', 'order', 'is_active')
     list_filter = ('category', 'is_featured', 'is_active')
     search_fields = ('title', 'caption')
+
+
+@admin.register(models.Alumni)
+class AlumniAdmin(admin.ModelAdmin):
+    list_display = ('name', 'position', 'start_date', 'end_date', 'current_affiliation', 'order', 'is_active')
+    list_editable = ('order', 'is_active')
+    list_filter = ('position', 'is_active')
+    search_fields = ('name', 'current_affiliation', 'bio')

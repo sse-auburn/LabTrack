@@ -112,7 +112,7 @@ def contact_view(request):
 # ── Team & Alumni ────────────────────────────────────────────────────────────
 
 def team_view(request):
-    """Show active lab members grouped by position."""
+    """Show active lab members grouped by position, plus alumni."""
     members = CustomUser.objects.filter(
         is_active=True,
     ).select_related('profile').prefetch_related('profile__research_domains')
@@ -156,21 +156,24 @@ def team_view(request):
         'VISITOR': 'Visiting Researchers',
     }
 
-    # Fetch alumni
-    alumni = CustomUser.objects.filter(
+    # Fetch alumni from inactive users + Alumni model
+    alumni_users = CustomUser.objects.filter(
         is_active=False,
     ).select_related('profile').order_by('-date_joined')
-    for user in alumni:
+    for user in alumni_users:
         if not hasattr(user, 'profile'):
             from apps.accounts.models import UserProfile
             UserProfile.objects.get_or_create(user=user)
+
+    alumni_records = models.Alumni.objects.filter(is_active=True).order_by('order', 'name')
 
     return render(request, 'public/team.html', {
         'pi_users': pi_users,
         'members': other_members,
         'position_order': position_order,
         'position_labels': position_labels,
-        'alumni': alumni,
+        'alumni_users': alumni_users,
+        'alumni_records': alumni_records,
     })
 
 

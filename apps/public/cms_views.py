@@ -12,6 +12,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
+from apps.activity.utils import log_activity
+from apps.notifications.utils import notify_admins
+
 from apps.public import models, forms
 
 
@@ -43,6 +46,7 @@ def cms_dashboard_view(request):
             'page_sections': models.PageSection.objects.count(),
             'contact_messages': models.ContactMessage.objects.count(),
             'highlights': models.HomepageHighlight.objects.count(),
+            'alumni': models.Alumni.objects.count(),
         }
     }
     return render(request, 'public/cms/dashboard.html', context)
@@ -74,7 +78,23 @@ def researchdomain_create_view(request):
         return redirect('dashboard:home')
     form = forms.ResearchDomainForm(request.POST or None)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Research Domain "{obj}" was created by {request.user.full_name}.',
+            content_type_label='researchdomain',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Research Domain Created',
+            message=f'Research Domain "{obj}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_researchdomain_list',
+            category='system',
+        )
         messages.success(request, 'Research domain created.')
         return redirect('public_cms:cms_researchdomain_list')
     return render(request, 'public/cms/form.html', {
@@ -92,7 +112,23 @@ def researchdomain_edit_view(request, pk):
     item = get_object_or_404(models.ResearchDomain, pk=pk)
     form = forms.ResearchDomainForm(request.POST or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Research Domain "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='researchdomain',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Research Domain Updated',
+            message=f'Research Domain "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_researchdomain_list',
+            category='system',
+        )
         messages.success(request, 'Research domain updated.')
         return redirect('public_cms:cms_researchdomain_list')
     return render(request, 'public/cms/form.html', {
@@ -110,7 +146,25 @@ def researchdomain_delete_view(request, pk):
         return redirect('dashboard:home')
     item = get_object_or_404(models.ResearchDomain, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Research Domain "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='researchdomain',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Research Domain Deleted',
+            message=f'Research Domain "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_researchdomain_list',
+            category='system',
+        )
         messages.success(request, 'Research domain deleted.')
         return redirect('public_cms:cms_researchdomain_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -146,7 +200,23 @@ def publication_create_view(request):
         return redirect('dashboard:home')
     form = forms.PublicationForm(request.POST or None, request.FILES or None)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Publication "{obj}" was created by {request.user.full_name}.',
+            content_type_label='publication',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Publication Created',
+            message=f'Publication "{obj}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_publication_list',
+            category='system',
+        )
         messages.success(request, 'Publication created.')
         return redirect('public_cms:cms_publication_list')
     return render(request, 'public/cms/form.html', {
@@ -164,7 +234,23 @@ def publication_edit_view(request, pk):
     item = get_object_or_404(models.Publication, pk=pk)
     form = forms.PublicationForm(request.POST or None, request.FILES or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Publication "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='publication',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Publication Updated',
+            message=f'Publication "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_publication_list',
+            category='system',
+        )
         messages.success(request, 'Publication updated.')
         return redirect('public_cms:cms_publication_list')
     return render(request, 'public/cms/form.html', {
@@ -182,7 +268,25 @@ def publication_delete_view(request, pk):
         return redirect('dashboard:home')
     item = get_object_or_404(models.Publication, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Publication "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='publication',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Publication Deleted',
+            message=f'Publication "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_publication_list',
+            category='system',
+        )
         messages.success(request, 'Publication deleted.')
         return redirect('public_cms:cms_publication_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -269,6 +373,22 @@ def blogpost_create_view(request):
         post = form.save(commit=False)
         post.author = request.user
         post.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Blog Post "{post}" was created by {request.user.full_name}.',
+            content_type_label='blogpost',
+            object_id=post.pk,
+            object_repr=str(post),
+            request=request,
+        )
+        notify_admins(
+            title='Blog Post Created',
+            message=f'Blog Post "{post}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_blogpost_list',
+            category='system',
+        )
         messages.success(request, 'Blog post created.')
         return redirect('public_cms:cms_blogpost_list')
     return render(request, 'public/cms/form.html', {
@@ -287,7 +407,23 @@ def blogpost_edit_view(request, pk):
         return redirect('public_cms:cms_blogpost_list')
     form = forms.BlogPostForm(request.POST or None, request.FILES or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Blog Post "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='blogpost',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Blog Post Updated',
+            message=f'Blog Post "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_blogpost_list',
+            category='system',
+        )
         messages.success(request, 'Blog post updated.')
         return redirect('public_cms:cms_blogpost_list')
     return render(request, 'public/cms/form.html', {
@@ -305,7 +441,25 @@ def blogpost_delete_view(request, pk):
         messages.error(request, 'You can only delete your own posts.')
         return redirect('public_cms:cms_blogpost_list')
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Blog Post "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='blogpost',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Blog Post Deleted',
+            message=f'Blog Post "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_blogpost_list',
+            category='system',
+        )
         messages.success(request, 'Blog post deleted.')
         return redirect('public_cms:cms_blogpost_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -341,7 +495,23 @@ def newsitem_create_view(request):
         return redirect('dashboard:home')
     form = forms.NewsItemForm(request.POST or None)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'News Item "{obj}" was created by {request.user.full_name}.',
+            content_type_label='newsitem',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='News Item Created',
+            message=f'News Item "{obj}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_newsitem_list',
+            category='system',
+        )
         messages.success(request, 'News item created.')
         return redirect('public_cms:cms_newsitem_list')
     return render(request, 'public/cms/form.html', {
@@ -359,7 +529,23 @@ def newsitem_edit_view(request, pk):
     item = get_object_or_404(models.NewsItem, pk=pk)
     form = forms.NewsItemForm(request.POST or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'News Item "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='newsitem',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='News Item Updated',
+            message=f'News Item "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_newsitem_list',
+            category='system',
+        )
         messages.success(request, 'News item updated.')
         return redirect('public_cms:cms_newsitem_list')
     return render(request, 'public/cms/form.html', {
@@ -377,7 +563,25 @@ def newsitem_delete_view(request, pk):
         return redirect('dashboard:home')
     item = get_object_or_404(models.NewsItem, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'News Item "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='newsitem',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='News Item Deleted',
+            message=f'News Item "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_newsitem_list',
+            category='system',
+        )
         messages.success(request, 'News item deleted.')
         return redirect('public_cms:cms_newsitem_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -413,7 +617,23 @@ def galleryitem_create_view(request):
         return redirect('dashboard:home')
     form = forms.GalleryItemForm(request.POST or None, request.FILES or None)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Gallery Item "{obj}" was created by {request.user.full_name}.',
+            content_type_label='galleryitem',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Gallery Item Created',
+            message=f'Gallery Item "{obj}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_galleryitem_list',
+            category='system',
+        )
         messages.success(request, 'Gallery item created.')
         return redirect('public_cms:cms_galleryitem_list')
     return render(request, 'public/cms/form.html', {
@@ -431,7 +651,23 @@ def galleryitem_edit_view(request, pk):
     item = get_object_or_404(models.GalleryItem, pk=pk)
     form = forms.GalleryItemForm(request.POST or None, request.FILES or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Gallery Item "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='galleryitem',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Gallery Item Updated',
+            message=f'Gallery Item "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_galleryitem_list',
+            category='system',
+        )
         messages.success(request, 'Gallery item updated.')
         return redirect('public_cms:cms_galleryitem_list')
     return render(request, 'public/cms/form.html', {
@@ -449,7 +685,25 @@ def galleryitem_delete_view(request, pk):
         return redirect('dashboard:home')
     item = get_object_or_404(models.GalleryItem, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Gallery Item "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='galleryitem',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Gallery Item Deleted',
+            message=f'Gallery Item "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_galleryitem_list',
+            category='system',
+        )
         messages.success(request, 'Gallery item deleted.')
         return redirect('public_cms:cms_galleryitem_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -479,7 +733,23 @@ def publicproject_list_view(request):
 def publicproject_create_view(request):
     form = forms.PublicProjectForm(request.POST or None, request.FILES or None)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Public Project "{obj}" was created by {request.user.full_name}.',
+            content_type_label='publicproject',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Public Project Created',
+            message=f'Public Project "{obj}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_publicproject_list',
+            category='system',
+        )
         messages.success(request, 'Project created.')
         return redirect('public_cms:cms_publicproject_list')
     return render(request, 'public/cms/form.html', {
@@ -494,7 +764,23 @@ def publicproject_edit_view(request, pk):
     item = get_object_or_404(models.PublicProject, pk=pk)
     form = forms.PublicProjectForm(request.POST or None, request.FILES or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Public Project "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='publicproject',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Public Project Updated',
+            message=f'Public Project "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_publicproject_list',
+            category='system',
+        )
         messages.success(request, 'Project updated.')
         return redirect('public_cms:cms_publicproject_list')
     return render(request, 'public/cms/form.html', {
@@ -509,7 +795,25 @@ def publicproject_edit_view(request, pk):
 def publicproject_delete_view(request, pk):
     item = get_object_or_404(models.PublicProject, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Public Project "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='publicproject',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Public Project Deleted',
+            message=f'Public Project "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_publicproject_list',
+            category='system',
+        )
         messages.success(request, 'Project deleted.')
         return redirect('public_cms:cms_publicproject_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -545,7 +849,23 @@ def homepagestat_create_view(request):
         return redirect('dashboard:home')
     form = forms.HomepageStatForm(request.POST or None)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Homepage Stat "{obj}" was created by {request.user.full_name}.',
+            content_type_label='homepagestat',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Homepage Stat Created',
+            message=f'Homepage Stat "{obj}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_homepagestat_list',
+            category='system',
+        )
         messages.success(request, 'Homepage stat created.')
         return redirect('public_cms:cms_homepagestat_list')
     return render(request, 'public/cms/form.html', {
@@ -563,7 +883,23 @@ def homepagestat_edit_view(request, pk):
     item = get_object_or_404(models.HomepageStat, pk=pk)
     form = forms.HomepageStatForm(request.POST or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Homepage Stat "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='homepagestat',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Homepage Stat Updated',
+            message=f'Homepage Stat "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_homepagestat_list',
+            category='system',
+        )
         messages.success(request, 'Homepage stat updated.')
         return redirect('public_cms:cms_homepagestat_list')
     return render(request, 'public/cms/form.html', {
@@ -581,7 +917,25 @@ def homepagestat_delete_view(request, pk):
         return redirect('dashboard:home')
     item = get_object_or_404(models.HomepageStat, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Homepage Stat "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='homepagestat',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Homepage Stat Deleted',
+            message=f'Homepage Stat "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_homepagestat_list',
+            category='system',
+        )
         messages.success(request, 'Homepage stat deleted.')
         return redirect('public_cms:cms_homepagestat_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -622,6 +976,22 @@ def homepagehighlight_create_view(request):
             max_order=models.Max('order')
         )['max_order'] or 0) + 1
         highlight.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Homepage Highlight "{highlight}" was created by {request.user.full_name}.',
+            content_type_label='homepagehighlight',
+            object_id=highlight.pk,
+            object_repr=str(highlight),
+            request=request,
+        )
+        notify_admins(
+            title='Homepage Highlight Created',
+            message=f'Homepage Highlight "{highlight}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_homepagehighlight_list',
+            category='system',
+        )
         messages.success(request, 'Homepage highlight created.')
         return redirect('public_cms:cms_homepagehighlight_list')
     return render(request, 'public/cms/highlight_form.html', {
@@ -639,7 +1009,23 @@ def homepagehighlight_edit_view(request, pk):
     item = get_object_or_404(models.HomepageHighlight, pk=pk)
     form = forms.HomepageHighlightForm(request.POST or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Homepage Highlight "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='homepagehighlight',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Homepage Highlight Updated',
+            message=f'Homepage Highlight "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_homepagehighlight_list',
+            category='system',
+        )
         messages.success(request, 'Homepage highlight updated.')
         return redirect('public_cms:cms_homepagehighlight_list')
     return render(request, 'public/cms/highlight_form.html', {
@@ -657,7 +1043,25 @@ def homepagehighlight_delete_view(request, pk):
         return redirect('dashboard:home')
     item = get_object_or_404(models.HomepageHighlight, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Homepage Highlight "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='homepagehighlight',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Homepage Highlight Deleted',
+            message=f'Homepage Highlight "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_homepagehighlight_list',
+            category='system',
+        )
         messages.success(request, 'Homepage highlight deleted.')
         return redirect('public_cms:cms_homepagehighlight_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -699,7 +1103,23 @@ def aboutpage_edit_view(request):
         item.save()
     form = forms.AboutPageForm(request.POST or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'About Page "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='aboutpage',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='About Page Updated',
+            message=f'About Page "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:dashboard',
+            category='system',
+        )
         messages.success(request, 'About page updated.')
         return redirect('public_cms:cms_aboutpage_edit')
     return render(request, 'public/cms/form.html', {
@@ -735,7 +1155,23 @@ def dataresource_create_view(request):
         return redirect('dashboard:home')
     form = forms.DataResourceForm(request.POST or None, request.FILES or None)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Data Resource "{obj}" was created by {request.user.full_name}.',
+            content_type_label='dataresource',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Data Resource Created',
+            message=f'Data Resource "{obj}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_dataresource_list',
+            category='system',
+        )
         messages.success(request, 'Data resource created.')
         return redirect('public_cms:cms_dataresource_list')
     return render(request, 'public/cms/form.html', {
@@ -753,7 +1189,23 @@ def dataresource_edit_view(request, pk):
     item = get_object_or_404(models.DataResource, pk=pk)
     form = forms.DataResourceForm(request.POST or None, request.FILES or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Data Resource "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='dataresource',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Data Resource Updated',
+            message=f'Data Resource "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_dataresource_list',
+            category='system',
+        )
         messages.success(request, 'Data resource updated.')
         return redirect('public_cms:cms_dataresource_list')
     return render(request, 'public/cms/form.html', {
@@ -771,7 +1223,25 @@ def dataresource_delete_view(request, pk):
         return redirect('dashboard:home')
     item = get_object_or_404(models.DataResource, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Data Resource "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='dataresource',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Data Resource Deleted',
+            message=f'Data Resource "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_dataresource_list',
+            category='system',
+        )
         messages.success(request, 'Data resource deleted.')
         return redirect('public_cms:cms_dataresource_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -807,7 +1277,23 @@ def jobopening_create_view(request):
         return redirect('dashboard:home')
     form = forms.JobOpeningForm(request.POST or None)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Job Opening "{obj}" was created by {request.user.full_name}.',
+            content_type_label='jobopening',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Job Opening Created',
+            message=f'Job Opening "{obj}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_jobopening_list',
+            category='system',
+        )
         messages.success(request, 'Job opening created.')
         return redirect('public_cms:cms_jobopening_list')
     return render(request, 'public/cms/form.html', {
@@ -825,7 +1311,23 @@ def jobopening_edit_view(request, pk):
     item = get_object_or_404(models.JobOpening, pk=pk)
     form = forms.JobOpeningForm(request.POST or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Job Opening "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='jobopening',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Job Opening Updated',
+            message=f'Job Opening "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_jobopening_list',
+            category='system',
+        )
         messages.success(request, 'Job opening updated.')
         return redirect('public_cms:cms_jobopening_list')
     return render(request, 'public/cms/form.html', {
@@ -843,7 +1345,25 @@ def jobopening_delete_view(request, pk):
         return redirect('dashboard:home')
     item = get_object_or_404(models.JobOpening, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Job Opening "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='jobopening',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Job Opening Deleted',
+            message=f'Job Opening "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_jobopening_list',
+            category='system',
+        )
         messages.success(request, 'Job opening deleted.')
         return redirect('public_cms:cms_jobopening_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -879,7 +1399,23 @@ def sponsor_create_view(request):
         return redirect('dashboard:home')
     form = forms.SponsorForm(request.POST or None, request.FILES or None)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Sponsor "{obj}" was created by {request.user.full_name}.',
+            content_type_label='sponsor',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Sponsor Created',
+            message=f'Sponsor "{obj}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_sponsor_list',
+            category='system',
+        )
         messages.success(request, 'Sponsor created.')
         return redirect('public_cms:cms_sponsor_list')
     return render(request, 'public/cms/form.html', {
@@ -897,7 +1433,23 @@ def sponsor_edit_view(request, pk):
     item = get_object_or_404(models.Sponsor, pk=pk)
     form = forms.SponsorForm(request.POST or None, request.FILES or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Sponsor "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='sponsor',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Sponsor Updated',
+            message=f'Sponsor "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_sponsor_list',
+            category='system',
+        )
         messages.success(request, 'Sponsor updated.')
         return redirect('public_cms:cms_sponsor_list')
     return render(request, 'public/cms/form.html', {
@@ -915,7 +1467,25 @@ def sponsor_delete_view(request, pk):
         return redirect('dashboard:home')
     item = get_object_or_404(models.Sponsor, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Sponsor "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='sponsor',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Sponsor Deleted',
+            message=f'Sponsor "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_sponsor_list',
+            category='system',
+        )
         messages.success(request, 'Sponsor deleted.')
         return redirect('public_cms:cms_sponsor_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -951,7 +1521,23 @@ def contactblock_create_view(request):
         return redirect('dashboard:home')
     form = forms.ContactBlockForm(request.POST or None)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Contact Block "{obj}" was created by {request.user.full_name}.',
+            content_type_label='contactblock',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Contact Block Created',
+            message=f'Contact Block "{obj}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_contactblock_list',
+            category='system',
+        )
         messages.success(request, 'Contact block created.')
         return redirect('public_cms:cms_contactblock_list')
     return render(request, 'public/cms/form.html', {
@@ -969,7 +1555,23 @@ def contactblock_edit_view(request, pk):
     item = get_object_or_404(models.ContactBlock, pk=pk)
     form = forms.ContactBlockForm(request.POST or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Contact Block "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='contactblock',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Contact Block Updated',
+            message=f'Contact Block "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_contactblock_list',
+            category='system',
+        )
         messages.success(request, 'Contact block updated.')
         return redirect('public_cms:cms_contactblock_list')
     return render(request, 'public/cms/form.html', {
@@ -987,7 +1589,25 @@ def contactblock_delete_view(request, pk):
         return redirect('dashboard:home')
     item = get_object_or_404(models.ContactBlock, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Contact Block "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='contactblock',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Contact Block Deleted',
+            message=f'Contact Block "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_contactblock_list',
+            category='system',
+        )
         messages.success(request, 'Contact block deleted.')
         return redirect('public_cms:cms_contactblock_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -1023,7 +1643,23 @@ def pagesection_create_view(request):
         return redirect('dashboard:home')
     form = forms.PageSectionForm(request.POST or None)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Page Section "{obj}" was created by {request.user.full_name}.',
+            content_type_label='pagesection',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Page Section Created',
+            message=f'Page Section "{obj}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_pagesection_list',
+            category='system',
+        )
         messages.success(request, 'Page section created.')
         return redirect('public_cms:cms_pagesection_list')
     return render(request, 'public/cms/form.html', {
@@ -1041,7 +1677,23 @@ def pagesection_edit_view(request, pk):
     item = get_object_or_404(models.PageSection, pk=pk)
     form = forms.PageSectionForm(request.POST or None, instance=item)
     if form.is_valid():
-        form.save()
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Page Section "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='pagesection',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Page Section Updated',
+            message=f'Page Section "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_pagesection_list',
+            category='system',
+        )
         messages.success(request, 'Page section updated.')
         return redirect('public_cms:cms_pagesection_list')
     return render(request, 'public/cms/form.html', {
@@ -1059,7 +1711,25 @@ def pagesection_delete_view(request, pk):
         return redirect('dashboard:home')
     item = get_object_or_404(models.PageSection, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Page Section "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='pagesection',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Page Section Deleted',
+            message=f'Page Section "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_pagesection_list',
+            category='system',
+        )
         messages.success(request, 'Page section deleted.')
         return redirect('public_cms:cms_pagesection_list')
     return render(request, 'public/cms/confirm_delete.html', {
@@ -1115,11 +1785,151 @@ def contactmessage_delete_view(request, pk):
         return redirect('dashboard:home')
     item = get_object_or_404(models.ContactMessage, pk=pk)
     if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
         item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Contact Message "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='contactmessage',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Contact Message Deleted',
+            message=f'Contact Message "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_contactmessage_list',
+            category='system',
+        )
         messages.success(request, 'Contact message deleted.')
         return redirect('public_cms:cms_contactmessage_list')
     return render(request, 'public/cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Contact Message',
         'list_url': 'public_cms:cms_contactmessage_list',
+    })
+
+
+# ── Alumni CRUD ──────────────────────────────────────────────────────────────
+
+@login_required
+def alumni_list_view(request):
+    if not _is_admin(request.user):
+        messages.error(request, 'Admin access required.')
+        return redirect('dashboard:home')
+    items = models.Alumni.objects.all()
+    return render(request, 'public/cms/list.html', {
+        'items': items,
+        'model_name': 'Alumnus',
+        'model_name_plural': 'Alumni',
+        'create_url': 'public_cms:cms_alumni_create',
+        'edit_url': 'public_cms:cms_alumni_edit',
+        'delete_url': 'public_cms:cms_alumni_delete',
+        'list_fields': ['name', 'position', 'start_date', 'end_date', 'current_affiliation', 'is_active'],
+    })
+
+
+@login_required
+def alumni_create_view(request):
+    if not _is_admin(request.user):
+        messages.error(request, 'Admin access required.')
+        return redirect('dashboard:home')
+    form = forms.AlumniForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_CREATED',
+            description=f'Alumnus "{obj}" was created by {request.user.full_name}.',
+            content_type_label='alumni',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Alumnus Created',
+            message=f'Alumnus "{obj}" was created by {request.user.full_name}.',
+            level='success',
+            link='public_cms:cms_alumni_list',
+            category='system',
+        )
+        messages.success(request, 'Alumnus created.')
+        return redirect('public_cms:cms_alumni_list')
+    return render(request, 'public/cms/form.html', {
+        'form': form,
+        'model_name': 'Alumnus',
+        'list_url': 'public_cms:cms_alumni_list',
+    })
+
+
+@login_required
+def alumni_edit_view(request, pk):
+    if not _is_admin(request.user):
+        messages.error(request, 'Admin access required.')
+        return redirect('dashboard:home')
+    item = get_object_or_404(models.Alumni, pk=pk)
+    form = forms.AlumniForm(request.POST or None, request.FILES or None, instance=item)
+    if form.is_valid():
+        obj = form.save()
+        log_activity(
+            actor=request.user,
+            action='CMS_UPDATED',
+            description=f'Alumnus "{obj}" was updated by {request.user.full_name}.',
+            content_type_label='alumni',
+            object_id=obj.pk,
+            object_repr=str(obj),
+            request=request,
+        )
+        notify_admins(
+            title='Alumnus Updated',
+            message=f'Alumnus "{obj}" was updated by {request.user.full_name}.',
+            level='info',
+            link='public_cms:cms_alumni_list',
+            category='system',
+        )
+        messages.success(request, 'Alumnus updated.')
+        return redirect('public_cms:cms_alumni_list')
+    return render(request, 'public/cms/form.html', {
+        'form': form,
+        'model_name': 'Alumnus',
+        'list_url': 'public_cms:cms_alumni_list',
+        'delete_url': 'public_cms:cms_alumni_delete',
+    })
+
+
+@login_required
+def alumni_delete_view(request, pk):
+    if not _is_admin(request.user):
+        messages.error(request, 'Admin access required.')
+        return redirect('dashboard:home')
+    item = get_object_or_404(models.Alumni, pk=pk)
+    if request.method == 'POST':
+        name = str(item)
+        pk_val = item.pk
+        item.delete()
+        log_activity(
+            actor=request.user,
+            action='CMS_DELETED',
+            description=f'Alumnus "{name}" was deleted by {request.user.full_name}.',
+            content_type_label='alumni',
+            object_id=pk_val,
+            object_repr=name,
+            request=request,
+        )
+        notify_admins(
+            title='Alumnus Deleted',
+            message=f'Alumnus "{name}" was deleted by {request.user.full_name}.',
+            level='warning',
+            link='public_cms:cms_alumni_list',
+            category='system',
+        )
+        messages.success(request, 'Alumnus deleted.')
+        return redirect('public_cms:cms_alumni_list')
+    return render(request, 'public/cms/confirm_delete.html', {
+        'item': item,
+        'model_name': 'Alumnus',
+        'list_url': 'public_cms:cms_alumni_list',
     })

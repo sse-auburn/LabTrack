@@ -74,6 +74,12 @@ urlpatterns = [
     path('page-sections/<int:pk>/edit/', cms_views.pagesection_edit_view, name='cms_pagesection_edit'),
     path('page-sections/<int:pk>/delete/', cms_views.pagesection_delete_view, name='cms_pagesection_delete'),
 
+    # Alumni
+    path('alumni/', cms_views.alumni_list_view, name='cms_alumni_list'),
+    path('alumni/create/', cms_views.alumni_create_view, name='cms_alumni_create'),
+    path('alumni/<int:pk>/edit/', cms_views.alumni_edit_view, name='cms_alumni_edit'),
+    path('alumni/<int:pk>/delete/', cms_views.alumni_delete_view, name='cms_alumni_delete'),
+
     # Contact Messages
     path('contact-messages/', cms_views.contactmessage_list_view, name='cms_contactmessage_list'),
     path('contact-messages/<int:pk>/', cms_views.contactmessage_detail_view, name='cms_contactmessage_detail'),

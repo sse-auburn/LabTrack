@@ -114,6 +114,9 @@ class UserProfile(models.Model):
     github = models.URLField(blank=True)
     personal_website = models.URLField(blank=True)
 
+    start_date = models.DateField(blank=True, null=True, help_text='When they joined the lab')
+    end_date = models.DateField(blank=True, null=True, help_text='When they left the lab (leave blank if still active)')
+
     # Global notification toggles
     in_app_notifications = models.BooleanField(
         default=True,
