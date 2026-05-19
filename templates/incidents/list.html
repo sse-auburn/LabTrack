@@ -3,21 +3,39 @@
 {% block page_title %}Incident Reports{% endblock %}
 {% block content %}
 <div class="space-y-6">
-  <!-- Page Header Banner -->
-  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md">
-    <div class="flex items-center justify-between gap-3">
-      <div>
-        <h1 class="text-2xl font-bold tracking-tight">Incident Reports</h1>
-        <p class="text-white/80 text-sm mt-0.5">Track and manage lab incidents and issues</p>
-      </div>
-      <a href="{% url 'incidents:create' %}" class="inline-flex items-center px-4 py-1.5 bg-white text-brand-700 text-sm font-semibold rounded-lg hover:bg-brand-50 transition-colors shadow-sm">
+
+
+  <!-- Page Header -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+
+  <!-- LEFT SECTION -->
+  <div class="rounded-3xl px-6 py-5">
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+      Incident Reports
+    </h1>
+
+    <p class="mt-1 text-sm text-slate-500">
+      Track and manage lab incidents and issues
+    </p>
+  </div>
+
+  <!-- RIGHT SECTION -->
+  <div class="rounded-3xl px-6 py-5">
+    <div class="flex items-center justify-end">
+
+      <a href="{% url 'incidents:create' %}"
+         class="inline-flex items-center px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm">
         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 4v16m8-8H4"/>
         </svg>
         Report Incident
       </a>
+
     </div>
   </div>
+
+</div>
 
   <!-- Filters -->
   <div class="flex flex-wrap gap-3">

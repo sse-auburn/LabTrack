@@ -9,18 +9,36 @@
 {% block content %}
 <div class="space-y-6">
 
-  <!-- Welcome Banner -->
-  <div class="bg-auburn-blue rounded-2xl px-6 py-5 text-white shadow-md">
+<!-- Page Header -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+
+  <!-- LEFT SECTION -->
+  <div class="rounded-3xl px-6 py-5">
     {% if user.is_admin %}
-    <p class="text-brand-200 text-sm font-medium">Lab Management Overview</p>
-    <h2 class="text-2xl font-bold mt-0.5">Welcome, {{ request.user.full_name }}</h2>
-    <p class="text-brand-200 text-sm mt-1">System-wide stats and your personal activity.</p>
+      <p class="text-slate-500 text-sm font-medium">Lab Management Overview</p>
+      <h2 class="text-2xl font-bold mt-0.5 text-slate-900">
+        Welcome, {{ request.user.full_name }}
+      </h2>
+      <p class="text-slate-500 text-sm mt-1">
+        System-wide stats and your personal activity.
+      </p>
     {% else %}
-    <p class="text-brand-200 text-sm font-medium">Welcome back,</p>
-    <h2 class="text-2xl font-bold mt-0.5">{{ request.user.full_name }}</h2>
-    <p class="text-brand-200 text-sm mt-1">Here's a summary of your lab activity today.</p>
+      <p class="text-slate-500 text-sm font-medium">Welcome back,</p>
+      <h2 class="text-2xl font-bold mt-0.5 text-slate-900">
+        {{ request.user.full_name }}
+      </h2>
+      <p class="text-slate-500 text-sm mt-1">
+        Here's a summary of your lab activity today.
+      </p>
     {% endif %}
   </div>
+
+  <!-- RIGHT SECTION -->
+  <div class="rounded-3xl px-6 py-5">
+    <!-- intentionally empty for future stats/actions -->
+  </div>
+
+</div>
 
   <!-- ── Stat Cards ── -->
   {% if user.is_admin %}

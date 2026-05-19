@@ -8,54 +8,80 @@
   <div>
 
     <!-- Page Header Banner -->
-    <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 class="text-2xl font-bold tracking-tight">Equipment</h1>
-          {% if total_count is not None %}
-          <p class="text-white/80 text-sm mt-0.5">{{ total_count }} item{{ total_count|pluralize }} in the lab</p>
-          {% endif %}
-        </div>
-        <div class="flex items-center gap-2 flex-wrap">
-          <div class="inline-flex rounded-lg border border-white/30 overflow-hidden">
-            <a href="?{{ query_string }}&view=grid"
-               class="inline-flex items-center px-3 py-1.5 text-sm transition-colors
-                 {% if view_mode == 'grid' %}bg-white text-brand-700 font-semibold{% else %}text-white hover:bg-white/20{% endif %}"
-               title="Grid view">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-              </svg>
-            </a>
-            <a href="?{{ query_string }}&view=list"
-               class="inline-flex items-center px-3 py-1.5 text-sm border-l border-white/30 transition-colors
-                 {% if view_mode == 'list' %}bg-white text-brand-700 font-semibold{% else %}text-white hover:bg-white/20{% endif %}"
-               title="List view">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-              </svg>
-            </a>
-          </div>
-          <a href="{% url 'equipment:create' %}"
-             class="inline-flex items-center px-4 py-1.5 bg-white text-brand-700 text-sm font-semibold rounded-lg hover:bg-brand-50 transition-colors shadow-sm">
-            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Add Equipment
-          </a>
-          {% if user.is_admin %}
-          <a href="{% url 'equipment:category_list' %}"
-             class="inline-flex items-center px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-medium rounded-lg transition-colors">
-            Categories
-          </a>
-          <a href="{% url 'equipment:location_list' %}"
-             class="inline-flex items-center px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-medium rounded-lg transition-colors">
-            Locations
-          </a>
-          {% endif %}
-        </div>
+ <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+
+  <!-- LEFT SECTION -->
+  <div class="rounded-3xl px-6 py-5">
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+      Equipment
+    </h1>
+
+    {% if total_count is not None %}
+    <p class="text-slate-500 text-sm mt-1">
+      {{ total_count }} item{{ total_count|pluralize }} in the lab
+    </p>
+    {% endif %}
+  </div>
+
+  <!-- RIGHT SECTION -->
+  <div class="rounded-3xl px-6 py-5">
+    <div class="flex items-center justify-end gap-2 flex-wrap">
+
+      <div class="inline-flex rounded-lg border border-slate-300 overflow-hidden">
+        <a href="?{{ query_string }}&view=grid"
+           class="inline-flex items-center px-3 py-1.5 text-sm transition-colors
+             {% if view_mode == 'grid' %}
+               bg-slate-900 text-white font-semibold
+             {% else %}
+               text-slate-600 hover:bg-slate-100
+             {% endif %}"
+           title="Grid view">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+          </svg>
+        </a>
+
+        <a href="?{{ query_string }}&view=list"
+           class="inline-flex items-center px-3 py-1.5 text-sm border-l border-slate-300 transition-colors
+             {% if view_mode == 'list' %}
+               bg-slate-900 text-white font-semibold
+             {% else %}
+               text-slate-600 hover:bg-slate-100
+             {% endif %}"
+           title="List view">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+          </svg>
+        </a>
       </div>
+
+      <a href="{% url 'equipment:create' %}"
+         class="inline-flex items-center px-4 py-1.5 bg-brand-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-700 transition-colors">
+        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 4v16m8-8H4"/>
+        </svg>
+        Add Equipment
+      </a>
+
+ {% if user.is_admin %}
+<a href="{% url 'equipment:category_list' %}"
+   class="inline-flex items-center px-3 py-1.5 border border-auburn-orange text-auburn-orange hover:bg-auburn-orange hover:text-white text-sm font-medium rounded-lg transition-colors">
+  Categories
+</a>
+
+<a href="{% url 'equipment:location_list' %}"
+   class="inline-flex items-center px-3 py-1.5 border border-auburn-orange text-auburn-orange hover:bg-auburn-orange hover:text-white text-sm font-medium rounded-lg transition-colors">
+  Locations
+</a>
+{% endif %}
+
     </div>
+  </div>
+
+</div>
 
     <!-- Filter Bar -->
     <form method="get" class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
