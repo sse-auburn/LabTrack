@@ -265,7 +265,7 @@ def user_edit_view(request, pk):
         profile_form = ProfileUpdateForm(instance=profile)
 
     return render(request, 'accounts/user_form.html', {
-        'user_form': user_form,
+        'form': user_form,
         'profile_form': profile_form,
         'target_user': target_user,
         'action': 'Edit',
