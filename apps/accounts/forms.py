@@ -88,14 +88,14 @@ class CustomUserChangeForm(UserChangeForm):
 
 
 class LoginForm(forms.Form):
-    """Email + password login form with an optional remember-me flag."""
+    """Username or email + password login form with an optional remember-me flag."""
 
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={
+    username_or_email = forms.CharField(
+        widget=forms.TextInput(attrs={
             'class': 'form-input',
-            'placeholder': 'you@example.com',
+            'placeholder': 'Username or email',
             'autofocus': True,
-            'autocomplete': 'email',
+            'autocomplete': 'username',
         }),
     )
     password = forms.CharField(

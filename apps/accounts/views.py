@@ -84,11 +84,21 @@ def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data['email'].lower()
+            username_or_email = form.cleaned_data['username_or_email'].lower().strip()
             password = form.cleaned_data['password']
             remember_me = form.cleaned_data.get('remember_me', False)
 
-            user = authenticate(request, username=email, password=password)
+            # Resolve username → email since USERNAME_FIELD is 'email'
+            if '@' in username_or_email:
+                email = username_or_email
+            else:
+                try:
+                    user_lookup = CustomUser.objects.get(username__iexact=username_or_email)
+                    email = user_lookup.email
+                except CustomUser.DoesNotExist:
+                    email = None
+
+            user = authenticate(request, username=email, password=password) if email else None
             if user is not None:
                 if user.is_active:
                     login(request, user)
@@ -101,7 +111,7 @@ def login_view(request):
                 else:
                     messages.error(request, 'Your account is pending admin approval. You will be notified once your account is activated.')
             else:
-                messages.error(request, 'Invalid email address or password. Please try again.')
+                messages.error(request, 'Invalid username, email, or password. Please try again.')
     else:
         form = LoginForm()
 

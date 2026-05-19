@@ -19,22 +19,11 @@ def _page_sections(page):
 
 # ── Homepage ─────────────────────────────────────────────────────────────────
 
-def _highlight_has_image(hl):
-    """Return True if the highlight's content object has an image."""
-    if hl.highlight_type == 'PROJECT' and hl.project and hl.project.image:
-        return True
-    if hl.highlight_type == 'NEWS' and hl.news_item and hl.news_item.image:
-        return True
-    return False
-
-
 def home_view(request):
     stats = models.HomepageStat.objects.filter(is_active=True)
-    highlights = list(models.HomepageHighlight.objects.filter(is_active=True).select_related(
+    highlights = models.HomepageHighlight.objects.filter(is_active=True).select_related(
         'project', 'publication', 'news_item', 'job_opening'
-    ).order_by('order'))
-    # Image-bearing cards first, then others; preserve original order within each group
-    highlights.sort(key=lambda h: (0 if _highlight_has_image(h) else 1, h.order))
+    ).order_by('order')
     funding_partners = models.Sponsor.objects.filter(is_active=True, partner_type='FUNDING').order_by('order')
     collaborative_partners = models.Sponsor.objects.filter(is_active=True, partner_type='COLLABORATION').order_by('order')
     return render(request, 'public/home.html', {

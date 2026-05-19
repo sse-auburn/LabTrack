@@ -1,6 +1,6 @@
 # LabTrack User Manual
 
-This manual documents every feature and workflow in LabTrack for both members and administrators. Read the section that matches your role, then refer to specific workflow sections as needed.
+This manual documents every feature and workflow in LabTrack for members, administrators, and content editors. Read the section that matches your role, then refer to specific workflow sections as needed.
 
 ---
 
@@ -18,57 +18,63 @@ This manual documents every feature and workflow in LabTrack for both members an
    - [Changing Your Password](#23-changing-your-password)
    - [Notification Preferences](#24-notification-preferences)
 3. [Equipment](#3-equipment)
-   - [Browsing and Searching Equipment](#31-browsing-and-searching-equipment)
-   - [Viewing Equipment Details](#32-viewing-equipment-details)
+   - [Browsing and Searching](#31-browsing-and-searching)
+   - [Equipment Details](#32-equipment-details)
    - [Registering New Equipment](#33-registering-new-equipment)
-   - [Equipment Approval](#34-equipment-approval)
+   - [Approval Workflow](#34-approval-workflow)
    - [Editing Equipment](#35-editing-equipment)
-   - [Moving Equipment Between Locations](#36-moving-equipment-between-locations)
-   - [Recording Lifecycle Events](#37-recording-lifecycle-events)
-   - [Deactivating and Retiring Equipment](#38-deactivating-and-retiring-equipment)
+   - [Moving Equipment](#36-moving-equipment)
+   - [Lifecycle Events](#37-lifecycle-events)
+   - [Deactivating and Retiring](#38-deactivating-and-retiring)
    - [Categories and Locations](#39-categories-and-locations)
-4. [Borrowing](#4-borrowing)
-   - [Submitting a Borrow Request](#41-submitting-a-borrow-request)
-   - [Borrow Request Status Reference](#42-borrow-request-status-reference)
-   - [Viewing Your Active Borrows](#43-viewing-your-active-borrows)
-   - [Submitting a Return](#44-submitting-a-return)
-   - [Confirming a Return (Equipment Owner)](#45-confirming-a-return-equipment-owner)
-   - [Kit Borrow Returns](#46-kit-borrow-returns)
-   - [Overdue Items](#47-overdue-items)
-5. [Reservations](#5-reservations)
-   - [Creating a Reservation](#51-creating-a-reservation)
-   - [Reservation Status Reference](#52-reservation-status-reference)
-   - [Viewing Your Reservations](#53-viewing-your-reservations)
-   - [Calendar View](#54-calendar-view)
-   - [Cancelling a Reservation](#55-cancelling-a-reservation)
-   - [Submitting a Reservation Return](#56-submitting-a-reservation-return)
-   - [Confirming a Reservation Return (Equipment Owner)](#57-confirming-a-reservation-return-equipment-owner)
-   - [The Waitlist](#58-the-waitlist)
-6. [Kits](#6-kits)
-   - [Creating a Kit](#61-creating-a-kit)
-   - [Adding Items to a Kit](#62-adding-items-to-a-kit)
-   - [Sharing a Kit](#63-sharing-a-kit)
-   - [Borrowing a Kit](#64-borrowing-a-kit)
-   - [Returning a Kit](#65-returning-a-kit)
-   - [Editing and Deleting Kits](#66-editing-and-deleting-kits)
-7. [Consumables](#7-consumables)
-   - [Browsing Consumables](#71-browsing-consumables)
-   - [Logging Consumable Usage](#72-logging-consumable-usage)
-   - [Adding a New Consumable (Admin)](#73-adding-a-new-consumable-admin)
-   - [Restocking a Consumable (Admin)](#74-restocking-a-consumable-admin)
-   - [Low-Stock List (Admin)](#75-low-stock-list-admin)
-8. [Incidents](#8-incidents)
-   - [Reporting an Incident](#81-reporting-an-incident)
-   - [Incident Status Reference](#82-incident-status-reference)
-   - [Assigning an Investigator](#83-assigning-an-investigator)
-   - [Resolving an Incident](#84-resolving-an-incident)
-   - [Closing an Incident](#85-closing-an-incident)
-   - [Maintenance Logs](#86-maintenance-logs)
-   - [Calibration Logs](#87-calibration-logs)
-9. [Projects](#9-projects)
-   - [Creating a Project](#91-creating-a-project)
-   - [Managing Project Members](#92-managing-project-members)
-   - [Updating Project Status](#93-updating-project-status)
+4. [Reservations](#4-reservations)
+   - [Creating a Reservation](#41-creating-a-reservation)
+   - [Reservation Status Reference](#42-reservation-status-reference)
+   - [Viewing Your Reservations](#43-viewing-your-reservations)
+   - [Calendar View](#44-calendar-view)
+   - [Cancelling a Reservation](#45-cancelling-a-reservation)
+   - [Submitting a Return](#46-submitting-a-return)
+   - [Confirming a Return](#47-confirming-a-return)
+   - [The Waitlist](#48-the-waitlist)
+   - [Overdue Reservations](#49-overdue-reservations)
+5. [Kits](#5-kits)
+   - [Creating a Kit](#51-creating-a-kit)
+   - [Adding Items](#52-adding-items)
+   - [Sharing a Kit](#53-sharing-a-kit)
+   - [Reserving a Kit](#54-reserving-a-kit)
+   - [Returning a Kit](#55-returning-a-kit)
+   - [Editing and Deleting](#56-editing-and-deleting)
+6. [Incidents](#6-incidents)
+   - [Reporting an Incident](#61-reporting-an-incident)
+   - [Incident Status Reference](#62-incident-status-reference)
+   - [Assigning an Investigator](#63-assigning-an-investigator)
+   - [Resolving an Incident](#64-resolving-an-incident)
+   - [Closing an Incident](#65-closing-an-incident)
+   - [Maintenance Logs](#66-maintenance-logs)
+   - [Calibration Logs](#67-calibration-logs)
+7. [P-Card Purchase Tracking](#7-p-card-purchase-tracking)
+   - [Recording a Transaction](#71-recording-a-transaction)
+   - [Viewing Transactions](#72-viewing-transactions)
+   - [Editing a Transaction](#73-editing-a-transaction)
+   - [Requesting Deletion](#74-requesting-deletion)
+   - [Exporting Data](#75-exporting-data)
+8. [Files](#8-files)
+9. [Public Website & CMS](#9-public-website--cms)
+   - [Public Site Overview](#91-public-site-overview)
+   - [CMS Dashboard](#92-cms-dashboard)
+   - [Member CMS Access](#93-member-cms-access)
+   - [Publications](#94-publications)
+   - [Blog Posts](#95-blog-posts)
+   - [News Items](#96-news-items)
+   - [Public Projects](#97-public-projects)
+   - [Homepage Highlights](#98-homepage-highlights)
+   - [Homepage Stats](#99-homepage-stats)
+   - [Job Openings](#910-job-openings)
+   - [Sponsors](#911-sponsors)
+   - [Alumni](#912-alumni)
+   - [Page Sections](#913-page-sections)
+   - [Contact Messages](#914-contact-messages)
+   - [Research Domains & Data Resources](#915-research-domains--data-resources)
 10. [Notifications](#10-notifications)
     - [In-App Notifications](#101-in-app-notifications)
     - [Email Notifications](#102-email-notifications)
@@ -82,14 +88,10 @@ This manual documents every feature and workflow in LabTrack for both members an
     - [Admin Panel](#125-admin-panel)
     - [Approving Pending Equipment](#126-approving-pending-equipment)
     - [Return Queue](#127-return-queue)
-    - [Overdue Borrow Detection](#128-overdue-borrow-detection)
+    - [Scheduled Tasks](#128-scheduled-tasks)
     - [Django Back-Office](#129-django-back-office)
-13. [P-Card Purchase Tracking](#13-p-card-purchase-tracking)
-    - [Recording a Transaction](#131-recording-a-transaction)
-    - [Viewing Transactions](#132-viewing-transactions)
-    - [Editing a Transaction](#133-editing-a-transaction)
-    - [Deleting a Transaction](#134-deleting-a-transaction)
-    - [Exporting Data](#135-exporting-data)
+13. [URL Reference](#13-url-reference)
+14. [Troubleshooting](#14-troubleshooting)
 
 ---
 
@@ -104,6 +106,8 @@ This manual documents every feature and workflow in LabTrack for both members an
 
 If you forget your password, contact a LabTrack administrator — there is no self-service password reset. Administrators can set a new password for you through the Django back-office.
 
+> **Remember Me:** The login form includes a **Remember Me** checkbox. If unchecked, your session expires when you close the browser. If checked, you stay logged in across browser restarts.
+
 ### 1.2 Registering an Account
 
 If registration is open at your lab:
@@ -112,9 +116,9 @@ If registration is open at your lab:
 2. Fill in your **email address**, **username**, and **password** (confirmed twice).
 3. Click **Register**.
 
-Your account is created immediately, but you will have no role until an administrator assigns one. Until then you can log in but cannot access any module.
+Your account is created but set to **inactive** pending admin approval. You **cannot log in** until an administrator activates your account and assigns a role.
 
-> **Administrators:** New self-registered accounts appear in the Members list. Assign them a role before they can use the system.
+> **Administrators:** New self-registered accounts appear as inactive in the user list. Activate them and assign a role before they can use the system.
 
 ### 1.3 User Roles
 
@@ -122,32 +126,29 @@ LabTrack has two roles:
 
 | Role | Access |
 |---|---|
-| **Member** | Browse and borrow equipment; create reservations; manage their own kits; log consumable usage; report incidents; create projects |
-| **Admin** | Everything a Member can do, plus: manage users and roles; approve/reject equipment registrations; view the activity log; access the admin panel; perform any action on any record |
+| **Member** | Browse and reserve equipment; manage their own kits; report incidents; manage CMS content they own or that is member-accessible |
+| **Admin** | Everything a Member can do, plus: manage users and roles; approve/reject equipment registrations; view the full activity log; access all CMS sections; perform any action on any record |
 
-Roles are assigned by an administrator from the Members page.
-A superuser created with `createsuperuser` automatically has the Admin role.
+Roles are assigned by an administrator from the Members page. A superuser created with `createsuperuser` automatically has the Admin role.
 
 ### 1.4 The Dashboard
 
-After login you land on the dashboard, which differs by role.
+After login you land on the unified dashboard (`/dashboard/`). All users see the same page, but admins see additional system-wide panels.
 
-**Member dashboard:**
-- Stats bar: your active borrows, pending return approvals, active reservations, active projects
-- **My Active Borrows** — equipment and kits you currently have checked out, with due dates
-- **My Pending Returns** — items you have submitted for return that are awaiting owner confirmation
-- **Pending Return Approvals** — items whose owner you are, awaiting your confirmation
-- **My Reservations** — upcoming and active reservations
-- **My Kits** — your personal kits
+**Everyone sees:**
+- **Active Reservations** — equipment and kits you currently have checked out, with due dates
+- **My Pending Returns** — reservations you have submitted for return that are awaiting owner confirmation
+- **Pending Return Approvals** — reservations where you are the equipment owner and the borrower has submitted a return
+- **Upcoming Reservations** — confirmed or pending reservations starting within the next 7 days
+- **Pending Owned Equipment** — equipment you own that is still awaiting admin approval
+- **Recent Notifications** — your last 5 unread notifications
 - **Recent Activity** — your last 10 actions in the system
 
-**Admin dashboard:**
-- Stats bar: total equipment, active borrows, pending returns, low-stock consumables, open incidents
-- **Overdue Borrows** alert — appears when any borrow is past its due date
-- **Low Stock Consumables** alert — appears when any consumable is at or below its threshold
-- Quick actions: Browse Equipment, New Borrow, New Reservation, Return Queue, Consumables, Incidents
-- Charts: equipment by status, monthly borrow activity
-- **Recent Members** — last 5 registered users
+**Admins additionally see:**
+- Stats bar: total active equipment, available equipment, pending equipment approvals, pending returns, open incidents
+- Total kits and shared kits counts
+- **Overdue Reservations** — reservations whose end date has passed but are still CONFIRMED or ACTIVE
+- **System Activity** — last 15 actions across the entire system
 
 ### 1.5 Navigation
 
@@ -169,7 +170,11 @@ The profile page shows:
 - Contact information (phone, department, student ID)
 - Bio
 - Profile photo
+- Academic links (Google Scholar, LinkedIn, GitHub, personal website)
+- Lab position (PI, Postdoc, PhD, M.S., Undergraduate, Staff, Visitor)
+- Membership dates (start and end date)
 - Your current notification preferences (summary)
+- Borrow and reservation statistics
 
 ### 2.2 Editing Your Profile
 
@@ -182,6 +187,8 @@ You can update:
 - **Student ID**
 - **Bio**
 - **Profile photo** (JPEG/PNG, max 20 MB)
+- **Lab position**, **start date**, **end date**
+- **Google Scholar**, **LinkedIn**, **GitHub**, **personal website** URLs
 
 Click **Save Changes** to apply.
 
@@ -209,7 +216,6 @@ From the profile edit page, scroll to **Notification Preferences**.
 - Incidents
 - Equipment
 - Kits
-- Consumables
 - Projects
 - System
 
@@ -219,7 +225,7 @@ Disabling a category suppresses both in-app and email notifications for events i
 
 ## 3. Equipment
 
-### 3.1 Browsing and Searching Equipment
+### 3.1 Browsing and Searching
 
 Navigate to **Equipment** (`/equipment/`) to see all active, approved equipment.
 
@@ -227,19 +233,19 @@ Navigate to **Equipment** (`/equipment/`) to see all active, approved equipment.
 - **Search** — matches against name, serial number, model number, manufacturer, and description
 - **Category** — dropdown of all categories
 - **Location** — dropdown of all locations
+- **Owner** — filter by equipment owner
 - **Status** — Available, Borrowed, Reserved, Under Maintenance, Damaged, Retired
 - **Condition** — Excellent, Good, Fair, Poor, Damaged
 
-Results are paginated at 10 per page. Each card shows the equipment name, status badge, condition, category, location, and owner.
+Results can be viewed as a **list** (20 per page) or a **grid** (12 per page). Each card shows the equipment name, status badge, condition, category, location, and owner.
 
 **Bulk actions:** Select multiple items with the checkboxes on each card to perform bulk actions from the floating bar:
-- **Borrow** — check out all selected available items at once
-- **Reserve** — reserve all selected items for a future date range
+- **Reserve** — reserve all selected items for a date range
 - **Delete** (admin only) — retire all selected items in one operation
 
 > Members see only **Approved** equipment plus any **Pending** equipment they registered themselves. Admins see all equipment including Pending approval items.
 
-### 3.2 Viewing Equipment Details
+### 3.2 Equipment Details
 
 Click any equipment card or name to open its detail page.
 
@@ -248,11 +254,12 @@ The detail page shows:
 - Category, location, owner, current status and condition
 - Purchase date and price (if recorded)
 - Photo
-- **Borrow history** — last 10 borrow requests against this item
+- **Reservation history** — last 10 reservations against this item
 - **Lifecycle timeline** — events such as purchase, maintenance, repairs, and status changes
 - **Movement log** — history of location changes
+- **Maintenance history** — scheduled and completed maintenance logs
+- **Calibration history** — precision check records
 - For admins: an **Approve** button if the item is pending approval
-- A **Borrow** button if the item is available and you are not already borrowing it
 - A **Reserve** button to open a reservation form for this item
 - An **Edit** button (visible to the owner and admins)
 - A **Log Incident** button (visible to all members)
@@ -281,7 +288,7 @@ Any logged-in member can register equipment they own.
 
 A **PURCHASED** lifecycle event is recorded automatically when equipment is created.
 
-### 3.4 Equipment Approval
+### 3.4 Approval Workflow
 
 When a member registers equipment with a different owner, it appears in the Pending Approval queue.
 
@@ -300,7 +307,7 @@ Equipment can be edited by its **owner** or any **admin**.
 
 If the current user is not the owner and not an admin, the edit attempt is redirected back to the detail page with an error message. No changes are saved.
 
-### 3.6 Moving Equipment Between Locations
+### 3.6 Moving Equipment
 
 When equipment moves to a new physical location:
 
@@ -312,7 +319,7 @@ When equipment moves to a new physical location:
 
 A movement record is appended to the movement log and the equipment's location is updated.
 
-### 3.7 Recording Lifecycle Events
+### 3.7 Lifecycle Events
 
 A lifecycle event records a significant moment in an equipment item's history.
 
@@ -333,7 +340,7 @@ To add an event:
 3. Choose the event type and enter a description.
 4. Click **Save**.
 
-### 3.8 Deactivating and Retiring Equipment
+### 3.8 Deactivating and Retiring
 
 Admins can retire equipment that should no longer appear in the inventory (retired, lost, or scrapped). Retiring hides the item from all lists without deleting its history.
 
@@ -347,7 +354,7 @@ Admins can also set `is_active = False` directly on the equipment record for fin
 
 ### 3.9 Categories and Locations
 
-Categories and locations are shared across equipment and consumables. All authenticated users can browse the category and location lists from the sidebar.
+Categories and locations are shared across equipment. All authenticated users can browse the category and location lists from the sidebar.
 
 **Creating a category:**
 1. Go to `/equipment/categories/create/`.
@@ -362,56 +369,77 @@ Categories and locations are shared across equipment and consumables. All authen
 
 Both can also be created inline from the equipment registration form using the "+" button next to the dropdown.
 
+
 ---
 
-## 4. Borrowing
+## 4. Reservations
 
-Borrowing allows you to check out a specific piece of equipment or a kit for a defined period.
+Reservations are the primary way to check out equipment or kits. A reservation can be for a future date range (traditional reservation) or starting immediately today (immediate checkout).
 
-### 4.1 Submitting a Borrow Request
+### 4.1 Creating a Reservation
 
-1. Navigate to **Borrowing → Borrow Equipment** (`/borrowing/create/`), or click **Borrow** on an equipment detail page.
+1. Navigate to **Reservations → New Reservation** (`/reservations/create/`), or click **Reserve** on an equipment detail page.
 2. Select either **Equipment** or **Kit** (not both).
 3. Enter:
-   - **Purpose** — describe why you need the item
-   - **Due date** — the date you will return it (must be today or a future date)
-   - **Project** (optional) — link this borrow to a project
-4. Click **Submit Request**.
+   - **Start date** — first day of your reservation (can be today)
+   - **End date** — last day of your reservation
+   - **Purpose** — describe the planned use
+4. Click **Submit**.
 
-**Validation rules:**
-- The due date cannot be in the past.
-- You cannot borrow equipment that has a confirmed reservation overlapping with your due date.
+**What happens next:**
+- If your **start date is today or earlier**, the reservation is immediately set to **ACTIVE** — the item is considered checked out to you.
+- If your **start date is in the future**, the reservation is set to **CONFIRMED** — the period is booked.
 
-**Auto-approval:** Borrow requests are automatically set to **APPROVED** on submission. There is no separate approval step for single-item borrows. The equipment status is immediately changed to **Borrowed** so other members cannot simultaneously request it.
+The equipment owner receives a notification for awareness.
 
-### 4.2 Borrow Request Status Reference
+> **Note:** Reservations that overlap a confirmed or active reservation for the same item will be blocked. Check the calendar before creating a reservation to avoid conflicts.
+
+**Bulk reservation:** From the equipment list, select multiple available items with checkboxes, then click **Reserve Selected** in the floating action bar to reserve them all at once with the same date range.
+
+### 4.2 Reservation Status Reference
 
 | Status | Meaning |
 |---|---|
-| **APPROVED** | Request submitted and approved; item is checked out |
-| **ACTIVE** | Item has been physically picked up (manually set by owner or admin) |
-| **RETURN_PENDING** | Borrower has submitted the return; awaiting owner confirmation |
-| **RETURNED** | Owner confirmed receipt; transaction complete |
-| **OVERDUE** | Due date passed without a return being submitted |
-| **CANCELLED** | Request was cancelled before pickup |
+| **PENDING** | Submitted; awaiting owner confirmation (rarely used) |
+| **CONFIRMED** | The period is booked; item is reserved for future use |
+| **ACTIVE** | The reservation has started; item is checked out |
+| **RETURN_PENDING** | Requester submitted return; awaiting owner confirmation |
+| **RETURNED** | Owner confirmed return; transaction complete |
+| **CANCELLED** | Cancelled by the requester before the end date |
+| **COMPLETED** | Period ended normally |
+| **EXPIRED** | End date passed without any return action |
 
 Status flow:
 ```
-APPROVED → ACTIVE → RETURN_PENDING → RETURNED
-                 ↘ OVERDUE (automatic via management command)
+CONFIRMED → ACTIVE → RETURN_PENDING → RETURNED
+        ↘ CANCELLED    ↘ EXPIRED (via scheduled command)
 ```
 
-### 4.3 Viewing Your Active Borrows
+### 4.3 Viewing Your Reservations
 
-Go to **Borrowing** (`/borrowing/`) to see all your borrow requests grouped by status.
+Go to **Reservations** (`/reservations/`) to see all your reservations listed with their status, dates, and item.
 
-Alternatively, the **Member Dashboard** shows your active borrows with their due dates and a visual overdue indicator.
+### 4.4 Calendar View
 
-### 4.4 Submitting a Return
+The calendar at `/reservations/calendar/` shows all **CONFIRMED** and **ACTIVE** reservations from all members as blocks on a monthly calendar. Use the left/right arrows to navigate between months.
 
-When you are done with an item:
+Hovering over a block shows the item name and requester. This view is useful for checking availability before creating a new reservation.
 
-1. Open the borrow request detail page (`/borrowing/<id>/`), or click the item from your dashboard.
+### 4.5 Cancelling a Reservation
+
+You can cancel a reservation that is in **CONFIRMED** or **ACTIVE** status.
+
+1. Open the reservation detail page.
+2. Click **Cancel Reservation**.
+3. Confirm the cancellation.
+
+If someone is on the waitlist for the same equipment, the first person in the queue receives an automatic notification.
+
+### 4.6 Submitting a Return
+
+When the reservation period is over and you have physically returned the item:
+
+1. Open the reservation detail page.
 2. Click **Return Item**.
 3. Select the **Return Condition**:
    - Excellent
@@ -422,122 +450,11 @@ When you are done with an item:
 4. Enter any **notes** (optional but recommended if the condition is not Good).
 5. Click **Submit Return**.
 
-The request status becomes **RETURN_PENDING** and the return date is recorded. The equipment owner receives a notification.
-
-### 4.5 Confirming a Return (Equipment Owner)
-
-When someone returns equipment you own, you receive an in-app and email notification.
-
-To confirm:
-1. Go to **Borrowing → Return Queue** (`/borrowing/returns/`), or click the notification link.
-2. Find the pending return in the **Single Item Returns** section.
-3. Click **Confirm Return**.
-
-The borrow status becomes **RETURNED**. The borrower receives a notification.
-
-If you disagree with the condition reported, add a note before confirming. There is no reject-return option — contact the borrower directly if there is a dispute.
-
-### 4.6 Kit Borrow Returns
-
-When a kit is returned, each piece of equipment inside the kit must be confirmed by its individual owner. This is handled through per-item approval records.
-
-**When the borrower submits the return:**
-- One `KitItemReturnApproval` record is created for each distinct equipment owner in the kit.
-- The kit borrow status becomes **RETURN_PENDING**.
-- Each owner receives a notification.
-
-**For each owner:**
-1. Go to **Borrowing → Return Queue** (`/borrowing/returns/`).
-2. Find your item(s) in the **Kit Item Returns** section.
-3. Click **Confirm** next to your item.
-
-The borrow only transitions to **RETURNED** when every owner has confirmed their items. If you confirm your item but another owner has not yet confirmed theirs, the borrow stays **RETURN_PENDING** and the remaining owners see it in their queue.
-
-### 4.7 Overdue Items
-
-An item is overdue when its due date passes while the status is still **APPROVED** or **ACTIVE**.
-
-The system does not detect overdue items in real time — a scheduled management command (`mark_overdue_borrows`) must be run periodically by an administrator. See [Overdue Borrow Detection](#128-overdue-borrow-detection) in the Admin Guide.
-
-When an item is marked overdue:
-- Its status changes to **OVERDUE**.
-- The borrower receives an in-app and email notification.
-- All admins receive an in-app and email notification.
-
-Overdue items appear prominently on the admin dashboard. As a borrower, you should still return the item normally by submitting a return from the borrow detail page.
-
----
-
-## 5. Reservations
-
-Reservations let you book equipment or a kit for a future time window without immediately checking it out.
-
-### 5.1 Creating a Reservation
-
-1. Navigate to **Reservations → New Reservation** (`/reservations/create/`), or click **Reserve** on an equipment detail page.
-2. Select either **Equipment** or **Kit** (not both).
-3. Enter:
-   - **Start date** — first day of your reservation
-   - **End date** — last day of your reservation
-   - **Purpose** — describe the planned use
-4. Click **Submit**.
-
-The reservation is created with status **CONFIRMED** immediately. The equipment owner receives a notification for awareness. If the reservation starts today or earlier, the equipment status is set to **Reserved**.
-
-> **Note:** Reservations that overlap a confirmed reservation for the same item will be blocked. Check the calendar before creating a reservation to avoid conflicts.
-
-### 5.2 Reservation Status Reference
-
-| Status | Meaning |
-|---|---|
-| **PENDING** | Submitted; awaiting owner confirmation |
-| **CONFIRMED** | Owner confirmed; the period is booked |
-| **RETURN_PENDING** | Requester submitted return; awaiting owner confirmation |
-| **RETURNED** | Owner confirmed return; complete |
-| **CANCELLED** | Cancelled by the requester before the end date |
-| **COMPLETED** | Period ended normally (set manually or via future automation) |
-| **EXPIRED** | Period passed without any action |
-
-Status flow:
-```
-PENDING → CONFIRMED → RETURN_PENDING → RETURNED
-                    ↘ CANCELLED
-```
-
-### 5.3 Viewing Your Reservations
-
-Go to **Reservations** (`/reservations/`) to see all your reservations listed with their status, dates, and item.
-
-### 5.4 Calendar View
-
-The calendar at `/reservations/calendar/` shows all **CONFIRMED** reservations from all members as blocks on a monthly calendar. Use the left/right arrows to navigate between months.
-
-Hovering over a block shows the item name and requester. This view is useful for checking availability before creating a new reservation.
-
-### 5.5 Cancelling a Reservation
-
-You can cancel a reservation that is in **PENDING** or **CONFIRMED** status.
-
-1. Open the reservation detail page.
-2. Click **Cancel Reservation**.
-3. Confirm the cancellation.
-
-If someone is on the waitlist for the same equipment, the first person in the queue receives an automatic notification.
-
-### 5.6 Submitting a Reservation Return
-
-When the reservation period is over and you have physically returned the item:
-
-1. Open the reservation detail page.
-2. Click **Return Item**.
-3. Select the **Return Condition** and enter any notes.
-4. Click **Submit Return**.
-
 Status becomes **RETURN_PENDING** and the equipment owner is notified.
 
-You can only submit a return when the reservation is in **CONFIRMED** status. If it is already **CANCELLED**, **RETURNED**, or another terminal state, the return button is not shown.
+You can only submit a return when the reservation is in **ACTIVE** or **CONFIRMED** status.
 
-### 5.7 Confirming a Reservation Return (Equipment Owner)
+### 4.7 Confirming a Return
 
 1. Go to **Reservations** (`/reservations/`) and look for items with status **RETURN_PENDING**, or click the notification link.
 2. Open the reservation detail page.
@@ -547,9 +464,9 @@ Status becomes **RETURNED** and the requester is notified.
 
 Only the equipment (or kit) owner can confirm the return. Other members attempting to confirm are redirected with an error.
 
-### 5.8 The Waitlist
+### 4.8 The Waitlist
 
-If the equipment you need is already reserved or borrowed, you can join the waitlist.
+If the equipment you need is already reserved or unavailable, you can join the waitlist.
 
 **To join the waitlist:**
 1. On the equipment detail page, click **Join Waitlist** (visible when the item is unavailable).
@@ -562,26 +479,37 @@ You are assigned a position in the queue. Duplicate entries for the same user an
 When a confirmed reservation for the item is cancelled, LabTrack automatically notifies the first person in the queue (position 1). After notification, that entry is marked as notified but remains in the list until the user leaves manually.
 
 **To leave the waitlist:**
-Open your reservation list, find the waitlist entry, and click **Leave Waitlist**. Your entry is deleted.
+Open your waitlist entries, find the entry, and click **Leave Waitlist**. Your entry is deleted.
+
+### 4.9 Overdue Reservations
+
+A reservation is overdue when its **end date has passed** while the status is still **CONFIRMED** or **ACTIVE**.
+
+Overdue reservations appear prominently on the admin dashboard. The system does not detect overdue items in real time — a scheduled management command (`expire_reservations`) must be run periodically. See [Scheduled Tasks](#128-scheduled-tasks) in the Admin Guide.
+
+When a reservation is marked expired:
+- Its status changes to **EXPIRED**.
+- The equipment status is recomputed and may become AVAILABLE again.
+- The requester and owner are not explicitly notified (unlike the old borrow overdue system).
 
 ---
 
-## 6. Kits
+## 5. Kits
 
-A kit is a named bundle of equipment items that can be borrowed together as a single unit.
+A kit is a named bundle of equipment items that can be reserved together as a single unit.
 
-### 6.1 Creating a Kit
+### 5.1 Creating a Kit
 
 1. Navigate to **Kits → New Kit** (`/kits/create/`).
 2. Enter:
    - **Name** (required)
    - **Description** (optional)
-   - **Share with all members** — see [Sharing a Kit](#63-sharing-a-kit)
+   - **Share with all members** — see [Sharing a Kit](#53-sharing-a-kit)
 3. Click **Create Kit**.
 
 The kit is created with no items. You are redirected to the kit detail page.
 
-### 6.2 Adding Items to a Kit
+### 5.2 Adding Items
 
 From the kit detail page:
 
@@ -596,9 +524,9 @@ Each item can only appear once per kit. To adjust the quantity, remove the item 
 **Removing an item:**
 Click the **Remove** button next to the item in the kit detail page.
 
-### 6.3 Sharing a Kit
+### 5.3 Sharing a Kit
 
-By default, a kit is private — only you can see and borrow it.
+By default, a kit is private — only you can see and reserve it.
 
 To share:
 1. Open the kit detail page.
@@ -606,102 +534,45 @@ To share:
 3. Check **Share with all members**.
 4. Click **Save**.
 
-Shared kits appear in the **Shared Kits** section of the kit list for all members. Any member can then borrow the shared kit. You retain ownership and must confirm returns.
+Shared kits appear in the **Shared Kits** section of the kit list for all members. Any member can then reserve the shared kit. You retain ownership and must confirm returns.
 
-### 6.4 Borrowing a Kit
+### 5.4 Reserving a Kit
 
-Borrowing a kit works the same as borrowing individual equipment:
+Reserving a kit works the same as reserving individual equipment:
 
-1. Go to **Borrowing → Borrow Equipment** (`/borrowing/create/`).
+1. Go to **Reservations → New Reservation** (`/reservations/create/`).
 2. Leave Equipment blank and select your **Kit**.
-3. Fill in purpose and due date.
-4. Click **Submit Request**.
+3. Fill in start date, end date, and purpose.
+4. Click **Submit**.
 
-Or click **Borrow** from the kit detail page.
+Or click **Reserve** from the kit detail page.
 
-The kit borrow is automatically approved. Note that the individual equipment items inside the kit are not locked from simultaneous individual borrows — plan accordingly or use the reservation system for strict scheduling.
+The kit reservation is automatically confirmed. Note that the individual equipment items inside the kit are not locked from simultaneous individual reservations — plan accordingly.
 
-### 6.5 Returning a Kit
+### 5.5 Returning a Kit
 
-Returning a kit is described in detail in [Kit Borrow Returns](#46-kit-borrow-returns) in the Borrowing section. Each equipment owner inside the kit must independently confirm their items.
+Returning a kit follows the standard reservation return workflow:
 
-### 6.6 Editing and Deleting Kits
+1. The borrower opens the reservation detail page and clicks **Return Item**.
+2. Status becomes **RETURN_PENDING**.
+3. The kit owner confirms the return.
+4. Status becomes **RETURNED**.
+
+Unlike the old borrow system, kit returns do **not** require per-item owner confirmation. The kit creator is the single owner who confirms the return.
+
+### 5.6 Editing and Deleting
 
 **Edit:** From the kit detail page, click **Edit Kit**. You can change the name, description, and shared status.
 
-**Delete:** From the kit detail page, click **Delete Kit**. This permanently removes the kit and all its item records. Existing borrow requests linked to the kit are preserved (the kit field becomes null). Only the kit creator or an admin can delete a kit.
+**Delete:** From the kit detail page, click **Delete Kit**. This permanently removes the kit and all its item records. Existing reservations linked to the kit are preserved (the kit field becomes null). Only the kit creator or an admin can delete a kit.
 
 ---
 
-## 7. Consumables
-
-Consumables are non-returnable supplies (chemicals, components, materials) with quantity tracking.
-
-### 7.1 Browsing Consumables
-
-Navigate to **Consumables** (`/consumables/`) to see all active consumables. The list shows name, current quantity, unit, and a low-stock badge for items at or below their threshold.
-
-Click a consumable to view its detail page, which includes:
-- Full description, category, location, supplier, unit cost
-- Current quantity and threshold
-- Usage log (all recorded consumption events)
-
-### 7.2 Logging Consumable Usage
-
-Any logged-in member can record that they used a consumable.
-
-1. Open the consumable detail page.
-2. Click **Log Usage**.
-3. Enter:
-   - **Quantity used** — must not exceed the current stock
-   - **Purpose** — brief description of the use
-   - **Project** (optional) — link the usage to a project
-4. Click **Log Usage**.
-
-The stock is reduced immediately. If you enter a quantity greater than the available stock, the form is rejected and the stock is unchanged.
-
-### 7.3 Adding a New Consumable (Admin)
-
-1. Go to **Consumables → Add Consumable** (`/consumables/create/`).
-2. Fill in:
-   - **Name** (required)
-   - **Description**
-   - **Category** (optional)
-   - **Location** (optional)
-   - **Quantity** — initial stock level
-   - **Unit** — Piece, Box, Pack, Bottle, Liter, Gram, Meter, Roll, or Other
-   - **Low stock threshold** — quantity at or below which the item appears as low stock
-   - **Unit cost** (optional)
-   - **Supplier** (optional)
-   - **Notes** (optional)
-3. Click **Add Consumable**.
-
-### 7.4 Restocking a Consumable (Admin)
-
-When new stock arrives:
-
-1. Open the consumable detail page.
-2. Click **Restock**.
-3. Enter:
-   - **Quantity to add** — added on top of current stock
-   - **Notes** — e.g., "New delivery from supplier X"
-4. Click **Restock**.
-
-The stock is increased immediately.
-
-### 7.5 Low-Stock List (Admin)
-
-Navigate to **Consumables → Low Stock** (`/consumables/low-stock/`) to see every consumable where `quantity ≤ low_stock_threshold`. Use this list to prioritize reordering.
-
-The admin dashboard also shows a **Low Stock** alert card when any consumable is at or below its threshold.
-
----
-
-## 8. Incidents
+## 6. Incidents
 
 The incidents module tracks equipment damage, safety issues, and operational faults through a resolution workflow.
 
-### 8.1 Reporting an Incident
+### 6.1 Reporting an Incident
 
 Any member who discovers a problem with equipment should report it immediately.
 
@@ -720,7 +591,7 @@ Any member who discovers a problem with equipment should report it immediately.
 
 The incident is created with status **Open** and you are recorded as the reporter. The equipment owner receives a notification.
 
-### 8.2 Incident Status Reference
+### 6.2 Incident Status Reference
 
 | Status | Meaning |
 |---|---|
@@ -734,7 +605,7 @@ Status flow:
 Open → Investigating → Resolved → Closed
 ```
 
-### 8.3 Assigning an Investigator
+### 6.3 Assigning an Investigator
 
 The reporter, the equipment owner, or an admin can assign an investigator.
 
@@ -745,7 +616,7 @@ The reporter, the equipment owner, or an admin can assign an investigator.
 
 The status changes to **Investigating** and the assignee receives a notification.
 
-### 8.4 Resolving an Incident
+### 6.4 Resolving an Incident
 
 The assignee or an admin marks the incident resolved when the issue has been addressed.
 
@@ -756,7 +627,7 @@ The assignee or an admin marks the incident resolved when the issue has been add
 
 Status changes to **Resolved**. The reporter receives a notification.
 
-### 8.5 Closing an Incident
+### 6.5 Closing an Incident
 
 After the resolution has been reviewed and accepted:
 
@@ -765,7 +636,7 @@ After the resolution has been reviewed and accepted:
 
 Status becomes **Closed**. Closed incidents remain in the list for historical reference but cannot be re-opened.
 
-### 8.6 Maintenance Logs
+### 6.6 Maintenance Logs
 
 Maintenance records track scheduled or completed servicing of equipment.
 
@@ -785,7 +656,7 @@ Maintenance records track scheduled or completed servicing of equipment.
 
 Maintenance logs are visible on the equipment detail page under **Maintenance History**.
 
-### 8.7 Calibration Logs
+### 6.7 Calibration Logs
 
 Calibration logs track precision checks for measurement equipment.
 
@@ -801,51 +672,323 @@ Calibration logs track precision checks for measurement equipment.
    - **Notes** (optional)
 4. Click **Save**.
 
+
 ---
 
-## 9. Projects
+## 7. P-Card Purchase Tracking
 
-Projects provide lightweight coordination for lab work that involves multiple members and equipment.
+The P-Card module tracks lab purchase transactions with itemized line items, receipt uploads, and admin-approved deletion requests.
 
-### 9.1 Creating a Project
+### 7.1 Recording a Transaction
 
-1. Navigate to **Projects → New Project** (`/projects/create/`).
+1. Navigate to **P-Card → Record Purchase** (`/pcard/create/`).
 2. Fill in:
-   - **Name** (required)
-   - **Description** (optional)
-   - **Status** (defaults to Active)
-   - **Start date** (optional)
-   - **End date** (optional)
-3. Click **Create Project**.
+   - **Transaction date** (required)
+   - **Total price** (required)
+   - **Receipt file** — upload an image or PDF of the receipt
+   - **Notes** (optional)
+3. Add itemized line items:
+   - Click **Add Item**
+   - Enter **Name**, **Description**, **Quantity**, and **Unit price**
+   - Repeat for each item purchased
+4. Click **Save Transaction**.
 
-You are automatically set as the project **Lead**.
+The transaction is saved and all admins receive a notification.
 
-### 9.2 Managing Project Members
+### 7.2 Viewing Transactions
 
-The project lead or an admin can add and remove members.
+Navigate to **P-Card** (`/pcard/`) to see all transactions.
 
-**Adding a member:**
-1. Open the project detail page.
-2. Click **Add Member**.
-3. Select a user and a role: Lead, Member, or Observer.
-4. Click **Add**.
+**Filter options:**
+- **Date range** — filter by start and end dates
+- **Search** — search by item names or notes
 
-**Roles within a project:**
-- **Lead** — full control; can manage members and update the project
-- **Member** — can view the project and is listed as a participant
-- **Observer** — read-only participant
+Each transaction card shows the date, total price, number of items, and a receipt preview if available. Click a transaction to view its full detail page with all line items.
 
-**Removing a member:**
-Click the **Remove** button next to a member on the project detail page.
+### 7.3 Editing a Transaction
 
-### 9.3 Updating Project Status
-
-The project lead or an admin can change the project status at any time.
-
-1. Open the project detail page.
-2. Click **Edit Project**.
-3. Change **Status** to Active, On Hold, Completed, or Cancelled.
+1. Open the transaction detail page.
+2. Click **Edit**.
+3. Update any fields or modify line items.
 4. Click **Save**.
+
+### 7.4 Requesting Deletion
+
+Members cannot directly delete P-Card transactions. Instead, they must request deletion, which requires admin approval.
+
+1. Open the transaction detail page.
+2. Click **Request Deletion**.
+3. Enter a **reason** for the deletion request.
+4. Click **Submit Request**.
+
+The request enters a **Pending** status. All admins are notified.
+
+**Admins:** Go to **P-Card → Deletion Requests** (`/pcard/deletion-requests/`) to view the queue. Click **Approve** to delete the transaction permanently, or **Reject** to deny the request. Both actions notify the requester.
+
+### 7.5 Exporting Data
+
+**Excel export:**
+Navigate to `/pcard/export/excel/` to download all transactions (filtered by date range if set) as an Excel spreadsheet.
+
+**PDF export:**
+Navigate to `/pcard/export/pdf/` to compile all receipt images into a single PDF document.
+
+---
+
+## 8. Files
+
+LabTrack uses a custom database-backed file storage system. Files are stored as binary blobs in the database rather than on the filesystem, which makes the system portable and avoids filesystem dependency issues in containerized deployments.
+
+The `StoredFile` model tracks:
+- **Filename**
+- **MIME type**
+- **Binary data**
+- **Size** (in bytes)
+- **Created at** timestamp
+
+Files are uploaded automatically when you:
+- Attach a **receipt** to a P-Card transaction
+- Upload an **equipment photo**
+- Upload a **profile avatar**
+- Attach an **incident image**
+
+There is no standalone file browser in the UI. Files are managed in the context of the object they belong to. Admins can view and manage all stored files through the Django back-office (`/backoffice/files/storedfile/`).
+
+---
+
+## 9. Public Website & CMS
+
+LabTrack includes a fully CMS-driven public lab website. The public site is visible to anyone without login. The CMS (Content Management System) is a custom admin interface at `/admin/cms/` where lab members and admins manage the site's content.
+
+### 9.1 Public Site Overview
+
+The public website consists of these pages:
+
+| Page | URL | Content |
+|---|---|---|
+| **Home** | `/` | Hero section, stats bar, about teaser, lab highlights, sponsors, CTA |
+| **About** | `/about/` | Lab mission, history, editable sections |
+| **Projects** | `/projects/` | Research projects with domains and team members |
+| **Publications** | `/publications/` | All publications, filterable by year |
+| **Blog** | `/blog/` | Published blog posts, filterable by tag |
+| **News** | `/news/` | News announcements |
+| **Team** | `/team/` | Active lab members grouped by position |
+| **Alumni** | `/alumni/` | Former lab members |
+| **Data** | `/data/` | Data resources, datasets, software, tools |
+| **Jobs** | `/jobs/` | Open job positions |
+| **Sponsors** | `/sponsors/` | Funding and collaborative partners |
+| **Contact** | `/contact/` | Contact form and info blocks |
+
+### 9.2 CMS Dashboard
+
+The CMS dashboard at `/admin/cms/` is the landing page for content management.
+
+**Count cards** (clickable, linking to each management area):
+- Always visible: Publications, Blog Posts, News Items, Public Projects
+- Admin-only: Job Openings, Alumni, Sponsors, Homepage Stats, Highlights, Page Sections, Contact Messages
+
+**Recent Notifications** (left column):
+- Up to 5 unread notifications for the current user.
+
+**Recent CMS Activity** (right column):
+- Up to 10 recent CMS actions (create, update, delete) showing who did what and when.
+
+### 9.3 Member CMS Access
+
+Members (non-admin users) can access these CMS sections:
+- **Publications** — create, edit (any publication). Cannot delete or fetch DOI.
+- **Blog Posts** — create (auto-assigned as author), edit own posts, delete own posts.
+- **News Items** — create, edit. Cannot delete.
+- **Public Projects** — full CRUD (create, edit, delete).
+
+Members cannot access admin-only sections such as Homepage Highlights, Stats, Job Openings, Sponsors, Alumni, Page Sections, or Contact Messages.
+
+Admins can do everything members can, plus manage all admin-only sections and delete any content across all models.
+
+### 9.4 Publications
+
+Publications represent the lab's research output.
+
+**Fields:**
+- DOI (optional, unique) — supports auto-fetching metadata from Crossref
+- Title, Authors, Journal, Year, Volume, Issue, Pages
+- Abstract, URL, PDF file
+- **Featured** toggle — highlighted publications
+
+**Creating a publication:**
+1. Go to **CMS → Publications → Add Publication**.
+2. Fill in the details.
+3. Click **Save**.
+
+**DOI Auto-Fetch (admin only):**
+If you enter a DOI, admins can click **Fetch DOI** to automatically populate title, authors, journal, year, volume, issue, pages, and abstract from Crossref.
+
+### 9.5 Blog Posts
+
+Blog posts are long-form articles authored by lab members.
+
+**Fields:**
+- Title, Slug (auto-generated from title)
+- Content (rich text via CKEditor5)
+- Author (auto-set to the creator)
+- Featured image
+- Published status and publish date
+- Tags (comma-separated)
+
+**Creating a blog post:**
+1. Go to **CMS → Blog Posts → Add Blog Post**.
+2. Write your content.
+3. Toggle **Published** when ready to go live.
+4. Click **Save**.
+
+Members can only edit or delete their own blog posts. Admins can manage all posts.
+
+### 9.6 News Items
+
+News items are short announcements about lab achievements, events, and updates.
+
+**Fields:**
+- Title
+- Content (rich text)
+- Image (optional — displayed on the homepage if the news item is highlighted)
+- Published at (datetime)
+
+**Creating a news item:**
+1. Go to **CMS → News Items → Add News Item**.
+2. Fill in the title and content.
+3. Upload an image if desired.
+4. Click **Save**.
+
+### 9.7 Public Projects
+
+Public projects showcase the lab's research projects on the public website.
+
+**Fields:**
+- Title, Description (rich text)
+- Status (Active / Completed)
+- Funding source
+- Image
+- External link
+- Research domains (multi-select)
+- Team members (multi-select from lab users)
+
+**Creating a public project:**
+1. Go to **CMS → Public Projects → Add Project**.
+2. Fill in the details.
+3. Select research domains and team members.
+4. Click **Save**.
+
+Members have full CRUD access to public projects.
+
+### 9.8 Homepage Highlights
+
+Highlights are cards that appear on the public homepage, showcasing selected Projects, Publications, News Items, or Job Openings.
+
+**Managing highlights:**
+1. Go to **CMS → Homepage Highlights**.
+2. The page shows two sections:
+   - **Current Highlights** — items already on the homepage, shown in a table
+   - **Available Items** — un-highlighted content you can add
+
+**Adding a highlight:**
+Find the item you want in the Available Items section and click **Add**. It is automatically appended to the end of the highlight list.
+
+**Reordering:**
+Drag any row in the Current Highlights table by its drag handle (the hamburger icon on the left). Drop it in the desired position. The order is saved automatically and a "Order saved" toast appears.
+
+**Removing a highlight:**
+Click **Delete** next to a highlight. This only removes the highlight reference; the original content item is preserved.
+
+**Editing a highlight:**
+Click **Edit** to change the highlight's order number or active status.
+
+Image-bearing highlights (Projects and News Items with images) are sorted first on the public homepage, followed by text-only cards.
+
+### 9.9 Homepage Stats
+
+Stats are the numbers displayed in the colored bar on the public homepage (e.g., "15+ Publications", "8 Active Projects").
+
+**Fields:**
+- Label (e.g., "Publications")
+- Value (e.g., "15+")
+- Order
+- Active toggle
+
+Admins can create, edit, reorder, and deactivate stats from **CMS → Homepage Stats**.
+
+### 9.10 Job Openings
+
+Job postings appear on the public `/jobs/` page.
+
+**Fields:**
+- Title, Description, Requirements (all rich text)
+- Status (Open / Filled)
+- Tags
+- Order
+- Active toggle
+
+Only admins can manage job openings.
+
+### 9.11 Sponsors
+
+Sponsors are displayed on the homepage and the dedicated `/sponsors/` page.
+
+**Fields:**
+- Name, Description
+- Logo image
+- Website link
+- Partner type (Funding Partner / Collaborative Partner)
+- Order
+- Active toggle
+
+Only admins can manage sponsors.
+
+### 9.12 Alumni
+
+The alumni page (`/alumni/`) shows two sources:
+1. Inactive user accounts (users whose accounts have been deactivated)
+2. Manually created `Alumni` records for people without LabTrack accounts
+
+**Alumni record fields:**
+- Name, Email, Position
+- Start date, End date
+- Current affiliation
+- Photo, Bio
+- Google Scholar, LinkedIn, GitHub, Personal website links
+- Order, Active toggle
+
+Only admins can manage alumni records.
+
+### 9.13 Page Sections
+
+Page sections are editable content blocks that appear on static pages (Home, About, Jobs, Data, Projects, Contact).
+
+Each section has:
+- **Page** — which page it belongs to
+- **Section key** — a unique identifier (e.g., "hero", "about_teaser", "cta")
+- **Title**, **Subtitle**, **Content** (rich text)
+- **Order** and **Active** toggle
+
+Admins can create, edit, and reorder page sections. Sections are referenced by their key in the templates, so adding a new section requires a developer to wire it into the template.
+
+### 9.14 Contact Messages
+
+When a visitor submits the contact form on the public site, the message is stored as a Contact Message and all admins are notified.
+
+Admins can:
+- View the list of all contact messages at **CMS → Contact Messages**
+- Open a message to read the full details
+- Delete messages after handling them
+
+There is no reply mechanism within LabTrack — admins should reply via their regular email.
+
+### 9.15 Research Domains & Data Resources
+
+**Research Domains** are the research areas the lab works in (e.g., "Robotics", "Computer Vision"). They appear on the public Projects page and can be associated with Public Projects and team members.
+
+**Data Resources** are publications, datasets, software, and tools displayed on the public Data page.
+
+Both are managed by admins from their respective CMS sections.
 
 ---
 
@@ -860,7 +1003,7 @@ Click the bell (or navigate to `/notifications/`) to open your notification inbo
 Each notification shows:
 - A description of the event
 - The time it was created (relative, e.g., "3 hours ago")
-- A link to the related object (e.g., the borrow request, incident, or reservation)
+- A link to the related object (e.g., the reservation, incident, or equipment)
 - A read / unread indicator
 
 **Marking notifications as read:**
@@ -880,19 +1023,15 @@ Email links use the absolute `SITE_URL` configured in the server environment so 
 
 | Event | Who is notified |
 |---|---|
-| New borrow request submitted | All admins |
-| Borrow approved | Borrower |
-| Borrow rejected | Borrower |
-| Borrow overdue | Borrower + all admins |
-| Return submitted (single item) | Equipment owner |
-| Return confirmed (single item) | Borrower |
-| Kit item return submitted | Each equipment owner in the kit |
-| Kit item confirmed (all done) | Borrower |
-| Reservation created (confirmed) | Equipment / kit owner |
-| Reservation confirmed | Requester |
+| New reservation created | Equipment / kit owner |
+| Reservation starts today | Requester + owner |
+| Reservation period ended | Requester + owner |
 | Reservation cancelled | Requester; next person on waitlist (if any) |
-| Reservation return submitted | Equipment / kit owner |
-| Reservation return confirmed | Requester |
+| Return submitted | Equipment / kit owner |
+| Return confirmed | Requester |
+| Reservation expired | (No direct notification; logged to activity) |
+| Equipment registered (pending) | All admins |
+| Equipment approved | Registering member |
 | Incident reported | Equipment owner |
 | Incident assigned to you | Assignee |
 | Incident resolved | Reporter |
@@ -901,6 +1040,12 @@ Email links use the absolute `SITE_URL` configured in the server environment so 
 | P-Card deletion requested | All admins |
 | P-Card deletion approved | Requester |
 | P-Card deletion rejected | Requester |
+| User registered (pending approval) | All admins |
+| User activated | The user |
+| User deactivated | The user |
+| User role changed | The user |
+| Contact message received | All admins |
+| CMS content created/updated/deleted | All admins |
 
 ---
 
@@ -910,7 +1055,7 @@ The activity log at `/activity/` is an immutable audit trail of every significan
 
 Each entry records:
 - **Actor** — the user who performed the action
-- **Action type** — e.g., BORROW_CREATED, EQUIPMENT_UPDATED, INCIDENT_REPORTED
+- **Action type** — e.g., RESERVATION_CREATED, EQUIPMENT_UPDATED, INCIDENT_REPORTED, CMS_UPDATED
 - **Description** — human-readable summary of what happened
 - **Timestamp** — exact date and time
 
@@ -922,9 +1067,10 @@ The activity log is read-only — entries cannot be edited. Admins can delete in
 
 Use the activity log to:
 - Investigate who changed a piece of equipment's status
-- Audit borrow and return transactions
+- Audit reservation and return transactions
 - Track user logins and logouts
 - Identify who filed or resolved an incident
+- Review CMS content changes
 
 ---
 
@@ -936,28 +1082,47 @@ After deploying LabTrack for the first time:
 
 1. Run `python manage.py createsuperuser` (or `docker compose exec web python manage.py createsuperuser`) and create an account with your email and a strong password.
 2. Log in to LabTrack.
-3. Go to **Members** (`/accounts/members/`) and confirm your account shows the **Admin** role (superusers are automatically Admin).
+3. Go to **Members** (`/accounts/users/`) and confirm your account shows the **Admin** role (superusers are automatically Admin).
 4. Create **Categories** at `/equipment/categories/create/` (e.g., "Electronics", "Measurement", "Safety").
 5. Create **Locations** at `/equipment/locations/create/` (e.g., "Lab A", "Storage Cabinet 1").
 6. Register your first equipment items.
-7. If email notifications are needed, configure SMTP in `.env` and restart the server.
+7. Set up CMS content (homepage stats, highlights, page sections) for the public site.
+8. If email notifications are needed, configure SMTP in `.env` and restart the server.
 
 ### 12.2 Managing Members
 
-Go to **Members** (`/accounts/members/`) to see all registered users.
+Go to **Members** (`/accounts/users/`) to see all registered users.
 
-The list shows each user's username, email, role, and join date. Click a user to view their full profile, including their borrow history, reservations, and notification preferences.
+The list shows each user's username, email, role, and status. Use the search bar to find users by name, email, or username. Filter by role (Admin / Member) or status (Active / Inactive / Pending).
 
-**Deactivating a user:**
-From the Django back-office (`/backoffice/accounts/customuser/`), find the user and uncheck **Active**. Deactivated users cannot log in. Their existing records are preserved.
+**Creating a user:**
+1. Click **Create User**.
+2. Fill in email, username, password, name, and role.
+3. Click **Save**.
+
+The new user is created as **active** and receives a welcome notification.
+
+**Viewing a user:**
+Click a user's name to see their full profile, recent activity (last 20 actions), and current reservations.
+
+**Editing a user:**
+Click **Edit** on the user detail page to update their identity, profile, and notification preferences.
+
+**Activating / Deactivating:**
+Click **Toggle Active** to flip a user's active status. Deactivating prevents login. Activating sends an approval notification to the user.
+
+**Deleting a user:**
+Click **Delete**. You cannot delete your own account. The action is logged and all admins are notified.
 
 ### 12.3 Assigning Roles
 
-1. Go to **Members** (`/accounts/members/`).
+1. Go to **Members** (`/accounts/users/`).
 2. Click the user's name to open their profile.
-3. Click **Change Role** (admins only).
+3. Click **Change Role**.
 4. Select **Admin** or **Member**.
 5. Click **Save**.
+
+The user is notified of their role change.
 
 > Users with no role assigned cannot access any module. Always assign a role to newly registered users.
 
@@ -965,22 +1130,16 @@ From the Django back-office (`/backoffice/accounts/customuser/`), find the user 
 
 The admin dashboard at `/dashboard/` provides a real-time overview:
 
-- **Stats bar:** total active equipment, active borrows, pending returns, low-stock consumables, open incidents
-- **Overdue Borrows** alert card — click to view the borrow list filtered by status OVERDUE
-- **Low Stock Consumables** alert card — click to go to `/consumables/low-stock/`
-- **Quick actions:** common navigation shortcuts
-- **Equipment by status** chart — doughnut chart of current distribution
-- **Monthly borrow activity** chart — bar chart of the last 6 months
+- **Stats bar:** total active equipment, available equipment, pending equipment approvals, pending returns, open incidents
+- **Overdue Reservations** — reservations whose end date passed without return
+- **System Activity** — last 15 actions across the entire system
 - **Recent Members** — last 5 accounts created
 
 ### 12.5 Admin Panel
 
 The admin panel at `/admin/` is a management hub distinct from the Django back-office.
 
-It shows:
-- **Counts** for every module (users, equipment, borrows, reservations, kits, consumables, incidents, projects, notifications, and activity events)
-- Navigation links to all management areas
-- Recent activity feed
+It shows counts for every module (users, equipment, reservations, kits, incidents, categories, locations, maintenance, calibration, and all CMS content types). Click any card to jump to that module's list view.
 
 ### 12.6 Approving Pending Equipment
 
@@ -998,127 +1157,191 @@ To reject instead:
 
 ### 12.7 Return Queue
 
-The return queue at `/borrowing/returns/` shows all borrow requests awaiting your confirmation as equipment owner. It is split into two sections:
+The return queue shows all reservations with status **RETURN_PENDING** — items that borrowers have submitted for return but owners have not yet confirmed.
 
-**Single Item Returns** — a borrow of individual equipment where you are the owner. Click **Confirm Return** to close the transaction.
+Admins can view all pending returns. Equipment owners see only returns for items they own.
 
-**Kit Item Returns** — individual equipment items inside kit borrows that you own. Each row shows the kit name, borrower, and reported condition. Click **Confirm** to mark your specific items as returned. When all owners in the kit have confirmed, the overall borrow status becomes **RETURNED**.
+To confirm a return:
+1. Open the reservation detail page.
+2. Click **Confirm Return**.
 
-### 12.8 Overdue Borrow Detection
+### 12.8 Scheduled Tasks
 
-Overdue detection is not automatic in real time — it runs via a management command that should be scheduled to run once per day.
+LabTrack relies on two management commands that should be run daily via cron, Celery, or systemd timer:
 
-**Running manually:**
+**`expire_reservations`** — Expires confirmed reservations whose end date has passed.
+
 ```bash
-python manage.py mark_overdue_borrows --dry-run   # preview, no changes
-python manage.py mark_overdue_borrows             # apply
+# Run daily at midnight
+python manage.py expire_reservations
 ```
 
-**With Docker:**
+This transitions `CONFIRMED` reservations with `end_date < today` to `EXPIRED` and frees up the equipment status.
+
+**`check_reservation_notifications`** — Sends start/end notifications and transitions reservation statuses.
+
 ```bash
-docker compose exec web python manage.py mark_overdue_borrows
+# Run daily in the morning
+python manage.py check_reservation_notifications
 ```
 
-**Scheduling on Linux / Raspberry Pi (cron):**
-```cron
-0 1 * * * cd /path/to/LabTrack && python manage.py mark_overdue_borrows >> /var/log/labtrack-overdue.log 2>&1
-```
+This:
+- Transitions `CONFIRMED` reservations starting today to `ACTIVE` and notifies both parties
+- Transitions `ACTIVE` or `CONFIRMED` reservations ending today to `RETURN_PENDING` and notifies both parties
 
-**Scheduling on Windows (Task Scheduler):**
-
-1. Open **Task Scheduler**.
-2. Click **Create Basic Task**.
-3. Name it "LabTrack Overdue Check".
-4. Set the trigger to **Daily** at 01:00.
-5. Set the action to **Start a program**: `python` with arguments `manage.py mark_overdue_borrows` and start in the LabTrack directory.
-
-When the command runs, every borrow with a past due date that is still **APPROVED** or **ACTIVE** is transitioned to **OVERDUE**, and notifications are sent to the borrower and all admins.
+**Docker cron setup:**
+The `docker-compose.yml` includes a `scheduler` service that runs these commands daily at 08:00 America/Chicago time.
 
 ### 12.9 Django Back-Office
 
-The Django back-office is available at `/backoffice/` (not `/admin/` — that path is the LabTrack admin panel described above).
+The Django admin back-office at `/backoffice/` provides direct database access for advanced management.
 
-Use the back-office for:
-- Direct inspection and editing of any database record
-- Bulk actions (e.g., deactivating multiple users at once)
-- Recovery operations (e.g., fixing a corrupted status)
-- Creating records that do not yet have a front-end form
+Configured admin interfaces:
+- **Users** — with inline UserProfile editing, including research domains
+- **User Profiles** — searchable by email, username, department, student ID
+- **Stored Files** — view all database-backed files
+- **Activity Logs** — browse and filter the full audit trail
+- All CMS models (Publications, Blog Posts, News Items, etc.)
 
-Access is restricted to superusers (accounts created with `createsuperuser` or manually set `is_staff=True` and `is_superuser=True` in the database).
+Use the back-office for operations that don't have a dedicated frontend UI, such as:
+- Bulk-editing user profiles
+- Manually adjusting research domain associations
+- Viewing raw database records
+- Managing stored files directly
 
-> The back-office bypasses all application-level validation and signals. Use it carefully. Any status change made through the back-office does not fire notifications or activity log entries unless triggered via the Django admin's `save_model` hook.
+---
+
+## 13. URL Reference
+
+| Path | Description |
+|---|---|
+| `/` | Redirects to `/dashboard/` |
+| `/dashboard/` | Unified dashboard |
+| `/admin/` | LabTrack admin panel (custom management hub) |
+| `/backoffice/` | Django built-in back-office (direct DB access) |
+| `/accounts/login/` | Login page |
+| `/accounts/register/` | Self-registration |
+| `/accounts/profile/` | View own profile |
+| `/accounts/profile/edit/` | Edit profile and notification preferences |
+| `/accounts/users/` | Member list (admin only) |
+| `/equipment/` | Equipment list |
+| `/equipment/create/` | Register new equipment |
+| `/reservations/` | Reservation list |
+| `/reservations/create/` | Create a reservation |
+| `/reservations/calendar/` | Calendar view of all reservations |
+| `/kits/` | Kit list |
+| `/incidents/` | Incident list |
+| `/notifications/` | Notification inbox |
+| `/activity/` | Activity log (admins see all; members see own) |
+| `/activity/mine/` | Personal activity log |
+| `/pcard/` | P-Card transaction list |
+| `/pcard/create/` | Record a new purchase |
+| `/pcard/export/excel/` | Export transactions to Excel |
+| `/pcard/export/pdf/` | Compile receipts to PDF |
+| `/pcard/deletion-requests/` | Deletion request queue (admin only) |
+| `/admin/cms/` | CMS dashboard |
+| `/admin/cms/publications/` | CMS publications list |
+| `/admin/cms/blog-posts/` | CMS blog posts list |
+| `/admin/cms/news-items/` | CMS news items list |
+| `/admin/cms/public-projects/` | CMS public projects list |
+| `/admin/cms/homepage-highlights/` | CMS homepage highlights |
+| `/admin/cms/homepage-stats/` | CMS homepage stats |
+| `/admin/cms/job-openings/` | CMS job openings |
+| `/admin/cms/sponsors/` | CMS sponsors |
+| `/admin/cms/alumni/` | CMS alumni |
+| `/admin/cms/page-sections/` | CMS page sections |
+| `/admin/cms/contact-messages/` | CMS contact messages |
+| `/about/` | Public about page |
+| `/projects/` | Public projects page |
+| `/publications/` | Public publications list |
+| `/blog/` | Public blog list |
+| `/news/` | Public news list |
+| `/team/` | Public team page |
+| `/alumni/` | Public alumni page |
+| `/data/` | Public data/resources page |
+| `/jobs/` | Public job openings page |
+| `/sponsors/` | Public sponsors page |
+| `/contact/` | Public contact page |
 
 ---
 
-## 13. P-Card Purchase Tracking
+## 14. Troubleshooting
 
-The P-Card module tracks lab purchase transactions made with a procurement card. Each transaction records the date, total amount, itemized line items, notes, and an uploaded receipt.
+### Cannot log in after registering
 
-### 13.1 Recording a Transaction
+Self-registered accounts are created as **inactive**. Contact an administrator to activate your account and assign a role. You will see "Your account is pending admin approval" on the login page until then.
 
-1. Navigate to **P-Card** (`/pcard/`) and click **Record Purchase**.
-2. Fill in:
-   - **Transaction date** — date the purchase was made
-   - **Total price** — overall amount (the sum of line items should match)
-   - **Notes** (optional) — vendor name, justification, etc.
-   - **Receipt** — upload a receipt image (JPEG/PNG) or PDF. The file is stored in the database as a binary blob.
-3. Add itemized lines:
-   - Click **Add Item** to create a line.
-   - Enter **Name**, **Description**, **Quantity**, and **Unit Price** for each item.
-   - Click **Remove** to delete a line if needed.
-4. Click **Save Transaction**.
+### Equipment does not appear in the list
 
-The transaction is saved immediately and visible to all members.
+- Check that the equipment is **Approved** (not Pending).
+- Check that the equipment is **Active** (not Retired).
+- Admins see all equipment; members see only Approved equipment plus their own Pending items.
 
-### 13.2 Viewing Transactions
+### Reservation overlap error
 
-The P-Card list page (`/pcard/`) shows all transactions in reverse chronological order.
+The item is already reserved or active for part of your requested date range. Use the calendar view (`/reservations/calendar/`) to check availability, or join the waitlist.
 
-**Filtering:**
-- **Date range** — filter from/to specific dates
-- **Search** — search across notes and item names/descriptions
+### Email notifications not being sent
 
-Each row shows the transaction date, total price, item count, and creator. Click any row to view the full detail page, including the itemized breakdown and receipt preview.
+**Step 1** — Check which email backend is active:
 
-### 13.3 Editing a Transaction
+```bash
+docker compose exec web python -c "from django.conf import settings; print(settings.EMAIL_BACKEND)"
+```
 
-Only the creator of a transaction or an admin can edit it.
+If it prints `...console.EmailBackend`, then `EMAIL_HOST_USER` or `EMAIL_HOST_PASSWORD` is missing. Set both in `.env` and restart.
 
-1. Open the transaction detail page.
-2. Click **Edit**.
-3. Update any fields or add/remove item lines.
-4. Click **Save Changes**.
+**Step 2** — Test delivery directly:
 
-If you upload a new receipt, it replaces the previous one. The old receipt is permanently deleted.
+```bash
+docker compose exec web python manage.py shell -c "
+from django.core.mail import send_mail
+send_mail('Test', 'Hello', None, ['you@example.com'])
+print('OK')
+"
+```
 
-### 13.4 Deleting a Transaction
+**Step 3** — Check the user's notification preferences. They may have disabled email globally or for a specific category.
 
-**Admins** can delete a transaction immediately.
+### Static files return 404
 
-**Members** must request deletion, which requires admin approval:
+```bash
+docker compose exec web python manage.py collectstatic --noinput
+docker compose restart nginx
+```
 
-1. Open the transaction detail page.
-2. Click **Request Deletion**.
-3. Enter an optional reason.
-4. Click **Submit Request**.
+### Web container exits immediately
 
-The request goes into a pending queue. An admin reviews it at **P-Card → Deletion Requests** (`/pcard/deletion-requests/`):
-- **Approve** — the transaction is deleted and the requester is notified.
-- **Reject** — the transaction is preserved and the requester is notified with the reason.
+```bash
+docker compose logs web
+```
 
-Deletion request history is preserved for audit purposes even after the transaction is removed.
+Common causes:
+- `DB_HOST` is set but MySQL hasn't finished starting — wait a few seconds and restart: `docker compose restart web`.
+- Mismatched `DB_PASSWORD` (or `MYSQL_ROOT_PASSWORD`) between `.env` and the `db` service.
+- When using `docker-compose.mysql.yml`, the `db` healthcheck must pass before `web` starts — check `docker compose ps` to confirm `db` is healthy.
 
-### 13.5 Exporting Data
+### CSRF verification failed in production
 
-Two export formats are available from the P-Card list page. Both respect the current active filters (date range and search).
+Ensure `ALLOWED_HOSTS` includes your actual domain and that the `Host` header is forwarded correctly from Nginx. The provided `nginx/nginx.conf` already sets `proxy_set_header Host $host` for this purpose.
 
-**Excel Export (`/pcard/export/excel/`):**
-- **Transactions sheet** — one row per transaction with ID, date, total, item count, notes, creator, and created timestamp.
-- **Items sheet** — one row per item line with transaction ID, date, item name, description, quantity, unit price, and line total.
+### Full development reset
 
-**PDF Receipt Export (`/pcard/export/pdf/`):**
-- Compiles all receipt images and PDFs from the filtered transactions into a single multi-page PDF.
-- Each receipt is fitted to a full letter-sized page.
-- If no receipts are found, a single-page placeholder PDF is returned.
+```bash
+# Self-contained MySQL setup
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml down -v
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.mysql.yml exec web python manage.py createsuperuser
 
----
+# External MySQL setup
+docker compose down -v
+docker compose up -d
+docker compose exec web python manage.py createsuperuser
+```
+
+### Container status
+
+```bash
+docker compose ps
+docker compose logs --tail=50 web
+```
