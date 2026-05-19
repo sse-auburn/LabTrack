@@ -50,7 +50,7 @@ def cms_dashboard_view(request):
             'alumni': models.Alumni.objects.count(),
         }
     }
-    return render(request, 'public/cms/dashboard.html', context)
+    return render(request, 'cms/dashboard.html', context)
 
 
 # ── Research Domain CRUD ─────────────────────────────────────────────────────
@@ -61,7 +61,7 @@ def researchdomain_list_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     items = models.ResearchDomain.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Research Domain',
         'model_name_plural': 'Research Domains',
@@ -98,7 +98,7 @@ def researchdomain_create_view(request):
         )
         messages.success(request, 'Research domain created.')
         return redirect('public_cms:cms_researchdomain_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Research Domain',
         'list_url': 'public_cms:cms_researchdomain_list',
@@ -132,7 +132,7 @@ def researchdomain_edit_view(request, pk):
         )
         messages.success(request, 'Research domain updated.')
         return redirect('public_cms:cms_researchdomain_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Research Domain',
         'list_url': 'public_cms:cms_researchdomain_list',
@@ -168,7 +168,7 @@ def researchdomain_delete_view(request, pk):
         )
         messages.success(request, 'Research domain deleted.')
         return redirect('public_cms:cms_researchdomain_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Research Domain',
         'list_url': 'public_cms:cms_researchdomain_list',
@@ -183,7 +183,7 @@ def publication_list_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     items = models.Publication.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Publication',
         'model_name_plural': 'Publications',
@@ -220,7 +220,7 @@ def publication_create_view(request):
         )
         messages.success(request, 'Publication created.')
         return redirect('public_cms:cms_publication_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Publication',
         'list_url': 'public_cms:cms_publication_list',
@@ -254,7 +254,7 @@ def publication_edit_view(request, pk):
         )
         messages.success(request, 'Publication updated.')
         return redirect('public_cms:cms_publication_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Publication',
         'list_url': 'public_cms:cms_publication_list',
@@ -290,7 +290,7 @@ def publication_delete_view(request, pk):
         )
         messages.success(request, 'Publication deleted.')
         return redirect('public_cms:cms_publication_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Publication',
         'list_url': 'public_cms:cms_publication_list',
@@ -356,7 +356,7 @@ def publication_fetch_doi_view(request, pk):
 @login_required
 def blogpost_list_view(request):
     items = models.BlogPost.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Blog Post',
         'model_name_plural': 'Blog Posts',
@@ -392,7 +392,7 @@ def blogpost_create_view(request):
         )
         messages.success(request, 'Blog post created.')
         return redirect('public_cms:cms_blogpost_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Blog Post',
         'list_url': 'public_cms:cms_blogpost_list',
@@ -427,7 +427,7 @@ def blogpost_edit_view(request, pk):
         )
         messages.success(request, 'Blog post updated.')
         return redirect('public_cms:cms_blogpost_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Blog Post',
         'list_url': 'public_cms:cms_blogpost_list',
@@ -463,7 +463,7 @@ def blogpost_delete_view(request, pk):
         )
         messages.success(request, 'Blog post deleted.')
         return redirect('public_cms:cms_blogpost_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Blog Post',
         'list_url': 'public_cms:cms_blogpost_list',
@@ -478,7 +478,7 @@ def newsitem_list_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     items = models.NewsItem.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'News Item',
         'model_name_plural': 'News Items',
@@ -515,7 +515,7 @@ def newsitem_create_view(request):
         )
         messages.success(request, 'News item created.')
         return redirect('public_cms:cms_newsitem_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'News Item',
         'list_url': 'public_cms:cms_newsitem_list',
@@ -549,7 +549,7 @@ def newsitem_edit_view(request, pk):
         )
         messages.success(request, 'News item updated.')
         return redirect('public_cms:cms_newsitem_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'News Item',
         'list_url': 'public_cms:cms_newsitem_list',
@@ -585,7 +585,7 @@ def newsitem_delete_view(request, pk):
         )
         messages.success(request, 'News item deleted.')
         return redirect('public_cms:cms_newsitem_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'News Item',
         'list_url': 'public_cms:cms_newsitem_list',
@@ -597,7 +597,7 @@ def newsitem_delete_view(request, pk):
 @login_required
 def publicproject_list_view(request):
     items = models.PublicProject.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Public Project',
         'model_name_plural': 'Public Projects',
@@ -631,7 +631,7 @@ def publicproject_create_view(request):
         )
         messages.success(request, 'Project created.')
         return redirect('public_cms:cms_publicproject_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Public Project',
         'list_url': 'public_cms:cms_publicproject_list',
@@ -662,7 +662,7 @@ def publicproject_edit_view(request, pk):
         )
         messages.success(request, 'Project updated.')
         return redirect('public_cms:cms_publicproject_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Public Project',
         'list_url': 'public_cms:cms_publicproject_list',
@@ -695,7 +695,7 @@ def publicproject_delete_view(request, pk):
         )
         messages.success(request, 'Project deleted.')
         return redirect('public_cms:cms_publicproject_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Public Project',
         'list_url': 'public_cms:cms_publicproject_list',
@@ -710,7 +710,7 @@ def homepagetat_list_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     items = models.HomepageStat.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Homepage Stat',
         'model_name_plural': 'Homepage Stats',
@@ -747,7 +747,7 @@ def homepagestat_create_view(request):
         )
         messages.success(request, 'Homepage stat created.')
         return redirect('public_cms:cms_homepagestat_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Homepage Stat',
         'list_url': 'public_cms:cms_homepagestat_list',
@@ -781,7 +781,7 @@ def homepagestat_edit_view(request, pk):
         )
         messages.success(request, 'Homepage stat updated.')
         return redirect('public_cms:cms_homepagestat_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Homepage Stat',
         'list_url': 'public_cms:cms_homepagestat_list',
@@ -817,7 +817,7 @@ def homepagestat_delete_view(request, pk):
         )
         messages.success(request, 'Homepage stat deleted.')
         return redirect('public_cms:cms_homepagestat_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Homepage Stat',
         'list_url': 'public_cms:cms_homepagestat_list',
@@ -832,7 +832,7 @@ def homepagehighlight_list_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     items = models.HomepageHighlight.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Homepage Highlight',
         'model_name_plural': 'Homepage Highlights',
@@ -873,7 +873,7 @@ def homepagehighlight_create_view(request):
         )
         messages.success(request, 'Homepage highlight created.')
         return redirect('public_cms:cms_homepagehighlight_list')
-    return render(request, 'public/cms/highlight_form.html', {
+    return render(request, 'cms/highlight_form.html', {
         'form': form,
         'model_name': 'Homepage Highlight',
         'list_url': 'public_cms:cms_homepagehighlight_list',
@@ -907,7 +907,7 @@ def homepagehighlight_edit_view(request, pk):
         )
         messages.success(request, 'Homepage highlight updated.')
         return redirect('public_cms:cms_homepagehighlight_list')
-    return render(request, 'public/cms/highlight_form.html', {
+    return render(request, 'cms/highlight_form.html', {
         'form': form,
         'model_name': 'Homepage Highlight',
         'list_url': 'public_cms:cms_homepagehighlight_list',
@@ -943,7 +943,7 @@ def homepagehighlight_delete_view(request, pk):
         )
         messages.success(request, 'Homepage highlight deleted.')
         return redirect('public_cms:cms_homepagehighlight_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Homepage Highlight',
         'list_url': 'public_cms:cms_homepagehighlight_list',
@@ -1001,7 +1001,7 @@ def aboutpage_edit_view(request):
         )
         messages.success(request, 'About page updated.')
         return redirect('public_cms:cms_aboutpage_edit')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'About Page',
         'list_url': 'public_cms:dashboard',
@@ -1016,7 +1016,7 @@ def dataresource_list_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     items = models.DataResource.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Data Resource',
         'model_name_plural': 'Data Resources',
@@ -1053,7 +1053,7 @@ def dataresource_create_view(request):
         )
         messages.success(request, 'Data resource created.')
         return redirect('public_cms:cms_dataresource_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Data Resource',
         'list_url': 'public_cms:cms_dataresource_list',
@@ -1087,7 +1087,7 @@ def dataresource_edit_view(request, pk):
         )
         messages.success(request, 'Data resource updated.')
         return redirect('public_cms:cms_dataresource_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Data Resource',
         'list_url': 'public_cms:cms_dataresource_list',
@@ -1123,7 +1123,7 @@ def dataresource_delete_view(request, pk):
         )
         messages.success(request, 'Data resource deleted.')
         return redirect('public_cms:cms_dataresource_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Data Resource',
         'list_url': 'public_cms:cms_dataresource_list',
@@ -1138,7 +1138,7 @@ def jobopening_list_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     items = models.JobOpening.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Job Opening',
         'model_name_plural': 'Job Openings',
@@ -1175,7 +1175,7 @@ def jobopening_create_view(request):
         )
         messages.success(request, 'Job opening created.')
         return redirect('public_cms:cms_jobopening_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Job Opening',
         'list_url': 'public_cms:cms_jobopening_list',
@@ -1209,7 +1209,7 @@ def jobopening_edit_view(request, pk):
         )
         messages.success(request, 'Job opening updated.')
         return redirect('public_cms:cms_jobopening_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Job Opening',
         'list_url': 'public_cms:cms_jobopening_list',
@@ -1245,7 +1245,7 @@ def jobopening_delete_view(request, pk):
         )
         messages.success(request, 'Job opening deleted.')
         return redirect('public_cms:cms_jobopening_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Job Opening',
         'list_url': 'public_cms:cms_jobopening_list',
@@ -1260,7 +1260,7 @@ def sponsor_list_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     items = models.Sponsor.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Sponsor',
         'model_name_plural': 'Sponsors',
@@ -1297,7 +1297,7 @@ def sponsor_create_view(request):
         )
         messages.success(request, 'Sponsor created.')
         return redirect('public_cms:cms_sponsor_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Sponsor',
         'list_url': 'public_cms:cms_sponsor_list',
@@ -1331,7 +1331,7 @@ def sponsor_edit_view(request, pk):
         )
         messages.success(request, 'Sponsor updated.')
         return redirect('public_cms:cms_sponsor_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Sponsor',
         'list_url': 'public_cms:cms_sponsor_list',
@@ -1367,7 +1367,7 @@ def sponsor_delete_view(request, pk):
         )
         messages.success(request, 'Sponsor deleted.')
         return redirect('public_cms:cms_sponsor_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Sponsor',
         'list_url': 'public_cms:cms_sponsor_list',
@@ -1382,7 +1382,7 @@ def contactblock_list_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     items = models.ContactBlock.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Contact Block',
         'model_name_plural': 'Contact Blocks',
@@ -1419,7 +1419,7 @@ def contactblock_create_view(request):
         )
         messages.success(request, 'Contact block created.')
         return redirect('public_cms:cms_contactblock_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Contact Block',
         'list_url': 'public_cms:cms_contactblock_list',
@@ -1453,7 +1453,7 @@ def contactblock_edit_view(request, pk):
         )
         messages.success(request, 'Contact block updated.')
         return redirect('public_cms:cms_contactblock_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Contact Block',
         'list_url': 'public_cms:cms_contactblock_list',
@@ -1489,7 +1489,7 @@ def contactblock_delete_view(request, pk):
         )
         messages.success(request, 'Contact block deleted.')
         return redirect('public_cms:cms_contactblock_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Contact Block',
         'list_url': 'public_cms:cms_contactblock_list',
@@ -1504,7 +1504,7 @@ def pagesection_list_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     items = models.PageSection.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Page Section',
         'model_name_plural': 'Page Sections',
@@ -1541,7 +1541,7 @@ def pagesection_create_view(request):
         )
         messages.success(request, 'Page section created.')
         return redirect('public_cms:cms_pagesection_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Page Section',
         'list_url': 'public_cms:cms_pagesection_list',
@@ -1575,7 +1575,7 @@ def pagesection_edit_view(request, pk):
         )
         messages.success(request, 'Page section updated.')
         return redirect('public_cms:cms_pagesection_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Page Section',
         'list_url': 'public_cms:cms_pagesection_list',
@@ -1611,7 +1611,7 @@ def pagesection_delete_view(request, pk):
         )
         messages.success(request, 'Page section deleted.')
         return redirect('public_cms:cms_pagesection_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Page Section',
         'list_url': 'public_cms:cms_pagesection_list',
@@ -1626,7 +1626,7 @@ def contactmessage_list_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     items = models.ContactMessage.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Contact Message',
         'model_name_plural': 'Contact Messages',
@@ -1642,7 +1642,7 @@ def contactmessage_detail_view(request, pk):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     item = get_object_or_404(models.ContactMessage, pk=pk)
-    return render(request, 'public/cms/detail.html', {
+    return render(request, 'cms/detail.html', {
         'item': item,
         'model_name': 'Contact Message',
         'list_url': 'public_cms:cms_contactmessage_list',
@@ -1685,7 +1685,7 @@ def contactmessage_delete_view(request, pk):
         )
         messages.success(request, 'Contact message deleted.')
         return redirect('public_cms:cms_contactmessage_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Contact Message',
         'list_url': 'public_cms:cms_contactmessage_list',
@@ -1700,7 +1700,7 @@ def alumni_list_view(request):
         messages.error(request, 'Admin access required.')
         return redirect('dashboard:home')
     items = models.Alumni.objects.all()
-    return render(request, 'public/cms/list.html', {
+    return render(request, 'cms/list.html', {
         'items': items,
         'model_name': 'Alumnus',
         'model_name_plural': 'Alumni',
@@ -1737,7 +1737,7 @@ def alumni_create_view(request):
         )
         messages.success(request, 'Alumnus created.')
         return redirect('public_cms:cms_alumni_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Alumnus',
         'list_url': 'public_cms:cms_alumni_list',
@@ -1771,7 +1771,7 @@ def alumni_edit_view(request, pk):
         )
         messages.success(request, 'Alumnus updated.')
         return redirect('public_cms:cms_alumni_list')
-    return render(request, 'public/cms/form.html', {
+    return render(request, 'cms/form.html', {
         'form': form,
         'model_name': 'Alumnus',
         'list_url': 'public_cms:cms_alumni_list',
@@ -1807,7 +1807,7 @@ def alumni_delete_view(request, pk):
         )
         messages.success(request, 'Alumnus deleted.')
         return redirect('public_cms:cms_alumni_list')
-    return render(request, 'public/cms/confirm_delete.html', {
+    return render(request, 'cms/confirm_delete.html', {
         'item': item,
         'model_name': 'Alumnus',
         'list_url': 'public_cms:cms_alumni_list',
