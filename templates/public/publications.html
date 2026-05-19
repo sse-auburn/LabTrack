@@ -1,0 +1,59 @@
+{% extends 'public/base.html' %}
+
+{% block title %}Publications{% endblock %}
+
+{% block content %}
+<section class="py-20 bg-white">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-4xl font-bold text-auburn-blue mb-4">Publications</h1>
+    <p class="text-lg text-slate-600 mb-8">Peer-reviewed journal articles, conference proceedings, and other scholarly works from our lab.</p>
+
+    <!-- Year filter -->
+    {% if years %}
+    <div class="flex flex-wrap gap-2 mb-8">
+      <a href="{% url 'public:publications' %}" class="px-3 py-1 rounded-full text-sm font-medium {% if not selected_year %}bg-auburn-orange text-white{% else %}bg-slate-100 text-slate-700 hover:bg-auburn-bluePale{% endif %} transition">All</a>
+      {% for year in years %}
+        <a href="?year={{ year }}" class="px-3 py-1 rounded-full text-sm font-medium {% if selected_year == year|stringformat:'s' %}bg-auburn-orange text-white{% else %}bg-slate-100 text-slate-700 hover:bg-auburn-bluePale{% endif %} transition">{{ year }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if publications %}
+      <div class="space-y-6">
+        {% for pub in publications %}
+        <div class="p-6 rounded-xl border border-slate-200 bg-white hover:shadow-md transition">
+          <h3 class="text-lg font-bold text-auburn-blue mb-2">
+            {% if pub.url %}
+              <a href="{{ pub.url }}" target="_blank" class="hover:underline">{{ pub.title }}</a>
+            {% else %}
+              {{ pub.title }}
+            {% endif %}
+          </h3>
+          <p class="text-sm text-slate-600 mb-1">{{ pub.authors }}</p>
+          <p class="text-sm text-slate-500 mb-3">
+            <em>{{ pub.journal }}</em>
+            {% if pub.volume %}<strong>{{ pub.volume }}</strong>{% endif %}
+            {% if pub.issue %}({{ pub.issue }}){% endif %}
+            {% if pub.pages %}, {{ pub.pages }}{% endif %}
+            {% if pub.year %} — {{ pub.year }}{% endif %}
+          </p>
+          {% if pub.doi %}
+            <p class="text-xs text-slate-400 mb-2">DOI: {{ pub.doi }}</p>
+          {% endif %}
+          <div class="flex gap-3">
+            {% if pub.url %}
+              <a href="{{ pub.url }}" target="_blank" class="text-auburn-orange text-sm font-medium hover:underline">View Online</a>
+            {% endif %}
+            {% if pub.pdf_file %}
+              <a href="{{ pub.pdf_file.url }}" class="text-auburn-blue text-sm font-medium hover:underline">Download PDF</a>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-slate-500">No publications listed yet.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

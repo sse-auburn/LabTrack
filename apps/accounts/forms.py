@@ -119,15 +119,19 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = (
-            'phone', 'department', 'student_id', 'bio', 'avatar',
+            'position', 'phone', 'department', 'student_id', 'bio', 'avatar',
+            'google_scholar', 'linkedin', 'github', 'personal_website',
             'in_app_notifications', 'email_notifications',
             'notify_borrowing', 'notify_reservations', 'notify_incidents',
             'notify_equipment', 'notify_kits', 'notify_projects', 'notify_system',
         )
         widgets = {
+            'position': forms.Select(attrs={
+                'class': 'form-select',
+            }),
             'phone': forms.TextInput(attrs={
                 'class': 'form-input',
-                'placeholder': '+880 1xxx-xxxxxx',
+                'placeholder': '+1 (555) 000-0000',
             }),
             'department': forms.TextInput(attrs={
                 'class': 'form-input',
@@ -146,6 +150,22 @@ class ProfileUpdateForm(forms.ModelForm):
                 'class': 'form-file-input',
                 'accept': 'image/*',
             }),
+            'google_scholar': forms.URLInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'https://scholar.google.com/citations?user=...',
+            }),
+            'linkedin': forms.URLInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'https://linkedin.com/in/...',
+            }),
+            'github': forms.URLInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'https://github.com/...',
+            }),
+            'personal_website': forms.URLInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'https://...',
+            }),
         }
 
 
@@ -154,7 +174,7 @@ class UserUpdateForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'username')
+        fields = ('first_name', 'last_name', 'username', 'email')
         widgets = {
             'first_name': forms.TextInput(attrs={
                 'class': 'form-input',
@@ -163,6 +183,10 @@ class UserUpdateForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={
                 'class': 'form-input',
                 'placeholder': 'Last name',
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'email@auburn.edu',
             }),
             'username': forms.TextInput(attrs={
                 'class': 'form-input',

@@ -1,0 +1,35 @@
+{% extends 'public/base.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<section class="py-20 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <a href="{% url 'public:blog' %}" class="inline-flex items-center text-auburn-orange text-sm font-medium mb-6 hover:underline">
+      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+
+    {% if post.featured_image %}
+      <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-72 object-cover rounded-xl mb-8">
+    {% endif %}
+
+    <h1 class="text-3xl sm:text-4xl font-bold text-auburn-blue mb-4">{{ post.title }}</h1>
+    <p class="text-sm text-slate-500 mb-8">
+      By {{ post.author.full_name }} on {{ post.published_at|date:"F j, Y" }}
+    </p>
+
+    <div class="prose prose-lg prose-slate max-w-none text-slate-700">
+      {{ post.content|safe }}
+    </div>
+
+    {% if post.tags %}
+      <div class="mt-8 pt-6 border-t border-slate-200 flex flex-wrap gap-2">
+        {% for t in post.tags.split %}
+          <a href="{% url 'public:blog' %}?tag={{ t|cut:',' }}" class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-sm hover:bg-auburn-bluePale hover:text-auburn-blue transition">{{ t|cut:',' }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

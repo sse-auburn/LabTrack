@@ -1,0 +1,77 @@
+{% extends 'public/base.html' %}
+
+{% block title %}Data{% endblock %}
+
+{% block content %}
+<section class="py-20 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-4xl font-bold text-auburn-blue mb-8">{{ page_sections.intro.title|default:"Data & Publications" }}</h1>
+    <div class="text-lg text-slate-600 leading-relaxed mb-12">
+      {{ page_sections.intro.content|default:"<p>We are committed to open science. Below you can find datasets, publications, and software tools developed by our lab.</p>"|safe }}
+    </div>
+
+    {% if resources %}
+      <div class="grid md:grid-cols-2 gap-6">
+        {% for resource in resources %}
+        <div class="p-6 rounded-xl border border-slate-200 bg-auburn-bluePale/30 hover:shadow-md transition">
+          <div class="w-10 h-10 rounded-lg bg-auburn-blue flex items-center justify-center mb-4">
+            {% if resource.resource_type == 'PUBLICATION' %}
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            {% elif resource.resource_type == 'DATASET' %}
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+            {% elif resource.resource_type == 'SOFTWARE' %}
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            {% else %}
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            {% endif %}
+          </div>
+          <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ resource.title }}</h3>
+          {% if resource.description %}<div class="text-slate-600 text-sm mb-3">{{ resource.description|safe }}</div>{% endif %}
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 rounded bg-white text-auburn-blue text-xs font-medium border border-auburn-blue/20">{{ resource.get_resource_type_display }}</span>
+            {% if resource.external_link %}
+              <a href="{{ resource.external_link }}" target="_blank" class="px-2 py-1 rounded bg-auburn-orange text-white text-xs font-medium hover:bg-auburn-orangeDark transition">View</a>
+            {% endif %}
+            {% if resource.file %}
+              <a href="{{ resource.file.url }}" class="px-2 py-1 rounded bg-auburn-blue text-white text-xs font-medium hover:bg-auburn-blueLight transition">Download</a>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <!-- Default placeholder resources -->
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="p-6 rounded-xl border border-slate-200 bg-auburn-bluePale/30">
+          <div class="w-10 h-10 rounded-lg bg-auburn-blue flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-auburn-blue mb-2">Publications</h3>
+          <p class="text-slate-600 text-sm">Peer-reviewed journal articles and conference proceedings from our research.</p>
+        </div>
+        <div class="p-6 rounded-xl border border-slate-200 bg-auburn-bluePale/30">
+          <div class="w-10 h-10 rounded-lg bg-auburn-blue flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-auburn-blue mb-2">Datasets</h3>
+          <p class="text-slate-600 text-sm">Curated datasets from our experiments available for download.</p>
+        </div>
+        <div class="p-6 rounded-xl border border-slate-200 bg-auburn-bluePale/30">
+          <div class="w-10 h-10 rounded-lg bg-auburn-blue flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-auburn-blue mb-2">Software & Tools</h3>
+          <p class="text-slate-600 text-sm">Open-source code repositories and software tools developed by the lab.</p>
+        </div>
+        <div class="p-6 rounded-xl border border-slate-200 bg-auburn-bluePale/30">
+          <div class="w-10 h-10 rounded-lg bg-auburn-blue flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-auburn-blue mb-2">LabTrack System</h3>
+          <p class="text-slate-600 text-sm">Our internal lab inventory and reservation management system.</p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

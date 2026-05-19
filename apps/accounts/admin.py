@@ -9,6 +9,7 @@ class UserProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Profile'
     fk_name = 'user'
+    filter_horizontal = ('research_domains',)
 
 
 @admin.register(CustomUser)
@@ -39,6 +40,8 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'phone', 'department', 'student_id', 'created_at')
+    list_display = ('user', 'position', 'phone', 'department', 'student_id', 'created_at')
+    list_filter = ('position',)
     search_fields = ('user__email', 'user__username', 'department', 'student_id')
     raw_id_fields = ('user',)
+    filter_horizontal = ('research_domains',)

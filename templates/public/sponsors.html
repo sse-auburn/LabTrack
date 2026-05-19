@@ -1,0 +1,75 @@
+{% extends 'public/base.html' %}
+
+{% block title %}Lab Sponsors{% endblock %}
+
+{% block content %}
+<section class="py-20 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-4xl font-bold text-auburn-blue mb-8">Lab Sponsors & Partners</h1>
+    <p class="text-lg text-slate-600 leading-relaxed mb-12">
+      Our research is made possible through the generous support of federal agencies,
+      industry partners, and philanthropic organizations.
+    </p>
+
+    {% if sponsors %}
+      <div class="grid md:grid-cols-2 gap-6 mb-12">
+        {% for sponsor in sponsors %}
+        <div class="p-6 rounded-xl border border-slate-200 bg-white text-center hover:shadow-md transition">
+          {% if sponsor.logo %}
+            <img src="{{ sponsor.logo.url }}" alt="{{ sponsor.name }}" class="h-16 mx-auto mb-4 object-contain">
+          {% else %}
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-auburn-bluePale flex items-center justify-center">
+              <span class="text-auburn-blue font-bold text-lg">{{ sponsor.name|first }}</span>
+            </div>
+          {% endif %}
+          <h3 class="font-bold text-auburn-blue mb-1">{{ sponsor.name }}</h3>
+          {% if sponsor.description %}<div class="text-sm text-slate-500 mb-2">{{ sponsor.description|safe }}</div>{% endif %}
+          {% if sponsor.website_link %}
+            <a href="{{ sponsor.website_link }}" target="_blank" class="text-auburn-orange text-sm font-medium hover:underline">Visit website</a>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <!-- Default placeholder sponsors -->
+      <div class="grid md:grid-cols-2 gap-6 mb-12">
+        <div class="p-6 rounded-xl border border-slate-200 bg-white text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-auburn-bluePale flex items-center justify-center">
+            <span class="text-auburn-blue font-bold text-lg">NSF</span>
+          </div>
+          <h3 class="font-bold text-auburn-blue mb-1">National Science Foundation</h3>
+          <p class="text-sm text-slate-500">Federal research funding</p>
+        </div>
+        <div class="p-6 rounded-xl border border-slate-200 bg-white text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-auburn-bluePale flex items-center justify-center">
+            <span class="text-auburn-blue font-bold text-lg">USDA</span>
+          </div>
+          <h3 class="font-bold text-auburn-blue mb-1">USDA NIFA</h3>
+          <p class="text-sm text-slate-500">Agricultural research grants</p>
+        </div>
+        <div class="p-6 rounded-xl border border-slate-200 bg-white text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-auburn-bluePale flex items-center justify-center">
+            <span class="text-auburn-blue font-bold text-lg">AU</span>
+          </div>
+          <h3 class="font-bold text-auburn-blue mb-1">Auburn University</h3>
+          <p class="text-sm text-slate-500">Internal research support</p>
+        </div>
+        <div class="p-6 rounded-xl border border-slate-200 bg-white text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-auburn-bluePale flex items-center justify-center">
+            <span class="text-auburn-blue font-bold text-lg">Ag</span>
+          </div>
+          <h3 class="font-bold text-auburn-blue mb-1">Alabama Dept. of Agriculture</h3>
+          <p class="text-sm text-slate-500">State-level funding</p>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="text-center">
+      <p class="text-slate-600 mb-4">Interested in supporting our research?</p>
+      <a href="{% url 'public:contact' %}" class="inline-flex items-center px-6 py-3 rounded-lg bg-auburn-orange text-white font-semibold hover:bg-auburn-orangeDark transition">
+        Contact Us
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

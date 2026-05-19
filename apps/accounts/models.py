@@ -78,6 +78,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 class UserProfile(models.Model):
     """Extended profile information for a CustomUser."""
 
+    POSITION_CHOICES = [
+        ('PI', 'Principal Investigator'),
+        ('POSTDOC', 'Postdoctoral Researcher'),
+        ('PHD', 'Ph.D. Student'),
+        ('MS', 'M.S. Student'),
+        ('UNDERGRAD', 'Undergraduate Student'),
+        ('STAFF', 'Research Staff'),
+        ('VISITOR', 'Visiting Researcher'),
+    ]
+
     user = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,
@@ -88,6 +98,21 @@ class UserProfile(models.Model):
     student_id = models.CharField(max_length=50, blank=True)
     avatar = models.ImageField(upload_to='profiles/', blank=True, null=True)
     bio = models.TextField(blank=True)
+    position = models.CharField(
+        max_length=20,
+        choices=POSITION_CHOICES,
+        blank=True,
+        help_text='Position/role within the lab',
+    )
+    research_domains = models.ManyToManyField(
+        'public.ResearchDomain',
+        blank=True,
+        related_name='members',
+    )
+    google_scholar = models.URLField(blank=True)
+    linkedin = models.URLField(blank=True)
+    github = models.URLField(blank=True)
+    personal_website = models.URLField(blank=True)
 
     # Global notification toggles
     in_app_notifications = models.BooleanField(

@@ -6,12 +6,14 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import redirect, render
 
+from apps.accounts.models import CustomUser
 from apps.activity.models import ActivityLog
-from apps.equipment.models import Equipment
-from apps.incidents.models import IncidentReport
+from apps.equipment.models import Equipment, Category, Location
+from apps.incidents.models import IncidentReport, MaintenanceLog, CalibrationLog
 from apps.kits.models import Kit
 from apps.notifications.models import Notification
 from apps.reservations.models import Reservation
+from apps.public import models as public_models
 
 
 @login_required
@@ -125,4 +127,39 @@ def admin_dashboard_view(request):
 
 @login_required
 def admin_panel_view(request):
-    return redirect('dashboard:home')
+    """Custom admin panel for LabTrack management."""
+    if not request.user.is_admin:
+        messages.error(request, 'Admin access required.')
+        return redirect('dashboard:home')
+
+    counts = {
+        'equipment': Equipment.objects.filter(is_active=True).count(),
+        'users': CustomUser.objects.count(),
+        'borrow_requests': Reservation.objects.count(),
+        'reservations': Reservation.objects.count(),
+        'incidents_open': IncidentReport.objects.filter(status__in=['OPEN', 'INVESTIGATING']).count(),
+        'consumables': 0,
+        'categories': Category.objects.count(),
+        'locations': Location.objects.count(),
+        'kits': Kit.objects.filter(is_active=True).count(),
+        'pending_equipment': Equipment.objects.filter(approval_status='PENDING', is_active=True).count(),
+        'pending_returns': Reservation.objects.filter(status='RETURN_PENDING').count(),
+        'admins': CustomUser.objects.filter(role='ADMIN').count(),
+        'members': CustomUser.objects.filter(role='MEMBER').count(),
+        # CMS counts
+        'publications': public_models.Publication.objects.count(),
+        'blog_posts': public_models.BlogPost.objects.count(),
+        'news_items': public_models.NewsItem.objects.count(),
+        'gallery_items': public_models.GalleryItem.objects.count(),
+        'public_projects': public_models.PublicProject.objects.count(),
+        'research_domains': public_models.ResearchDomain.objects.count(),
+        'job_openings': public_models.JobOpening.objects.count(),
+        'sponsors': public_models.Sponsor.objects.count(),
+        'maintenance': MaintenanceLog.objects.count(),
+        'calibration': CalibrationLog.objects.count(),
+    }
+
+    context = {
+        'counts': counts,
+    }
+    return render(request, 'admin_panel.html', context)

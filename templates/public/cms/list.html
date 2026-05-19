@@ -1,0 +1,110 @@
+{% extends 'public/cms/base.html' %}
+{% load public_extras %}
+
+{% block title %}{{ model_name_plural }}{% endblock %}
+
+{% block cms_content %}
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+  <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-bold text-slate-800">{{ model_name_plural }}</h2>
+      <p class="text-xs text-slate-500 mt-0.5">{{ items|length }} item{{ items|length|pluralize }}</p>
+    </div>
+    {% if create_url %}
+    <a href="{% url create_url %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition shadow-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      Add {{ model_name }}
+    </a>
+    {% endif %}
+  </div>
+
+  {% if items %}
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-slate-50 text-slate-600 font-medium">
+          <tr>
+            {% for field in list_fields %}
+              <th class="px-6 py-3 capitalize">{{ field|replace:"_, " }}</th>
+            {% endfor %}
+            <th class="px-6 py-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for item in items %}
+          <tr class="hover:bg-slate-50 transition">
+            {% for field in list_fields %}
+              <td class="px-6 py-3 text-slate-700">
+                {% if field == 'is_active' or field == 'is_published' or field == 'is_featured' or field == 'is_pinned' %}
+                  {% if item|attr:field %}
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                      Yes
+                    </span>
+                  {% else %}
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
+                      <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                      No
+                    </span>
+                  {% endif %}
+                {% elif field == 'status' %}
+                  {% with status=item|attr:field %}
+                    {% if status == 'ACTIVE' or status == 'OPEN' %}
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium">{{ status }}</span>
+                    {% elif status == 'COMPLETED' or status == 'FILLED' %}
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">{{ status }}</span>
+                    {% else %}
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">{{ status|default:"—" }}</span>
+                    {% endif %}
+                  {% endwith %}
+                {% elif field == 'author' %}
+                  {{ item.author.full_name|default:"—" }}
+                {% elif field == 'published_at' or field == 'created_at' %}
+                  {{ item|attr:field|date:"M j, Y g:i A"|default:"—" }}
+                {% else %}
+                  {{ item|attr:field|default:"—"|truncatechars:60 }}
+                {% endif %}
+              </td>
+            {% endfor %}
+            <td class="px-6 py-3 text-right">
+              <div class="flex items-center justify-end gap-2">
+                {% if detail_url %}
+                <a href="{% url detail_url item.pk %}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-medium text-brand-700 bg-brand-50 hover:bg-brand-100 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  View
+                </a>
+                {% endif %}
+                {% if edit_url %}
+                <a href="{% url edit_url item.pk %}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-medium text-brand-700 bg-brand-50 hover:bg-brand-100 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  Edit
+                </a>
+                {% endif %}
+                {% if delete_url %}
+                <a href="{% url delete_url item.pk %}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  Delete
+                </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="px-6 py-16 text-center">
+      <div class="mx-auto w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+      </div>
+      <p class="text-slate-500 text-sm mb-4">No {{ model_name_plural|lower }} yet.</p>
+      {% if create_url %}
+      <a href="{% url create_url %}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition shadow-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Create first {{ model_name }}
+      </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

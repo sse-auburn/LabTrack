@@ -1,0 +1,34 @@
+{% extends 'public/base.html' %}
+
+{% block title %}Alumni{% endblock %}
+
+{% block content %}
+<section class="py-20 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-4xl font-bold text-auburn-blue mb-4">Alumni</h1>
+    <p class="text-lg text-slate-600 mb-12">Former members of the Smart Systems Engineering.</p>
+
+    {% if alumni %}
+      <div class="space-y-4">
+        {% for member in alumni %}
+        <div class="flex items-center gap-4 p-4 rounded-lg border border-slate-200 bg-white">
+          {% if member.profile.avatar %}
+            <img src="{{ member.profile.avatar.url }}" alt="{{ member.full_name }}" class="w-12 h-12 rounded-full object-cover">
+          {% else %}
+            <div class="w-12 h-12 rounded-full bg-auburn-bluePale flex items-center justify-center">
+              <span class="text-auburn-blue font-bold">{{ member.get_initials }}</span>
+            </div>
+          {% endif %}
+          <div>
+            <h3 class="font-bold text-auburn-blue">{{ member.full_name }}</h3>
+            {% if member.profile.position %}<p class="text-sm text-slate-500">{{ member.profile.get_position_display }}</p>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-slate-500">No alumni listed yet.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

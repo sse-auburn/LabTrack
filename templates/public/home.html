@@ -1,0 +1,245 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative bg-white overflow-hidden">
+  <div class="absolute inset-0 bg-auburn-bluePale/30"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 relative">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-auburn-orange/10 text-auburn-orange text-sm font-semibold mb-6">
+          <span class="w-2 h-2 rounded-full bg-auburn-orange"></span>
+          {{ page_sections.hero.subtitle|default:"Auburn University" }}
+        </div>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-auburn-blue leading-tight mb-6">
+          {{ page_sections.hero.title|default:"Smart Systems<br><span class='text-auburn-orange'>Engineering Lab</span>"|safe }}
+        </h1>
+        <div class="text-lg text-slate-600 leading-relaxed mb-8 max-w-xl">
+          {{ page_sections.hero.content|default:"Advancing cutting-edge research in smart horticulture systems, sensor networks, and data-driven engineering solutions for a sustainable future."|safe }}
+        </div>
+        <div class="flex flex-wrap gap-4">
+          <a href="{% url 'public:projects' %}" class="inline-flex items-center px-6 py-3 rounded-lg bg-auburn-orange text-white font-semibold hover:bg-auburn-orangeDark transition shadow-lg shadow-auburn-orange/20">
+            Explore Our Research
+            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+          <a href="{% url 'public:contact' %}" class="inline-flex items-center px-6 py-3 rounded-lg border-2 border-auburn-blue text-auburn-blue font-semibold hover:bg-auburn-blue hover:text-white transition">
+            Get in Touch
+          </a>
+          <a href="https://github.com/sse-auburn" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border-2 border-slate-300 text-slate-700 font-semibold hover:border-slate-800 hover:bg-slate-800 hover:text-white transition">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+            GitHub
+          </a>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="aspect-square rounded-2xl bg-auburn-blue/5 border border-auburn-blue/10 overflow-hidden">
+          <img src="{% static 'public/main.png' %}" alt="Lab research" class="w-full h-full object-cover">
+        </div>
+        <div class="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-auburn-orange/10"></div>
+        <div class="absolute -bottom-4 -left-4 w-16 h-16 rounded-full bg-auburn-blue/10"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Bar -->
+{% if stats %}
+<section class="bg-auburn-blue text-white py-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      {% for stat in stats %}
+      <div>
+        <p class="text-3xl sm:text-4xl font-bold text-auburn-orange">{{ stat.value }}</p>
+        <p class="text-sm text-slate-300 mt-1">{{ stat.label }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- About Teaser -->
+<section class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <div class="order-2 lg:order-1">
+        <div class="rounded-2xl bg-auburn-bluePale p-8 sm:p-12">
+          <div class="w-16 h-16 rounded-xl bg-auburn-orange flex items-center justify-center mb-6">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          </div>
+          <h3 class="text-2xl font-bold text-auburn-blue mb-4">{{ page_sections.about_teaser.title|default:"Our Mission" }}</h3>
+          <div class="text-slate-600 leading-relaxed">
+            {{ page_sections.about_teaser.content|default:"We develop intelligent systems that bridge the gap between engineering innovation and real-world agricultural challenges. Our interdisciplinary team combines expertise in robotics, IoT, data science, and plant science."|safe }}
+          </div>
+        </div>
+      </div>
+      <div class="order-1 lg:order-2">
+        <h2 class="text-3xl sm:text-4xl font-bold text-auburn-blue mb-6">{{ page_sections.about.title|default:"About the Lab" }}</h2>
+        <div class="text-lg text-slate-600 leading-relaxed mb-6">
+          {{ page_sections.about.content|default:"<p>The Smart Systems Engineering at Auburn University is dedicated to creating transformative technologies for precision agriculture and smart horticulture. We leverage advanced sensing, machine learning, and automation to solve critical challenges in food production and sustainability.</p>"|safe }}
+        </div>
+        <ul class="space-y-3 mb-8">
+          <li class="flex items-start gap-3">
+            <svg class="w-6 h-6 text-auburn-orange flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="text-slate-700">Smart sensor networks for crop monitoring</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="w-6 h-6 text-auburn-orange flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="text-slate-700">AI-driven decision support systems</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="w-6 h-6 text-auburn-orange flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="text-slate-700">Autonomous robotic platforms</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="w-6 h-6 text-auburn-orange flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="text-slate-700">Sustainable resource optimization</span>
+          </li>
+        </ul>
+        <a href="{% url 'public:about' %}" class="inline-flex items-center text-auburn-orange font-semibold hover:text-auburn-orangeDark transition">
+          Learn more about us
+          <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Lab Highlights -->
+{% if highlights %}
+<section class="py-20 bg-auburn-bluePale/30">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl sm:text-4xl font-bold text-auburn-blue mb-4">{{ page_sections.research.title|default:"Lab Highlights" }}</h2>
+      <div class="text-lg text-slate-600 max-w-2xl mx-auto">
+        {{ page_sections.research.content|default:"<p>Latest projects, publications, news, and opportunities from the lab.</p>"|safe }}
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for hl in highlights %}
+        {% if hl.highlight_type == 'PROJECT' and hl.project %}
+        <a href="{% url 'public:projects' %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
+          <div class="h-48 bg-auburn-blue/5 flex items-center justify-center overflow-hidden">
+            {% if hl.project.image %}
+              <img src="{{ hl.project.image.url }}" alt="{{ hl.project.title }}" class="h-full w-full object-cover group-hover:scale-105 transition duration-500">
+            {% else %}
+              <svg class="w-16 h-16 text-auburn-blue/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+            {% endif %}
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-auburn-orange/10 text-auburn-orange text-xs font-semibold w-fit mb-3">Project</span>
+            <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ hl.project.title }}</h3>
+            <div class="text-slate-600 text-sm leading-relaxed line-clamp-3">{{ hl.project.description|safe }}</div>
+          </div>
+        </a>
+        {% elif hl.highlight_type == 'PUBLICATION' and hl.publication %}
+        <a href="{% url 'public:publications' %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
+          <div class="h-48 bg-auburn-blue/5 flex items-center justify-center">
+            <svg class="w-16 h-16 text-auburn-blue/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold w-fit mb-3">Publication</span>
+            <h3 class="text-lg font-bold text-auburn-blue mb-2 line-clamp-2">{{ hl.publication.title }}</h3>
+            <p class="text-slate-600 text-sm line-clamp-2">{{ hl.publication.authors|truncatechars:120 }}</p>
+            <p class="text-slate-500 text-xs mt-2">{{ hl.publication.journal }} {% if hl.publication.year %}· {{ hl.publication.year }}{% endif %}</p>
+          </div>
+        </a>
+        {% elif hl.highlight_type == 'NEWS' and hl.news_item %}
+        <a href="{% url 'public:news' %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
+          <div class="h-48 bg-auburn-blue/5 flex items-center justify-center">
+            <svg class="w-16 h-16 text-auburn-blue/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-xs font-semibold w-fit mb-3">News</span>
+            <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ hl.news_item.title }}</h3>
+            <div class="text-slate-600 text-sm leading-relaxed line-clamp-3">{{ hl.news_item.content|safe }}</div>
+          </div>
+        </a>
+        {% elif hl.highlight_type == 'GALLERY' and hl.gallery_item %}
+        <a href="{% url 'public:gallery' %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
+          <div class="h-48 bg-auburn-blue/5 flex items-center justify-center overflow-hidden">
+            {% if hl.gallery_item.image %}
+              <img src="{{ hl.gallery_item.image.url }}" alt="{{ hl.gallery_item.title }}" class="h-full w-full object-cover group-hover:scale-105 transition duration-500">
+            {% else %}
+              <svg class="w-16 h-16 text-auburn-blue/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            {% endif %}
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 text-xs font-semibold w-fit mb-3">Gallery</span>
+            <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ hl.gallery_item.title }}</h3>
+            {% if hl.gallery_item.caption %}<div class="text-slate-600 text-sm line-clamp-3">{{ hl.gallery_item.caption|safe }}</div>{% endif %}
+          </div>
+        </a>
+        {% elif hl.highlight_type == 'JOB' and hl.job_opening %}
+        <a href="{% url 'public:jobs' %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
+          <div class="h-48 bg-auburn-blue/5 flex items-center justify-center">
+            <svg class="w-16 h-16 text-auburn-blue/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-semibold w-fit mb-3">Open Position</span>
+            <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ hl.job_opening.title }}</h3>
+            <div class="text-slate-600 text-sm leading-relaxed line-clamp-3">{{ hl.job_opening.description|safe }}</div>
+          </div>
+        </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-10">
+      <a href="{% url 'public:projects' %}" class="inline-flex items-center px-6 py-3 rounded-lg border-2 border-auburn-blue text-auburn-blue font-semibold hover:bg-auburn-blue hover:text-white transition">
+        Explore All Research
+        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Sponsors -->
+<section class="py-16 bg-white border-t border-slate-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <p class="text-center text-sm font-semibold text-slate-400 uppercase tracking-widest mb-8">Supported By</p>
+    <div class="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+      {% for sponsor in sponsors %}
+        {% if sponsor.website_link %}
+          <a href="{{ sponsor.website_link }}" target="_blank" class="opacity-70 hover:opacity-100 transition">
+        {% else %}
+          <span class="opacity-70">
+        {% endif %}
+        {% if sponsor.logo %}
+          <img src="{{ sponsor.logo.url }}" alt="{{ sponsor.name }}" class="h-12 md:h-14 object-contain">
+        {% else %}
+          <span class="text-lg font-bold text-slate-400">{{ sponsor.name }}</span>
+        {% endif %}
+        {% if sponsor.website_link %}</a>{% else %}</span>{% endif %}
+      {% empty %}
+        <span class="text-lg font-bold text-slate-400">NSF</span>
+        <span class="text-lg font-bold text-slate-400">USDA NIFA</span>
+        <span class="text-lg font-bold text-slate-400">Auburn University</span>
+        <span class="text-lg font-bold text-slate-400">Alabama Dept. of Agriculture</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-auburn-bluePale/30">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h2 class="text-3xl sm:text-4xl font-bold text-auburn-blue mb-6">{{ page_sections.cta.title|default:"Join Our Team" }}</h2>
+    <div class="text-lg text-slate-600 leading-relaxed mb-8">
+      {{ page_sections.cta.content|default:"<p>We are always looking for passionate researchers, engineers, and students who want to make an impact at the intersection of technology and agriculture.</p>"|safe }}
+    </div>
+    <div class="flex flex-wrap justify-center gap-4">
+      <a href="{% url 'public:jobs' %}" class="inline-flex items-center px-6 py-3 rounded-lg bg-auburn-orange text-white font-semibold hover:bg-auburn-orangeDark transition shadow-lg shadow-auburn-orange/20">
+        See Open Positions
+      </a>
+      <a href="{% url 'public:contact' %}" class="inline-flex items-center px-6 py-3 rounded-lg border-2 border-slate-300 text-slate-700 font-semibold hover:border-auburn-blue hover:text-auburn-blue transition">
+        Contact Us
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

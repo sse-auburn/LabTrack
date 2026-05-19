@@ -1,0 +1,55 @@
+{% extends 'public/base.html' %}
+
+{% block title %}Job Openings{% endblock %}
+
+{% block content %}
+<section class="py-20 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-4xl font-bold text-auburn-blue mb-8">{{ page_sections.intro.title|default:"Job Openings" }}</h1>
+    <div class="text-lg text-slate-600 leading-relaxed mb-12">
+      {{ page_sections.intro.content|default:"<p>Join our team of researchers and engineers working at the forefront of smart systems and precision agriculture.</p>"|safe }}
+    </div>
+
+    {% if jobs %}
+      <div class="space-y-6">
+        {% for job in jobs %}
+        <div class="p-6 rounded-xl border border-slate-200 bg-white hover:shadow-md transition">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
+            <h3 class="text-xl font-bold text-auburn-blue">{{ job.title }}</h3>
+            <span class="px-3 py-1 rounded-full {% if job.status == 'OPEN' %}bg-auburn-orange/10 text-auburn-orange{% else %}bg-slate-100 text-slate-600{% endif %} text-xs font-semibold w-fit">
+              {{ job.get_status_display }}
+            </span>
+          </div>
+          <div class="text-slate-600 text-sm leading-relaxed mb-4">{{ job.description|safe }}</div>
+          {% if job.requirements %}
+            <div class="text-slate-600 text-sm leading-relaxed mb-4"><strong>Requirements:</strong> {{ job.requirements|safe }}</div>
+          {% endif %}
+          {% if job.tags %}
+            <div class="flex flex-wrap gap-2 text-xs text-slate-500">
+              {% for tag in job.tags.split %}
+                <span class="px-2 py-1 rounded bg-slate-100">{{ tag|cut:',' }}</span>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-12">
+        <div class="mx-auto w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <p class="text-slate-500 text-lg">No open positions at this time.</p>
+        <p class="text-slate-400 text-sm mt-1">Check back later or reach out via the Contact page.</p>
+      </div>
+    {% endif %}
+
+    <div class="mt-12 p-6 rounded-xl bg-auburn-bluePale/30 border border-auburn-blue/10">
+      <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ page_sections.apply.title|default:"How to Apply" }}</h3>
+      <div class="text-slate-600 text-sm leading-relaxed">
+        {{ page_sections.apply.content|default:"<p>Interested candidates should send a CV and brief statement of interest to the lab PI. You can find contact details on our <a href='/contact/' class='text-auburn-orange font-medium hover:underline'>Contact page</a>.</p>"|safe }}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'public/base.html' %}
+
+{% block title %}About Lab{% endblock %}
+
+{% block content %}
+<section class="py-20 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <h1 class="text-4xl font-bold text-auburn-blue">
+        {{ page_sections.main.title|default:"About the Lab" }}
+      </h1>
+      <a href="https://github.com/sse-auburn" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-slate-300 text-slate-700 font-semibold hover:border-slate-800 hover:bg-slate-800 hover:text-white transition w-fit">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+        GitHub
+      </a>
+    </div>
+
+    <div class="about-content text-slate-700 leading-relaxed">
+      {{ page_sections.main.content|default:'
+        <p class="text-xl leading-relaxed mb-6">
+          The Smart Systems Engineering (SSE Lab) at Auburn University is a leading research
+          group focused on developing intelligent technologies for precision agriculture and
+          sustainable food systems.
+        </p>
+        <p class="mb-6">
+          Our interdisciplinary team brings together expertise in mechanical engineering,
+          computer science, electrical engineering, and plant science to tackle complex challenges
+          at the intersection of technology and agriculture.
+        </p>
+        <h2>Research Areas</h2>
+        <ul>
+          <li>Smart sensor networks and IoT for crop monitoring</li>
+          <li>Autonomous robotic systems for agriculture</li>
+          <li>Machine learning and computer vision for plant phenotyping</li>
+          <li>Controlled environment agriculture and greenhouse automation</li>
+        </ul>
+        <h2>Our Facilities</h2>
+        <p>
+          The lab is housed within the Samuel Ginn College of Engineering at Auburn University,
+          with access to state-of-the-art research greenhouses, field stations, and fabrication
+          facilities.
+        </p>
+      '|safe }}
+    </div>
+  </div>
+</section>
+
+<!-- Sponsors -->
+<section class="py-16 bg-white border-t border-slate-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <p class="text-center text-sm font-semibold text-slate-400 uppercase tracking-widest mb-8">Supported By</p>
+    <div class="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+      {% for sponsor in sponsors %}
+        {% if sponsor.website_link %}
+          <a href="{{ sponsor.website_link }}" target="_blank" class="opacity-70 hover:opacity-100 transition">
+        {% else %}
+          <span class="opacity-70">
+        {% endif %}
+        {% if sponsor.logo %}
+          <img src="{{ sponsor.logo.url }}" alt="{{ sponsor.name }}" class="h-12 md:h-14 object-contain">
+        {% else %}
+          <span class="text-lg font-bold text-slate-400">{{ sponsor.name }}</span>
+        {% endif %}
+        {% if sponsor.website_link %}</a>{% else %}</span>{% endif %}
+      {% empty %}
+        <span class="text-lg font-bold text-slate-400">NSF</span>
+        <span class="text-lg font-bold text-slate-400">USDA NIFA</span>
+        <span class="text-lg font-bold text-slate-400">Auburn University</span>
+        <span class="text-lg font-bold text-slate-400">Alabama Dept. of Agriculture</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-content h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #03244D;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .about-content h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #03244D;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  .about-content p {
+    margin-bottom: 1.25rem;
+    line-height: 1.75;
+  }
+  .about-content ul, .about-content ol {
+    margin-bottom: 1.25rem;
+    padding-left: 1.5rem;
+  }
+  .about-content ul li {
+    list-style-type: disc;
+    margin-bottom: 0.5rem;
+  }
+  .about-content ol li {
+    list-style-type: decimal;
+    margin-bottom: 0.5rem;
+  }
+  .about-content strong, .about-content b {
+    font-weight: 700;
+    color: #1e293b;
+  }
+  .about-content em, .about-content i {
+    font-style: italic;
+  }
+  .about-content a {
+    color: #F26522;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+  .about-content a:hover {
+    color: #DD550C;
+  }
+  .about-content img {
+    border-radius: 0.75rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  .about-content blockquote {
+    border-left: 4px solid #F26522;
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    color: #475569;
+    font-style: italic;
+  }
+  .about-content figure {
+    margin: 1.5rem 0;
+  }
+  .about-content figcaption {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+  }
+</style>
+{% endblock %}

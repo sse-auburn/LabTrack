@@ -1,0 +1,44 @@
+{% extends 'public/base.html' %}
+
+{% block title %}{{ publication.title|default:"Publication" }}{% endblock %}
+
+{% block content %}
+<section class="py-20 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <a href="{% url 'public:publications' %}" class="inline-flex items-center text-auburn-orange text-sm font-medium mb-6 hover:underline">
+      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Back to Publications
+    </a>
+
+    <h1 class="text-3xl font-bold text-auburn-blue mb-4">{{ publication.title }}</h1>
+    <p class="text-slate-700 mb-2">{{ publication.authors }}</p>
+    <p class="text-slate-500 mb-6">
+      <em>{{ publication.journal }}</em>
+      {% if publication.volume %}<strong>{{ publication.volume }}</strong>{% endif %}
+      {% if publication.issue %}({{ publication.issue }}){% endif %}
+      {% if publication.pages %}, {{ publication.pages }}{% endif %}
+      {% if publication.year %} — {{ publication.year }}{% endif %}
+    </p>
+
+    {% if publication.doi %}
+      <p class="text-sm text-slate-400 mb-6">DOI: {{ publication.doi }}</p>
+    {% endif %}
+
+    {% if publication.abstract %}
+      <div class="prose prose-slate max-w-none mb-8">
+        <h2 class="text-xl font-bold text-auburn-blue mb-2">Abstract</h2>
+        <div>{{ publication.abstract|safe }}</div>
+      </div>
+    {% endif %}
+
+    <div class="flex gap-4">
+      {% if publication.url %}
+        <a href="{{ publication.url }}" target="_blank" class="inline-flex items-center px-4 py-2 rounded-lg bg-auburn-orange text-white text-sm font-semibold hover:bg-auburn-orangeDark transition">View Online</a>
+      {% endif %}
+      {% if publication.pdf_file %}
+        <a href="{{ publication.pdf_file.url }}" class="inline-flex items-center px-4 py-2 rounded-lg border-2 border-auburn-blue text-auburn-blue text-sm font-semibold hover:bg-auburn-blue hover:text-white transition">Download PDF</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
