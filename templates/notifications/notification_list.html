@@ -7,7 +7,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">Notifications</h1>
@@ -40,21 +40,21 @@
     <div class="space-y-2">
       {% for notification in page_obj %}
         <div class="relative bg-white rounded-xl border shadow-sm overflow-hidden transition-all
-                    {% if not notification.is_read %}border-l-4 border-l-indigo-500 border-t-indigo-100 border-r-indigo-100 border-b-indigo-100 bg-indigo-50/40{% else %}border-slate-200{% endif %}">
+                    {% if not notification.is_read %}border-l-4 border-l-auburn-orange border-t-auburn-bluePale border-r-auburn-bluePale border-b-auburn-bluePale bg-auburn-bluePale/40{% else %}border-slate-200{% endif %}">
           <div class="flex items-start gap-4 p-4">
 
             <!-- Level Icon -->
             <div class="flex-shrink-0 mt-0.5">
               {% if notification.level == 'info' %}
-                <span class="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100">
-                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span class="flex items-center justify-center w-9 h-9 rounded-full bg-auburn-bluePale">
+                  <svg class="w-5 h-5 text-auburn-blueLight" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                 </span>
               {% elif notification.level == 'success' %}
-                <span class="flex items-center justify-center w-9 h-9 rounded-full bg-green-100">
-                  <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span class="flex items-center justify-center w-9 h-9 rounded-full bg-brand-100">
+                  <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
@@ -81,7 +81,7 @@
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">
                   <p class="text-sm font-semibold text-slate-800 leading-snug
-                            {% if not notification.is_read %}text-indigo-900{% endif %}">
+                            {% if not notification.is_read %}text-auburn-blue{% endif %}">
                     {{ notification.title }}
                   </p>
                   <p class="text-sm text-slate-600 mt-0.5 leading-relaxed">{{ notification.message }}</p>
@@ -90,7 +90,7 @@
                 <!-- Unread dot + dismiss button -->
                 {% if not notification.is_read %}
                 <div class="flex items-center gap-2 flex-shrink-0">
-                  <span class="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0"></span>
+                  <span class="w-2 h-2 rounded-full bg-auburn-blueLight flex-shrink-0"></span>
                   <form method="post" action="{% url 'notifications:mark_read' notification.pk %}">
                     {% csrf_token %}
                     <button type="submit"
@@ -129,8 +129,8 @@
 
                 <!-- Level badge -->
                 <span class="ml-auto text-xs font-medium px-2 py-0.5 rounded-full
-                  {% if notification.level == 'info' %}bg-blue-100 text-blue-700
-                  {% elif notification.level == 'success' %}bg-green-100 text-green-700
+                  {% if notification.level == 'info' %}bg-auburn-bluePale text-auburn-blue
+                  {% elif notification.level == 'success' %}bg-brand-100 text-brand-700
                   {% elif notification.level == 'warning' %}bg-yellow-100 text-yellow-700
                   {% elif notification.level == 'error' %}bg-red-100 text-red-700
                   {% endif %}">

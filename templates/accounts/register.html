@@ -12,9 +12,9 @@
         extend: {
           colors: {
             brand: {
-              50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe',
-              300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1',
-              600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81',
+              50: '#FFF5EE', 100: '#FFE4D1', 200: '#FFC9A3',
+              300: '#FFA675', 400: '#F2854A', 500: '#F26522',
+              600: '#DD550C', 700: '#B8450A', 800: '#933608', 900: '#6E2806',
             }
           },
           fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] }
@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 </head>
-<body class="min-h-full bg-gradient-to-br from-slate-900 via-slate-800 to-brand-900 font-sans antialiased">
+<body class="min-h-full bg-gradient-to-br from-[#03244D] via-[#0a2e5c] to-[#6E2806] font-sans antialiased">
 
 <div class="flex flex-col items-center justify-center px-4 py-12">
 
@@ -284,7 +284,7 @@
       { color: 'bg-red-500',    text: 'Weak',      textColor: 'text-red-600' },
       { color: 'bg-orange-400', text: 'Fair',      textColor: 'text-orange-600' },
       { color: 'bg-yellow-400', text: 'Good',      textColor: 'text-yellow-600' },
-      { color: 'bg-green-500',  text: 'Strong',    textColor: 'text-green-600' },
+      { color: 'bg-brand-500',  text: 'Strong',    textColor: 'text-brand-600' },
     ];
 
     bars.forEach((bar, i) => {

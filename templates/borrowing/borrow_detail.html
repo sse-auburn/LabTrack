@@ -3,7 +3,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">Borrow Request #{{ borrow.pk }}</h1>
@@ -22,9 +22,9 @@
       {% if borrow.status == 'RETURN_PENDING' %}
         <span class="px-3 py-1 bg-orange-100 text-orange-800 text-sm font-medium rounded-full">Return Pending</span>
       {% elif borrow.status == 'APPROVED' or borrow.status == 'ACTIVE' %}
-        <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">{{ borrow.get_status_display }}</span>
+        <span class="px-3 py-1 bg-auburn-bluePale text-auburn-blue text-sm font-medium rounded-full">{{ borrow.get_status_display }}</span>
       {% elif borrow.status == 'RETURNED' %}
-        <span class="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">Returned</span>
+        <span class="px-3 py-1 bg-brand-100 text-brand-800 text-sm font-medium rounded-full">Returned</span>
       {% elif borrow.status == 'REJECTED' or borrow.status == 'CANCELLED' %}
         <span class="px-3 py-1 bg-red-100 text-red-800 text-sm font-medium rounded-full">{{ borrow.get_status_display }}</span>
       {% elif borrow.status == 'OVERDUE' %}
@@ -100,7 +100,7 @@
     {% if borrow.status == 'RETURN_PENDING' and borrow.equipment and borrow.equipment.owner == user %}
       <form method="post" action="{% url 'borrowing:return_confirm' borrow.pk %}">
         {% csrf_token %}
-        <button class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">Confirm Return</button>
+        <button class="px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700">Confirm Return</button>
       </form>
     {% endif %}
     {% if borrow.equipment and borrow.equipment.owner == user %}

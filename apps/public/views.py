@@ -33,11 +33,13 @@ def home_view(request):
     ).order_by('order'))
     # Image-bearing cards first, then others; preserve original order within each group
     highlights.sort(key=lambda h: (0 if _highlight_has_image(h) else 1, h.order))
-    sponsors = models.Sponsor.objects.filter(is_active=True).order_by('order')
+    funding_partners = models.Sponsor.objects.filter(is_active=True, partner_type='FUNDING').order_by('order')
+    collaborative_partners = models.Sponsor.objects.filter(is_active=True, partner_type='COLLABORATION').order_by('order')
     return render(request, 'public/home.html', {
         'stats': stats,
         'highlights': highlights,
-        'sponsors': sponsors,
+        'funding_partners': funding_partners,
+        'collaborative_partners': collaborative_partners,
         'page_sections': _page_sections('home'),
     })
 
@@ -45,9 +47,11 @@ def home_view(request):
 # ── Static-ish pages ─────────────────────────────────────────────────────────
 
 def about_view(request):
-    sponsors = models.Sponsor.objects.filter(is_active=True).order_by('order')
+    funding_partners = models.Sponsor.objects.filter(is_active=True, partner_type='FUNDING').order_by('order')
+    collaborative_partners = models.Sponsor.objects.filter(is_active=True, partner_type='COLLABORATION').order_by('order')
     return render(request, 'public/about.html', {
-        'sponsors': sponsors,
+        'funding_partners': funding_partners,
+        'collaborative_partners': collaborative_partners,
         'page_sections': _page_sections('about'),
     })
 
@@ -79,8 +83,12 @@ def jobs_view(request):
 
 
 def sponsors_view(request):
-    sponsors = models.Sponsor.objects.filter(is_active=True)
-    return render(request, 'public/sponsors.html', {'sponsors': sponsors})
+    funding_partners = models.Sponsor.objects.filter(is_active=True, partner_type='FUNDING').order_by('order')
+    collaborative_partners = models.Sponsor.objects.filter(is_active=True, partner_type='COLLABORATION').order_by('order')
+    return render(request, 'public/sponsors.html', {
+        'funding_partners': funding_partners,
+        'collaborative_partners': collaborative_partners,
+    })
 
 
 def contact_view(request):

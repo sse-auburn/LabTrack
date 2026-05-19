@@ -9,6 +9,7 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Max
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
@@ -851,7 +852,7 @@ def homepagehighlight_create_view(request):
     if form.is_valid():
         highlight = form.save(commit=False)
         highlight.order = (models.HomepageHighlight.objects.aggregate(
-            max_order=models.Max('order')
+            max_order=Max('order')
         )['max_order'] or 0) + 1
         highlight.save()
         log_activity(
@@ -1266,7 +1267,7 @@ def sponsor_list_view(request):
         'create_url': 'public_cms:cms_sponsor_create',
         'edit_url': 'public_cms:cms_sponsor_edit',
         'delete_url': 'public_cms:cms_sponsor_delete',
-        'list_fields': ['name', 'order', 'is_active'],
+        'list_fields': ['name', 'partner_type', 'order', 'is_active'],
     })
 
 

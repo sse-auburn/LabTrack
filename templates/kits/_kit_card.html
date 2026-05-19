@@ -1,6 +1,6 @@
 <div class="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition group flex flex-col h-full">
   <!-- Card Header -->
-  <div class="bg-gradient-to-r from-indigo-50 to-purple-50 px-5 pt-5 pb-4 border-b border-slate-100">
+  <div class="bg-gradient-to-r from-auburn-bluePale to-brand-50 px-5 pt-5 pb-4 border-b border-slate-100">
     <div class="flex items-start justify-between">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -39,7 +39,7 @@
       <div class="space-y-1">
         {% for item in items %}
         <div class="flex items-center gap-2 text-xs text-slate-600">
-          <span class="w-1.5 h-1.5 rounded-full bg-indigo-700 flex-shrink-0"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-auburn-blue flex-shrink-0"></span>
           {{ item.equipment.name }}
           {% if item.quantity > 1 %}<span class="text-slate-400">×{{ item.quantity }}</span>{% endif %}
         </div>

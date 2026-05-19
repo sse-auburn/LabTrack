@@ -7,7 +7,7 @@
 <div>
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight">Reservations</h1>
@@ -29,7 +29,7 @@
           Waitlist
         </a>
         <a href="{% url 'reservations:create' %}"
-           class="inline-flex items-center px-4 py-1.5 bg-white text-blue-700 text-sm font-semibold rounded-lg hover:bg-emerald-50 transition-colors shadow-sm">
+           class="inline-flex items-center px-4 py-1.5 bg-white text-auburn-blue text-sm font-semibold rounded-lg hover:bg-emerald-50 transition-colors shadow-sm">
           <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
@@ -136,7 +136,7 @@
               {% elif reservation.status == 'RETURN_PENDING' %}
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">Return Pending</span>
               {% elif reservation.status == 'RETURNED' %}
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Returned</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800">Returned</span>
               {% elif reservation.status == 'CANCELLED' %}
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Cancelled</span>
               {% elif reservation.status == 'EXPIRED' %}

@@ -5,7 +5,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">Complete Maintenance</h1>
@@ -27,7 +27,7 @@
         {% endfor %}
       </div>
       <div class="mt-6 flex gap-3">
-        <button type="submit" class="px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">Mark Complete</button>
+        <button type="submit" class="px-5 py-2.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700">Mark Complete</button>
         <a href="{% url 'incidents:maintenance_list' %}" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50">Cancel</a>
       </div>
     </form>

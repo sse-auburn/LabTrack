@@ -7,7 +7,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">{% if action == 'Edit' %}Edit{% else %}New{% endif %} P-Card Transaction</h1>
@@ -69,7 +69,7 @@
                 </label>
                 <input type="date" name="{{ form.transaction_date.html_name }}" id="{{ form.transaction_date.id_for_label }}"
                        value="{{ form.transaction_date.value|date:'Y-m-d'|default:'' }}"
-                       class="w-full px-3 py-2 text-sm border {% if form.transaction_date.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500">
+                       class="w-full px-3 py-2 text-sm border {% if form.transaction_date.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-auburn-orange">
                 {% for error in form.transaction_date.errors %}
                 <p class="mt-1 text-xs text-red-600">{{ error }}</p>
                 {% endfor %}
@@ -85,7 +85,7 @@
                   <input type="number" name="{{ form.total_price.html_name }}" id="{{ form.total_price.id_for_label }}"
                          value="{{ form.total_price.value|default:'' }}"
                          step="0.01" min="0"
-                         class="w-full pl-7 pr-3 py-2 text-sm border {% if form.total_price.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500"
+                         class="w-full pl-7 pr-3 py-2 text-sm border {% if form.total_price.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-auburn-orange"
                          placeholder="0.00">
                 </div>
                 {% for error in form.total_price.errors %}
@@ -98,7 +98,7 @@
                 <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Notes</label>
                 <textarea name="{{ form.notes.html_name }}" id="{{ form.notes.id_for_label }}"
                           rows="3"
-                          class="w-full px-3 py-2 text-sm border {% if form.notes.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500 resize-none"
+                          class="w-full px-3 py-2 text-sm border {% if form.notes.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-auburn-orange resize-none"
                           placeholder="Optional notes about this purchase…">{{ form.notes.value|default:'' }}</textarea>
                 {% for error in form.notes.errors %}
                 <p class="mt-1 text-xs text-red-600">{{ error }}</p>
@@ -133,7 +133,7 @@
                     <label class="block text-xs font-medium text-slate-500 mb-1">Item Name <span class="text-red-500">*</span></label>
                     <input type="text" name="{{ item_form.name.html_name }}" id="{{ item_form.name.id_for_label }}"
                            value="{{ item_form.name.value|default:'' }}"
-                           class="w-full px-3 py-2 text-sm border {% if item_form.name.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500"
+                           class="w-full px-3 py-2 text-sm border {% if item_form.name.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-auburn-orange"
                            placeholder="e.g. Solder, Wire, Components…">
                     {% for error in item_form.name.errors %}
                     <p class="mt-1 text-xs text-red-600">{{ error }}</p>
@@ -145,7 +145,7 @@
                     <label class="block text-xs font-medium text-slate-500 mb-1">Description</label>
                     <input type="text" name="{{ item_form.description.html_name }}" id="{{ item_form.description.id_for_label }}"
                            value="{{ item_form.description.value|default:'' }}"
-                           class="w-full px-3 py-2 text-sm border {% if item_form.description.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500"
+                           class="w-full px-3 py-2 text-sm border {% if item_form.description.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-auburn-orange"
                            placeholder="Optional description">
                   </div>
 
@@ -155,7 +155,7 @@
                     <input type="number" name="{{ item_form.quantity.html_name }}" id="{{ item_form.quantity.id_for_label }}"
                            value="{{ item_form.quantity.value|default:'1' }}"
                            min="1" step="1"
-                           class="w-full px-3 py-2 text-sm border {% if item_form.quantity.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500">
+                           class="w-full px-3 py-2 text-sm border {% if item_form.quantity.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-auburn-orange">
                     {% for error in item_form.quantity.errors %}
                     <p class="mt-1 text-xs text-red-600">{{ error }}</p>
                     {% endfor %}
@@ -169,7 +169,7 @@
                       <input type="number" name="{{ item_form.unit_price.html_name }}" id="{{ item_form.unit_price.id_for_label }}"
                              value="{{ item_form.unit_price.value|default:'' }}"
                              step="0.01" min="0"
-                             class="w-full pl-7 pr-3 py-2 text-sm border {% if item_form.unit_price.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500"
+                             class="w-full pl-7 pr-3 py-2 text-sm border {% if item_form.unit_price.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-auburn-orange"
                              placeholder="0.00">
                     </div>
                   </div>
@@ -228,7 +228,7 @@
             {% endif %}
 
             <label for="{{ form.receipt_file.id_for_label }}"
-                   class="cursor-pointer flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed border-slate-300 hover:border-indigo-400 hover:bg-indigo-50 transition-colors">
+                   class="cursor-pointer flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed border-slate-300 hover:border-auburn-blueLight hover:bg-auburn-bluePale transition-colors">
               <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                       d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -245,7 +245,7 @@
             {% endif %}
           </div>
 
-          <div class="bg-indigo-50 rounded-xl border border-indigo-100 p-4">
+          <div class="bg-auburn-bluePale rounded-xl border border-auburn-bluePale p-4">
             <h3 class="text-sm font-semibold text-brand-800 mb-2">Tips</h3>
             <ul class="text-xs text-brand-700 space-y-1">
               <li>• Upload a clear photo or PDF of your receipt.</li>

@@ -3,7 +3,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">{{ consumable.name }}</h1>
@@ -23,7 +23,7 @@
       {% endif %}
       <a href="{% url 'consumables:log_usage' consumable.pk %}" class="px-3 py-1.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700">Log Usage</a>
       {% if user.is_admin %}
-        <a href="{% url 'consumables:restock' consumable.pk %}" class="px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">Restock</a>
+        <a href="{% url 'consumables:restock' consumable.pk %}" class="px-3 py-1.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700">Restock</a>
         <a href="{% url 'consumables:delete' consumable.pk %}" class="px-3 py-1.5 bg-red-50 border border-red-300 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100">Delete</a>
       {% endif %}
     </div>
@@ -53,7 +53,7 @@
         <div><dt class="text-slate-500">Unit Cost</dt><dd class="font-medium text-slate-900">{% if consumable.unit_cost %}${{ consumable.unit_cost }}{% else %}—{% endif %}</dd></div>
         <div><dt class="text-slate-500">Supplier</dt><dd class="font-medium text-slate-900">{{ consumable.supplier|default:"—" }}</dd></div>
         <div><dt class="text-slate-500">Status</dt>
-          <dd>{% if consumable.is_low_stock %}<span class="text-yellow-600 font-semibold">Low Stock</span>{% elif consumable.quantity == 0 %}<span class="text-red-600 font-semibold">Out of Stock</span>{% else %}<span class="text-green-600 font-semibold">In Stock</span>{% endif %}</dd>
+          <dd>{% if consumable.is_low_stock %}<span class="text-yellow-600 font-semibold">Low Stock</span>{% elif consumable.quantity == 0 %}<span class="text-red-600 font-semibold">Out of Stock</span>{% else %}<span class="text-brand-600 font-semibold">In Stock</span>{% endif %}</dd>
         </div>
       </dl>
       {% if consumable.description %}

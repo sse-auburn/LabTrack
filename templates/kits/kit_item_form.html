@@ -5,7 +5,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">Add Equipment to Kit</h1>
@@ -56,7 +56,7 @@
       {% if available_equipment %}
       <div class="divide-y divide-slate-100 max-h-[420px] overflow-y-auto" id="equipment-list">
         {% for eq in available_equipment %}
-        <label class="eq-row flex items-center gap-3 px-5 py-3 hover:bg-indigo-50 cursor-pointer transition-colors"
+        <label class="eq-row flex items-center gap-3 px-5 py-3 hover:bg-auburn-bluePale cursor-pointer transition-colors"
                data-name="{{ eq.name|lower }} {% if eq.category %}{{ eq.category.name|lower }}{% endif %} {% if eq.location %}{{ eq.location.name|lower }}{% endif %}">
           <input type="checkbox" name="equipment_ids" value="{{ eq.pk }}"
                  class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500 flex-shrink-0"
@@ -69,7 +69,7 @@
             </p>
           </div>
           <span class="flex-shrink-0 text-xs font-medium px-2 py-0.5 rounded-full
-            {% if eq.status == 'AVAILABLE' %}bg-green-100 text-green-700
+            {% if eq.status == 'AVAILABLE' %}bg-brand-100 text-brand-700
             {% elif eq.status == 'BORROWED' %}bg-yellow-100 text-yellow-700
             {% else %}bg-slate-100 text-slate-600{% endif %}">
             {{ eq.get_status_display }}

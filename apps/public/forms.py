@@ -224,11 +224,12 @@ class JobOpeningForm(forms.ModelForm):
 class SponsorForm(forms.ModelForm):
     class Meta:
         model = models.Sponsor
-        fields = ['name', 'description', 'logo', 'website_link', 'order', 'is_active']
+        fields = ['name', 'description', 'logo', 'website_link', 'partner_type', 'order', 'is_active']
         widgets = {
             'name': forms.TextInput(attrs=_text_input()),
             'logo': forms.ClearableFileInput(attrs=_file_input()),
             'website_link': forms.URLInput(attrs=_text_input({'placeholder': 'https://...'})),
+            'partner_type': forms.Select(attrs=_select()),
             'order': forms.NumberInput(attrs=_text_input()),
             'is_active': forms.CheckboxInput(attrs=_checkbox()),
         }

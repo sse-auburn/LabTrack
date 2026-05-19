@@ -114,8 +114,9 @@ class JobOpeningAdmin(admin.ModelAdmin):
 
 @admin.register(models.Sponsor)
 class SponsorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'website_link', 'order', 'is_active')
-    list_editable = ('order', 'is_active')
+    list_display = ('name', 'partner_type', 'website_link', 'order', 'is_active')
+    list_editable = ('partner_type', 'order', 'is_active')
+    list_filter = ('partner_type', 'is_active')
     search_fields = ('name', 'description')
 
 

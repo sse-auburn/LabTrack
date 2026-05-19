@@ -25,16 +25,16 @@
               bluePale: '#E6EAEF',
             },
             brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
+              50: '#FFF5EE',
+              100: '#FFE4D1',
+              200: '#FFC9A3',
+              300: '#FFA675',
+              400: '#F2854A',
+              500: '#F26522',
+              600: '#DD550C',
+              700: '#B8450A',
+              800: '#933608',
+              900: '#6E2806',
             },
           },
           fontFamily: {
@@ -73,15 +73,15 @@
 
         <!-- Desktop Nav -->
         <nav class="hidden lg:flex items-center gap-1">
-          <a href="{% url 'public:home' %}" class="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale transition">Home</a>
-          <a href="{% url 'public:about' %}" class="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale transition">About Lab</a>
-          <a href="{% url 'public:team' %}" class="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale transition">Team</a>
-          <a href="{% url 'public:projects' %}" class="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale transition">Projects</a>
-          <a href="{% url 'public:publications' %}" class="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale transition">Publications</a>
-          <a href="{% url 'public:blog' %}" class="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale transition">Blog</a>
-          <a href="{% url 'public:news' %}" class="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale transition">News</a>
-          <a href="{% url 'public:jobs' %}" class="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale transition">Jobs</a>
-          <a href="{% url 'public:contact' %}" class="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale transition">Contact</a>
+          <a href="{% url 'public:home' %}" class="px-3 py-2 rounded-md text-sm font-medium transition {% if request.resolver_match.url_name == 'home' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Home</a>
+          <a href="{% url 'public:about' %}" class="px-3 py-2 rounded-md text-sm font-medium transition {% if request.resolver_match.url_name == 'about' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">About Lab</a>
+          <a href="{% url 'public:team' %}" class="px-3 py-2 rounded-md text-sm font-medium transition {% if request.resolver_match.url_name == 'team' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Team</a>
+          <a href="{% url 'public:projects' %}" class="px-3 py-2 rounded-md text-sm font-medium transition {% if request.resolver_match.url_name == 'projects' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Projects</a>
+          <a href="{% url 'public:publications' %}" class="px-3 py-2 rounded-md text-sm font-medium transition {% if request.resolver_match.url_name == 'publications' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Publications</a>
+          <a href="{% url 'public:blog' %}" class="px-3 py-2 rounded-md text-sm font-medium transition {% if request.resolver_match.url_name == 'blog' or request.resolver_match.url_name == 'blog_detail' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Blog</a>
+          <a href="{% url 'public:news' %}" class="px-3 py-2 rounded-md text-sm font-medium transition {% if request.resolver_match.url_name == 'news' or request.resolver_match.url_name == 'news_detail' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">News</a>
+          <a href="{% url 'public:jobs' %}" class="px-3 py-2 rounded-md text-sm font-medium transition {% if request.resolver_match.url_name == 'jobs' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Jobs</a>
+          <a href="{% url 'public:contact' %}" class="px-3 py-2 rounded-md text-sm font-medium transition {% if request.resolver_match.url_name == 'contact' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Contact</a>
 
           <!-- Resource Dropdown -->
           <div class="relative ml-2" x-data="{ open: false }" @click.away="open = false">
@@ -106,15 +106,15 @@
           <!-- Mobile Nav -->
           <div x-show="open" x-cloak x-transition class="absolute top-20 left-0 right-0 bg-white border-b border-slate-200 shadow-lg">
             <div class="px-4 py-3 space-y-1">
-              <a href="{% url 'public:home' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale">Home</a>
-              <a href="{% url 'public:about' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale">About Lab</a>
-              <a href="{% url 'public:team' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale">Team</a>
-              <a href="{% url 'public:projects' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale">Projects</a>
-              <a href="{% url 'public:publications' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale">Publications</a>
-              <a href="{% url 'public:blog' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale">Blog</a>
-              <a href="{% url 'public:news' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale">News</a>
-              <a href="{% url 'public:jobs' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale">Jobs</a>
-              <a href="{% url 'public:contact' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale">Contact</a>
+              <a href="{% url 'public:home' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.url_name == 'home' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Home</a>
+              <a href="{% url 'public:about' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.url_name == 'about' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">About Lab</a>
+              <a href="{% url 'public:team' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.url_name == 'team' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Team</a>
+              <a href="{% url 'public:projects' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.url_name == 'projects' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Projects</a>
+              <a href="{% url 'public:publications' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.url_name == 'publications' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Publications</a>
+              <a href="{% url 'public:blog' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.url_name == 'blog' or request.resolver_match.url_name == 'blog_detail' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Blog</a>
+              <a href="{% url 'public:news' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.url_name == 'news' or request.resolver_match.url_name == 'news_detail' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">News</a>
+              <a href="{% url 'public:jobs' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.url_name == 'jobs' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Jobs</a>
+              <a href="{% url 'public:contact' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.url_name == 'contact' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Contact</a>
               <div class="pt-2 border-t border-slate-100">
                 <a href="{% url 'accounts:login' %}" class="block px-3 py-2 rounded-md text-base font-semibold text-auburn-orange">LabTrack Login</a>
                 <a href="{% url 'accounts:register' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600">Request Access</a>

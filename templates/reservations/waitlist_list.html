@@ -6,7 +6,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">Waitlist</h1>
@@ -42,7 +42,7 @@
     </div>
     <div class="bg-white rounded-xl border border-slate-200 p-4">
       <p class="text-xs text-slate-500 uppercase tracking-wider">Notified</p>
-      <p class="text-2xl font-bold text-green-600 mt-1">{{ notified_count|default:"—" }}</p>
+      <p class="text-2xl font-bold text-brand-600 mt-1">{{ notified_count|default:"—" }}</p>
     </div>
     <div class="bg-white rounded-xl border border-slate-200 p-4">
       <p class="text-xs text-slate-500 uppercase tracking-wider">Items Affected</p>
@@ -130,7 +130,7 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               {% if entry.notified %}
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800">
                   <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                   </svg>

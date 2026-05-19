@@ -6,7 +6,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">{{ project.name }}</h1>
@@ -31,9 +31,9 @@
             
             <!-- Status Badge -->
             {% if project.status == 'ACTIVE' %}
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">Active</span>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800">Active</span>
             {% elif project.status == 'COMPLETED' %}
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">Completed</span>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-auburn-bluePale text-auburn-blue">Completed</span>
             {% elif project.status == 'ON_HOLD' %}
               <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">On Hold</span>
             {% elif project.status == 'CANCELLED' %}
@@ -148,7 +148,7 @@
             <span class="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
               {% if membership.role == 'LEAD' %}bg-brand-100 text-brand-700
               {% elif membership.role == 'OBSERVER' %}bg-slate-100 text-slate-600
-              {% else %}bg-green-100 text-green-700{% endif %}">
+              {% else %}bg-brand-100 text-brand-700{% endif %}">
               {{ membership.get_role_display }}
             </span>
           </div>
@@ -186,7 +186,7 @@
               <p class="text-xs text-slate-400">{% if eq.category %}{{ eq.category.name }}{% endif %}{% if eq.location %} &bull; {{ eq.location.name }}{% endif %}</p>
             </div>
             <span class="text-xs font-medium px-2 py-0.5 rounded-full
-              {% if eq.status == 'AVAILABLE' %}bg-green-100 text-green-700
+              {% if eq.status == 'AVAILABLE' %}bg-brand-100 text-brand-700
               {% elif eq.status == 'BORROWED' %}bg-yellow-100 text-yellow-700
               {% else %}bg-slate-100 text-slate-600{% endif %}">
               {{ eq.get_status_display }}

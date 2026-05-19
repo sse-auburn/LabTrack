@@ -6,7 +6,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">{{ equipment.name }}</h1>
@@ -55,7 +55,7 @@
             {% if can_approve %}
             <div class="flex items-center gap-2">
               <a href="{% url 'equipment:approve' equipment.pk %}"
-                 class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition-colors">
+                 class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg transition-colors">
                 Approve
               </a>
               <a href="{% url 'equipment:reject' equipment.pk %}"
@@ -80,16 +80,16 @@
             
             <!-- Status Badge -->
             {% if equipment.status == 'AVAILABLE' %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-              <span class="w-2 h-2 rounded-full bg-green-500 mr-1.5"></span>Available
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800">
+              <span class="w-2 h-2 rounded-full bg-brand-500 mr-1.5"></span>Available
             </span>
             {% elif equipment.status == 'BORROWED' %}
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800">
               <span class="w-2 h-2 rounded-full bg-amber-500 mr-1.5"></span>Borrowed
             </span>
             {% elif equipment.status == 'RESERVED' %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-              <span class="w-2 h-2 rounded-full bg-blue-500 mr-1.5"></span>Reserved
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-auburn-bluePale text-auburn-blue">
+              <span class="w-2 h-2 rounded-full bg-auburn-bluePale0 mr-1.5"></span>Reserved
             </span>
             {% elif equipment.status == 'MAINTENANCE' %}
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
@@ -108,7 +108,7 @@
             {% if equipment.condition == 'EXCELLENT' %}
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Excellent</span>
             {% elif equipment.condition == 'GOOD' %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-50 text-teal-700 border border-teal-200">Good</span>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-auburn-bluePale text-auburn-blue border border-auburn-bluePale">Good</span>
             {% elif equipment.condition == 'FAIR' %}
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Fair</span>
             {% elif equipment.condition == 'POOR' %}
@@ -131,7 +131,7 @@
         <div class="flex flex-wrap gap-2 shrink-0">
           {% if user.is_authenticated %}
             <a href="{% url 'reservations:create' %}?equipment={{ equipment.pk }}"
-               class="inline-flex items-center px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 transition-colors duration-150">
+               class="inline-flex items-center px-4 py-2 bg-auburn-bluePale hover:bg-auburn-bluePale text-auburn-blue text-sm font-medium rounded-lg border border-auburn-bluePale transition-colors duration-150">
               Reserve
             </a>
             <a href="{% url 'incidents:create' %}?equipment={{ equipment.pk }}"
@@ -140,13 +140,13 @@
             </a>
             {% if user.is_admin %}
             <a href="{% url 'incidents:maintenance_create' %}?equipment={{ equipment.pk }}"
-               class="inline-flex items-center px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 text-sm font-medium rounded-lg border border-purple-200 transition-colors duration-150">
+               class="inline-flex items-center px-4 py-2 bg-brand-50 hover:bg-brand-100 text-brand-700 text-sm font-medium rounded-lg border border-brand-200 transition-colors duration-150">
               Log Maintenance
             </a>
             {% endif %}
             {% if user == equipment.owner or user.is_admin %}
             <a href="{% url 'equipment:move' equipment.pk %}"
-               class="inline-flex items-center px-4 py-2 bg-teal-50 hover:bg-teal-100 text-teal-700 text-sm font-medium rounded-lg border border-teal-200 transition-colors duration-150">
+               class="inline-flex items-center px-4 py-2 bg-auburn-bluePale hover:bg-auburn-bluePale text-auburn-blue text-sm font-medium rounded-lg border border-auburn-bluePale transition-colors duration-150">
               <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -261,32 +261,32 @@
       <div class="border-b border-slate-200">
         <nav class="flex overflow-x-auto -mb-px" aria-label="Tabs">
           <button @click="activeTab = 'reservation-history'"
-                  :class="activeTab === 'reservation-history' ? 'border-indigo-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+                  :class="activeTab === 'reservation-history' ? 'border-auburn-orange text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Reservation History
           </button>
           <button @click="activeTab = 'lifecycle'"
-                  :class="activeTab === 'lifecycle' ? 'border-indigo-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+                  :class="activeTab === 'lifecycle' ? 'border-auburn-orange text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Lifecycle
           </button>
           <button @click="activeTab = 'movements'"
-                  :class="activeTab === 'movements' ? 'border-indigo-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+                  :class="activeTab === 'movements' ? 'border-auburn-orange text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Movement History
           </button>
           <button @click="activeTab = 'incidents'"
-                  :class="activeTab === 'incidents' ? 'border-indigo-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+                  :class="activeTab === 'incidents' ? 'border-auburn-orange text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Incidents
           </button>
           <button @click="activeTab = 'maintenance'"
-                  :class="activeTab === 'maintenance' ? 'border-indigo-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+                  :class="activeTab === 'maintenance' ? 'border-auburn-orange text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Maintenance
           </button>
           <button @click="activeTab = 'calendar'"
-                  :class="activeTab === 'calendar' ? 'border-indigo-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+                  :class="activeTab === 'calendar' ? 'border-auburn-orange text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-150">
             Availability
           </button>
@@ -323,7 +323,7 @@
                     {% elif res.status == 'CONFIRMED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-brand-100 text-brand-800">Confirmed</span>
                     {% elif res.status == 'ACTIVE' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
                     {% elif res.status == 'RETURN_PENDING' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">Return Pending</span>
-                    {% elif res.status == 'RETURNED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Returned</span>
+                    {% elif res.status == 'RETURNED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-brand-100 text-brand-800">Returned</span>
                     {% elif res.status == 'CANCELLED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-500">Cancelled</span>
                     {% elif res.status == 'EXPIRED' %}<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-400">Expired</span>
                     {% endif %}
@@ -479,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const panel = document.getElementById('tab-' + name);
           const isActive = j === i;
           if (panel) panel.style.display = isActive ? 'block' : 'none';
-          document.querySelectorAll('nav button')[j].classList.toggle('border-indigo-500', isActive);
+          document.querySelectorAll('nav button')[j].classList.toggle('border-auburn-orange', isActive);
           document.querySelectorAll('nav button')[j].classList.toggle('text-brand-600', isActive);
           document.querySelectorAll('nav button')[j].classList.toggle('border-transparent', !isActive);
           document.querySelectorAll('nav button')[j].classList.toggle('text-slate-500', !isActive);

@@ -36,8 +36,8 @@
               <td class="px-6 py-3 text-slate-700">
                 {% if field == 'is_active' or field == 'is_published' or field == 'is_featured' or field == 'is_pinned' %}
                   {% if item|attr:field %}
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium">
-                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-xs font-medium">
+                      <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
                       Yes
                     </span>
                   {% else %}
@@ -49,9 +49,9 @@
                 {% elif field == 'status' %}
                   {% with status=item|attr:field %}
                     {% if status == 'ACTIVE' or status == 'OPEN' %}
-                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium">{{ status }}</span>
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-xs font-medium">{{ status }}</span>
                     {% elif status == 'COMPLETED' or status == 'FILLED' %}
-                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">{{ status }}</span>
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-auburn-bluePale text-auburn-blue text-xs font-medium">{{ status }}</span>
                     {% else %}
                       <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">{{ status|default:"—" }}</span>
                     {% endif %}

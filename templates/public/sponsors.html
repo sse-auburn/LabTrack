@@ -11,9 +11,11 @@
       industry partners, and philanthropic organizations.
     </p>
 
-    {% if sponsors %}
+    <!-- Funding Partners -->
+    <h2 class="text-2xl font-bold text-auburn-blue mb-6">Funding Partners</h2>
+    {% if funding_partners %}
       <div class="grid md:grid-cols-2 gap-6 mb-12">
-        {% for sponsor in sponsors %}
+        {% for sponsor in funding_partners %}
         <div class="p-6 rounded-xl border border-slate-200 bg-white text-center hover:shadow-md transition">
           {% if sponsor.logo %}
             <img src="{{ sponsor.logo.url }}" alt="{{ sponsor.name }}" class="h-16 mx-auto mb-4 object-contain">
@@ -31,7 +33,6 @@
         {% endfor %}
       </div>
     {% else %}
-      <!-- Default placeholder sponsors -->
       <div class="grid md:grid-cols-2 gap-6 mb-12">
         <div class="p-6 rounded-xl border border-slate-200 bg-white text-center">
           <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-auburn-bluePale flex items-center justify-center">
@@ -47,21 +48,30 @@
           <h3 class="font-bold text-auburn-blue mb-1">USDA NIFA</h3>
           <p class="text-sm text-slate-500">Agricultural research grants</p>
         </div>
-        <div class="p-6 rounded-xl border border-slate-200 bg-white text-center">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-auburn-bluePale flex items-center justify-center">
-            <span class="text-auburn-blue font-bold text-lg">AU</span>
-          </div>
-          <h3 class="font-bold text-auburn-blue mb-1">Auburn University</h3>
-          <p class="text-sm text-slate-500">Internal research support</p>
-        </div>
-        <div class="p-6 rounded-xl border border-slate-200 bg-white text-center">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-auburn-bluePale flex items-center justify-center">
-            <span class="text-auburn-blue font-bold text-lg">Ag</span>
-          </div>
-          <h3 class="font-bold text-auburn-blue mb-1">Alabama Dept. of Agriculture</h3>
-          <p class="text-sm text-slate-500">State-level funding</p>
-        </div>
       </div>
+    {% endif %}
+
+    <!-- Collaborative Partners -->
+    {% if collaborative_partners %}
+    <h2 class="text-2xl font-bold text-auburn-blue mb-6">Collaborative Partners</h2>
+    <div class="grid md:grid-cols-2 gap-6 mb-12">
+      {% for sponsor in collaborative_partners %}
+      <div class="p-6 rounded-xl border border-slate-200 bg-white text-center hover:shadow-md transition">
+        {% if sponsor.logo %}
+          <img src="{{ sponsor.logo.url }}" alt="{{ sponsor.name }}" class="h-16 mx-auto mb-4 object-contain">
+        {% else %}
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-auburn-bluePale flex items-center justify-center">
+            <span class="text-auburn-blue font-bold text-lg">{{ sponsor.name|first }}</span>
+          </div>
+        {% endif %}
+        <h3 class="font-bold text-auburn-blue mb-1">{{ sponsor.name }}</h3>
+        {% if sponsor.description %}<div class="text-sm text-slate-500 mb-2">{{ sponsor.description|safe }}</div>{% endif %}
+        {% if sponsor.website_link %}
+          <a href="{{ sponsor.website_link }}" target="_blank" class="text-auburn-orange text-sm font-medium hover:underline">Visit website</a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
     {% endif %}
 
     <div class="text-center">

@@ -3,7 +3,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">{% if form.instance.pk %}Edit Kit{% else %}Create New Kit{% endif %}</h1>
@@ -109,7 +109,7 @@
             <input type="text" id="eq-search" placeholder="Search equipment…"
                    class="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
             <button type="button" onclick="selectAllEq()"
-                    class="px-3 py-2 text-xs font-medium text-brand-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition">
+                    class="px-3 py-2 text-xs font-medium text-brand-600 border border-auburn-bluePale rounded-lg hover:bg-auburn-bluePale transition">
               All
             </button>
             <button type="button" onclick="clearEq()"
@@ -119,7 +119,7 @@
           </div>
           <div class="divide-y divide-slate-100 max-h-64 overflow-y-auto" id="eq-list">
             {% for eq in available_equipment %}
-            <label class="eq-item flex items-center gap-3 px-4 py-2.5 hover:bg-indigo-50 cursor-pointer transition-colors"
+            <label class="eq-item flex items-center gap-3 px-4 py-2.5 hover:bg-auburn-bluePale cursor-pointer transition-colors"
                    data-name="{{ eq.name|lower }}">
               <input type="checkbox" name="equipment_ids" value="{{ eq.pk }}"
                      class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500"

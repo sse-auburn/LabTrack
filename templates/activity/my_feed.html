@@ -7,7 +7,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">{% if is_mine %}My Activity{% else %}Activity Feed{% endif %}</h1>
@@ -141,33 +141,33 @@
           <!-- Icon column -->
           <div class="hidden sm:flex flex-shrink-0 w-[4.25rem] justify-center pt-1">
             <div class="z-10 flex items-center justify-center w-9 h-9 rounded-full ring-2 ring-white
-              {% if 'CREATED' in log.action or 'REGISTERED' in log.action %}bg-green-100
+              {% if 'CREATED' in log.action or 'REGISTERED' in log.action %}bg-brand-100
               {% elif 'DELETED' in log.action or 'OVERDUE' in log.action %}bg-red-100
-              {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action or 'COMPLETED' in log.action %}bg-blue-100
+              {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action or 'COMPLETED' in log.action %}bg-auburn-bluePale
               {% elif 'REJECTED' in log.action or 'CANCELLED' in log.action %}bg-orange-100
               {% elif 'UPDATED' in log.action or 'CHANGED' in log.action %}bg-yellow-100
-              {% elif 'REPORTED' in log.action %}bg-purple-100
+              {% elif 'REPORTED' in log.action %}bg-brand-100
               {% else %}bg-slate-100{% endif %}">
               {% if 'BORROW' in log.action %}
-                <svg class="w-4 h-4 {% if 'CREATED' in log.action or 'APPROVED' in log.action %}text-green-600{% elif 'REJECTED' in log.action %}text-red-600{% elif 'OVERDUE' in log.action %}text-red-600{% else %}text-blue-600{% endif %}"
+                <svg class="w-4 h-4 {% if 'CREATED' in log.action or 'APPROVED' in log.action %}text-brand-600{% elif 'REJECTED' in log.action %}text-red-600{% elif 'OVERDUE' in log.action %}text-red-600{% else %}text-auburn-blueLight{% endif %}"
                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                 </svg>
               {% elif 'EQUIPMENT' in log.action %}
-                <svg class="w-4 h-4 {% if 'DELETED' in log.action %}text-red-600{% elif 'CREATED' in log.action %}text-green-600{% else %}text-yellow-600{% endif %}"
+                <svg class="w-4 h-4 {% if 'DELETED' in log.action %}text-red-600{% elif 'CREATED' in log.action %}text-brand-600{% else %}text-yellow-600{% endif %}"
                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
                 </svg>
               {% elif 'INCIDENT' in log.action %}
-                <svg class="w-4 h-4 {% if 'RESOLVED' in log.action %}text-green-600{% else %}text-purple-600{% endif %}"
+                <svg class="w-4 h-4 {% if 'RESOLVED' in log.action %}text-brand-600{% else %}text-brand-600{% endif %}"
                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
               {% elif 'RESERVATION' in log.action %}
-                <svg class="w-4 h-4 {% if 'CANCELLED' in log.action %}text-orange-600{% else %}text-blue-600{% endif %}"
+                <svg class="w-4 h-4 {% if 'CANCELLED' in log.action %}text-orange-600{% else %}text-auburn-blueLight{% endif %}"
                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -203,12 +203,12 @@
                     <span class="text-sm font-semibold text-slate-400 italic">System</span>
                   {% endif %}
                   <span class="text-xs font-medium px-2 py-0.5 rounded-full
-                    {% if 'CREATED' in log.action or 'REGISTERED' in log.action %}bg-green-100 text-green-700
+                    {% if 'CREATED' in log.action or 'REGISTERED' in log.action %}bg-brand-100 text-brand-700
                     {% elif 'DELETED' in log.action %}bg-red-100 text-red-700
-                    {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action or 'COMPLETED' in log.action %}bg-blue-100 text-blue-700
+                    {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action or 'COMPLETED' in log.action %}bg-auburn-bluePale text-auburn-blue
                     {% elif 'REJECTED' in log.action or 'CANCELLED' in log.action %}bg-orange-100 text-orange-700
                     {% elif 'UPDATED' in log.action or 'CHANGED' in log.action %}bg-yellow-100 text-yellow-700
-                    {% elif 'REPORTED' in log.action %}bg-purple-100 text-purple-700
+                    {% elif 'REPORTED' in log.action %}bg-brand-100 text-brand-700
                     {% elif 'OVERDUE' in log.action %}bg-red-100 text-red-700
                     {% else %}bg-slate-100 text-slate-600{% endif %}">
                     {{ log.get_action_display }}

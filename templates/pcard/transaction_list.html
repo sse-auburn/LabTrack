@@ -8,7 +8,7 @@
 {% block content %}
 
 <!-- Page Header Banner -->
-<div class="bg-indigo-700 rounded-2xl px-6 py-2 text-white shadow-md mb-2">
+<div class="bg-auburn-blue rounded-2xl px-6 py-2 text-white shadow-md mb-2">
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-4">
     <div>
       <div>
@@ -29,7 +29,7 @@
       <a href="{% url 'pcard:export_excel' %}?{{ request.GET.urlencode }}"
         class="inline-flex items-center px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors"
         title="Download Excel with transaction details">
-        <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 mr-2 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
         </svg>
@@ -62,8 +62,8 @@
 
     <!-- Summary Card -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 mb-6 flex items-center gap-4">
-      <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-brand-100 flex items-center justify-center">
+        <svg class="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -89,7 +89,7 @@
                 d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
             </svg>
             <input type="text" id="search" name="q" value="{{ search }}" placeholder="Search items or notes..."
-              class="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500">
+              class="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-auburn-orange">
           </div>
         </div>
 
@@ -97,14 +97,14 @@
         <div>
           <label for="id_date_from" class="block text-xs font-medium text-slate-500 mb-1">From Date</label>
           <input type="date" id="id_date_from" name="date_from" value="{{ request.GET.date_from }}"
-            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500">
+            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-auburn-orange">
         </div>
 
         <!-- Date To -->
         <div>
           <label for="id_date_to" class="block text-xs font-medium text-slate-500 mb-1">To Date</label>
           <input type="date" id="id_date_to" name="date_to" value="{{ request.GET.date_to }}"
-            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-indigo-500">
+            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-auburn-orange">
         </div>
       </div>
 
@@ -144,7 +144,7 @@
               </td>
               <td class="px-5 py-3">
                 <span
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-brand-700 border border-indigo-100">
+                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-auburn-bluePale text-brand-700 border border-auburn-bluePale">
                   {{ tx.item_count }} item{{ tx.item_count|pluralize }}
                 </span>
                 <p class="text-xs text-slate-500 mt-1 truncate max-w-xs">

@@ -5,7 +5,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">Return Item</h1>
@@ -19,12 +19,12 @@
   </div>
 
   <!-- Item Summary -->
-  <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-5 flex items-start gap-4">
+  <div class="bg-auburn-bluePale border border-auburn-bluePale rounded-xl p-5 flex items-start gap-4">
     <div class="w-10 h-10 bg-brand-600 rounded-lg flex items-center justify-center flex-shrink-0">
       <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
     </div>
     <div>
-      <p class="text-sm font-semibold text-indigo-900">
+      <p class="text-sm font-semibold text-auburn-blue">
         {% if borrow.equipment %}{{ borrow.equipment.name }}{% elif borrow.kit %}{{ borrow.kit.name }} (Kit){% endif %}
       </p>
       <p class="text-xs text-brand-600 mt-0.5">Borrowed by {{ borrow.borrower.full_name }} · Due: {{ borrow.due_date|date:"M d, Y" }}</p>
@@ -49,7 +49,7 @@
       </div>
 
       <div class="mt-6 flex gap-3">
-        <button type="submit" class="px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
+        <button type="submit" class="px-5 py-2.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors">
           Confirm Return
         </button>
         <a href="{% url 'borrowing:detail' borrow.pk %}" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50">

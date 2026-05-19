@@ -128,10 +128,16 @@ class JobOpening(models.Model):
 
 class Sponsor(models.Model):
     """Lab sponsor or partner."""
+    PARTNER_TYPE_CHOICES = [
+        ('FUNDING', 'Funding Partner'),
+        ('COLLABORATION', 'Collaborative Partner'),
+    ]
+
     name = models.CharField(max_length=200)
     description = CKEditor5Field(blank=True)
     logo = models.ImageField(upload_to='public/sponsors/', blank=True, null=True)
     website_link = models.URLField(blank=True)
+    partner_type = models.CharField(max_length=20, choices=PARTNER_TYPE_CHOICES, default='FUNDING')
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 

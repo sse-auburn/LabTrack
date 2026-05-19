@@ -3,7 +3,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">Return Reserved Item</h1>
@@ -26,8 +26,8 @@
   
 
   <!-- Reservation Summary -->
-  <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mb-6">
-    <p class="text-sm font-medium text-indigo-900">
+  <div class="bg-auburn-bluePale border border-auburn-bluePale rounded-xl p-4 mb-6">
+    <p class="text-sm font-medium text-auburn-blue">
       {% if reservation.equipment %}{{ reservation.equipment.name }}{% elif reservation.kit %}{{ reservation.kit.name }}{% endif %}
     </p>
     <p class="text-xs text-brand-700 mt-1">

@@ -15,7 +15,7 @@
 
   <!-- Kit Header -->
   <div class="bg-white rounded-xl border border-slate-200 overflow-hidden mb-6">
-    <div class="bg-indigo-700 px-6 py-8">
+    <div class="bg-auburn-blue px-6 py-8">
       <div class="flex items-start justify-between">
         <div>
           <div class="flex items-center gap-3 mb-2">
@@ -33,7 +33,7 @@
             </div>
           </div>
           {% if kit.description %}
-          <p class="text-indigo-100 text-sm max-w-2xl mt-3">{{ kit.description }}</p>
+          <p class="text-auburn-bluePale text-sm max-w-2xl mt-3">{{ kit.description }}</p>
           {% endif %}
         </div>
         <div class="flex gap-2">
@@ -57,7 +57,7 @@
           {% endif %}
         </div>
       </div>
-      <div class="mt-4 flex items-center gap-4 text-xs text-indigo-200">
+      <div class="mt-4 flex items-center gap-4 text-xs text-auburn-bluePale">
         <span>Created by {{ kit.created_by.full_name|default:kit.created_by.username|default:"System" }}</span>
         <span>•</span>
         <span>{{ kit.created_at|date:"F j, Y" }}</span>
@@ -67,7 +67,7 @@
     <!-- Action Buttons -->
     <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-wrap gap-3">
       <a href="{% url 'reservations:create' %}?kit={{ kit.pk }}"
-         class="inline-flex items-center px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 transition">
+         class="inline-flex items-center px-4 py-2 bg-auburn-bluePale hover:bg-auburn-bluePale text-auburn-blue text-sm font-medium rounded-lg border border-auburn-bluePale transition">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -132,7 +132,7 @@
               </div>
             </div>
             <div class="flex items-center gap-3">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-brand-700">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-auburn-bluePale text-brand-700">
                 ×{{ kit_item.quantity }}
               </span>
               <!-- Equipment Status -->
@@ -184,7 +184,7 @@
               {% elif r.status == 'CONFIRMED' %}
                 <span class="text-xs text-brand-600 font-medium">Confirmed</span>
               {% elif r.status == 'RETURNED' %}
-                <span class="text-xs text-green-600 font-medium">Returned</span>
+                <span class="text-xs text-brand-600 font-medium">Returned</span>
               {% elif r.status == 'RETURN_PENDING' %}
                 <span class="text-xs text-orange-600 font-medium">Return Pending</span>
               {% else %}

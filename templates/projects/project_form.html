@@ -3,7 +3,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">{% if form.instance.pk %}Edit Project{% else %}Create New Project{% endif %}</h1>
@@ -120,7 +120,7 @@
           </div>
           <div class="divide-y divide-slate-100 max-h-56 overflow-y-auto" id="eq-list">
             {% for eq in form.equipment.field.queryset %}
-            <label class="eq-item flex items-center gap-3 px-5 py-2.5 hover:bg-indigo-50 cursor-pointer transition-colors"
+            <label class="eq-item flex items-center gap-3 px-5 py-2.5 hover:bg-auburn-bluePale cursor-pointer transition-colors"
                    data-name="{{ eq.name|lower }}">
               <input type="checkbox" name="equipment" value="{{ eq.pk }}"
                      {% if eq.pk in selected_equipment_ids %}checked{% endif %}
@@ -145,7 +145,7 @@
           </div>
           <div class="divide-y divide-slate-100 max-h-48 overflow-y-auto">
             {% for kit in form.kits.field.queryset %}
-            <label class="flex items-center gap-3 px-5 py-2.5 hover:bg-indigo-50 cursor-pointer transition-colors">
+            <label class="flex items-center gap-3 px-5 py-2.5 hover:bg-auburn-bluePale cursor-pointer transition-colors">
               <input type="checkbox" name="kits" value="{{ kit.pk }}"
                      {% if kit.pk in selected_kit_ids %}checked{% endif %}
                      class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500"
@@ -171,12 +171,12 @@
             <input type="text" id="mem-search" placeholder="Search users…"
                    class="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
           </div>
-          <div class="px-4 py-2 border-b border-slate-100 bg-indigo-50">
+          <div class="px-4 py-2 border-b border-slate-100 bg-auburn-bluePale">
             <p class="text-xs text-brand-700 font-medium">You will be added as Lead automatically.</p>
           </div>
           <div class="divide-y divide-slate-100 max-h-80 overflow-y-auto" id="mem-list">
             {% for user in form.initial_members.field.queryset %}
-            <label class="mem-item flex items-center gap-3 px-4 py-2.5 hover:bg-indigo-50 cursor-pointer transition-colors"
+            <label class="mem-item flex items-center gap-3 px-4 py-2.5 hover:bg-auburn-bluePale cursor-pointer transition-colors"
                    data-name="{{ user.username|lower }} {{ user.first_name|lower }} {{ user.last_name|lower }}">
               <input type="checkbox" name="initial_members" value="{{ user.pk }}"
                      {% if user.pk in selected_member_ids %}checked{% endif %}

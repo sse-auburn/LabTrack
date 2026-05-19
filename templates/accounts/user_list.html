@@ -11,7 +11,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-2 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-2 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
   <div>
     <p class="text-sm text-white mt-0.5">
@@ -77,12 +77,12 @@
       </a>
       <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}role=MEMBER"
          class="px-3 py-2 rounded-lg text-sm font-medium transition-colors
-           {% if request.GET.role == 'MEMBER' %}bg-blue-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
+           {% if request.GET.role == 'MEMBER' %}bg-auburn-blue text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
         Members
       </a>
       <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}role=ADMIN"
          class="px-3 py-2 rounded-lg text-sm font-medium transition-colors
-           {% if request.GET.role == 'ADMIN' %}bg-purple-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
+           {% if request.GET.role == 'ADMIN' %}bg-brand-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
         Admins
       </a>
     </div>
@@ -91,7 +91,7 @@
     <div class="flex items-center gap-2">
       <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.role %}role={{ request.GET.role }}&{% endif %}status=active"
          class="px-3 py-2 rounded-lg text-sm font-medium transition-colors
-           {% if status == 'active' %}bg-green-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
+           {% if status == 'active' %}bg-brand-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
         Active
       </a>
       <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.role %}role={{ request.GET.role }}&{% endif %}status=pending"
@@ -142,7 +142,7 @@
                      class="w-9 h-9 rounded-full object-cover flex-shrink-0 ring-1 ring-slate-200" />
               {% else %}
                 <div class="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center
-                  {% if member.is_admin %}bg-purple-600{% else %}bg-brand-600{% endif %}">
+                  {% if member.is_admin %}bg-brand-600{% else %}bg-brand-600{% endif %}">
                   <span class="text-white text-xs font-bold">
                     {{ member.first_name|first|upper }}{{ member.last_name|first|upper }}
                   </span>
@@ -163,7 +163,7 @@
           <!-- Role badge -->
           <td class="px-6 py-4">
             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
-              {% if member.is_admin %}bg-purple-100 text-purple-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+              {% if member.is_admin %}bg-brand-100 text-brand-700{% else %}bg-auburn-bluePale text-auburn-blue{% endif %}">
               {{ member.get_role_display }}
             </span>
           </td>
@@ -171,8 +171,8 @@
           <!-- Status badge -->
           <td class="px-6 py-4">
             {% if member.is_active %}
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-              <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-brand-100 text-brand-700">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-500 inline-block"></span>
               Active
             </span>
             {% else %}
@@ -195,7 +195,7 @@
               <form method="post" action="{% url 'accounts:toggle_active' member.pk %}">
                 {% csrf_token %}
                 <button type="submit"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition-colors">
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg transition-colors">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -247,8 +247,8 @@
                     <input type="hidden" name="role" value="MEMBER" />
                     <button type="submit"
                             class="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 text-left
-                              {% if member.role == 'MEMBER' %}font-semibold text-blue-700 bg-blue-50{% endif %}">
-                      <span class="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
+                              {% if member.role == 'MEMBER' %}font-semibold text-auburn-blue bg-auburn-bluePale{% endif %}">
+                      <span class="w-2 h-2 rounded-full bg-auburn-bluePale0 inline-block"></span>
                       Member
                     </button>
                   </form>
@@ -257,8 +257,8 @@
                     <input type="hidden" name="role" value="ADMIN" />
                     <button type="submit"
                             class="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 text-left
-                              {% if member.role == 'ADMIN' %}font-semibold text-purple-700 bg-purple-50{% endif %}">
-                      <span class="w-2 h-2 rounded-full bg-purple-500 inline-block"></span>
+                              {% if member.role == 'ADMIN' %}font-semibold text-brand-700 bg-brand-50{% endif %}">
+                      <span class="w-2 h-2 rounded-full bg-brand-500 inline-block"></span>
                       Admin
                     </button>
                   </form>
@@ -267,7 +267,7 @@
                     {% csrf_token %}
                     <button type="submit"
                             class="w-full flex items-center gap-2 px-4 py-2 text-sm text-left
-                              {% if member.is_active %}text-red-600 hover:bg-red-50{% else %}text-green-700 hover:bg-green-50{% endif %}">
+                              {% if member.is_active %}text-red-600 hover:bg-red-50{% else %}text-brand-700 hover:bg-brand-50{% endif %}">
                       {% if member.is_active %}
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

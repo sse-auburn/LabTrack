@@ -7,7 +7,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">Pending Equipment Approvals</h1>
@@ -70,7 +70,7 @@
               </td>
               <td class="px-6 py-4 text-sm text-slate-700">
                 {% if item.category %}
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-brand-700 border border-indigo-100">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-auburn-bluePale text-brand-700 border border-auburn-bluePale">
                   {{ item.category.name }}
                 </span>
                 {% else %}—{% endif %}
@@ -92,7 +92,7 @@
                   </a>
                   {% if user.is_admin or item.owner == user %}
                   <a href="{% url 'equipment:approve' item.pk %}"
-                     class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition-colors">
+                     class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg transition-colors">
                     Approve
                   </a>
                   <a href="{% url 'equipment:reject' item.pk %}"

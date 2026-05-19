@@ -4,7 +4,7 @@
 {% block content %}
 
   <!-- Page Header Banner -->
-  <div class="bg-indigo-700 rounded-2xl px-6 py-4 text-white shadow-md mb-6">
+  <div class="bg-auburn-blue rounded-2xl px-6 py-4 text-white shadow-md mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white">{{ incident.title }}</h1>
@@ -22,8 +22,8 @@
         {% elif incident.severity == 'MEDIUM' %}<span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-semibold rounded-full">Medium</span>
         {% else %}<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">Low</span>{% endif %}
         {% if incident.status == 'OPEN' %}<span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">Open</span>
-        {% elif incident.status == 'INVESTIGATING' %}<span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">Investigating</span>
-        {% elif incident.status == 'RESOLVED' %}<span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">Resolved</span>
+        {% elif incident.status == 'INVESTIGATING' %}<span class="px-2 py-0.5 bg-auburn-bluePale text-auburn-blue text-xs rounded-full">Investigating</span>
+        {% elif incident.status == 'RESOLVED' %}<span class="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs rounded-full">Resolved</span>
         {% else %}<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">Closed</span>{% endif %}
       </div>
     </div>
@@ -36,7 +36,7 @@
       {% endif %}
       {% if incident.status != 'RESOLVED' and incident.status != 'CLOSED' %}
         {% if user.is_admin or user == incident.reported_by or user == incident.equipment.owner or user == incident.assigned_to %}
-          <a href="{% url 'incidents:resolve' incident.pk %}" class="px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">Mark Resolved</a>
+          <a href="{% url 'incidents:resolve' incident.pk %}" class="px-3 py-1.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700">Mark Resolved</a>
         {% endif %}
       {% endif %}
       {% if user.is_admin or incident.reported_by == user %}
@@ -71,8 +71,8 @@
     </div>
     {% endif %}
     {% if incident.resolution %}
-    <div class="p-6 bg-green-50">
-      <p class="text-xs font-medium text-green-700 uppercase mb-2">Resolution</p>
+    <div class="p-6 bg-brand-50">
+      <p class="text-xs font-medium text-brand-700 uppercase mb-2">Resolution</p>
       <p class="text-sm text-slate-700 whitespace-pre-line">{{ incident.resolution }}</p>
       {% if incident.resolved_by %}<p class="text-xs text-slate-500 mt-2">Resolved by {{ incident.resolved_by.full_name }}</p>{% endif %}
     </div>
