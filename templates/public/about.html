@@ -16,31 +16,7 @@
     </div>
 
     <div class="about-content text-slate-700 leading-relaxed">
-      {{ page_sections.main.content|default:'
-        <p class="text-xl leading-relaxed mb-6">
-          The Smart Systems Engineering (SSE Lab) at Auburn University is a leading research
-          group focused on developing intelligent technologies for precision agriculture and
-          sustainable food systems.
-        </p>
-        <p class="mb-6">
-          Our interdisciplinary team brings together expertise in mechanical engineering,
-          computer science, electrical engineering, and plant science to tackle complex challenges
-          at the intersection of technology and agriculture.
-        </p>
-        <h2>Research Areas</h2>
-        <ul>
-          <li>Smart sensor networks and IoT for crop monitoring</li>
-          <li>Autonomous robotic systems for agriculture</li>
-          <li>Machine learning and computer vision for plant phenotyping</li>
-          <li>Controlled environment agriculture and greenhouse automation</li>
-        </ul>
-        <h2>Our Facilities</h2>
-        <p>
-          The lab is housed within the Samuel Ginn College of Engineering at Auburn University,
-          with access to state-of-the-art research greenhouses, field stations, and fabrication
-          facilities.
-        </p>
-      '|safe }}
+      {{ page_sections.main.content|default:"<p>About content coming soon.</p>"|safe }}
     </div>
   </div>
 </section>

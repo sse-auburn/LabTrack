@@ -15,7 +15,7 @@
           {{ page_sections.hero.subtitle|default:"Auburn University" }}
         </div>
         <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-auburn-blue leading-tight mb-6">
-          {{ page_sections.hero.title|default:"Smart Systems<br><span class='text-auburn-orange'>Engineering Lab</span>"|safe }}
+          {{ page_sections.hero.title|default:"Smart Systems<br><span class='text-auburn-orange'>Engineering</span>"|safe }}
         </h1>
         <div class="text-lg text-slate-600 leading-relaxed mb-8 max-w-xl">
           {{ page_sections.hero.content|default:"Advancing cutting-edge research in smart horticulture systems, sensor networks, and data-driven engineering solutions for a sustainable future."|safe }}
@@ -122,13 +122,11 @@
       {% for hl in highlights %}
         {% if hl.highlight_type == 'PROJECT' and hl.project %}
         <a href="{% url 'public:projects' %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
+          {% if hl.project.image %}
           <div class="h-48 bg-auburn-blue/5 flex items-center justify-center overflow-hidden">
-            {% if hl.project.image %}
-              <img src="{{ hl.project.image.url }}" alt="{{ hl.project.title }}" class="h-full w-full object-cover group-hover:scale-105 transition duration-500">
-            {% else %}
-              <svg class="w-16 h-16 text-auburn-blue/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-            {% endif %}
+            <img src="{{ hl.project.image.url }}" alt="{{ hl.project.title }}" class="h-full w-full object-cover group-hover:scale-105 transition duration-500">
           </div>
+          {% endif %}
           <div class="p-6 flex-1 flex flex-col">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-auburn-orange/10 text-auburn-orange text-xs font-semibold w-fit mb-3">Project</span>
             <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ hl.project.title }}</h3>
@@ -137,9 +135,6 @@
         </a>
         {% elif hl.highlight_type == 'PUBLICATION' and hl.publication %}
         <a href="{% url 'public:publications' %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
-          <div class="h-48 bg-auburn-blue/5 flex items-center justify-center">
-            <svg class="w-16 h-16 text-auburn-blue/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          </div>
           <div class="p-6 flex-1 flex flex-col">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold w-fit mb-3">Publication</span>
             <h3 class="text-lg font-bold text-auburn-blue mb-2 line-clamp-2">{{ hl.publication.title }}</h3>
@@ -148,10 +143,7 @@
           </div>
         </a>
         {% elif hl.highlight_type == 'NEWS' and hl.news_item %}
-        <a href="{% url 'public:news' %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
-          <div class="h-48 bg-auburn-blue/5 flex items-center justify-center">
-            <svg class="w-16 h-16 text-auburn-blue/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-          </div>
+        <a href="{% url 'public:news_detail' hl.news_item.pk %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
           <div class="p-6 flex-1 flex flex-col">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-xs font-semibold w-fit mb-3">News</span>
             <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ hl.news_item.title }}</h3>
@@ -160,13 +152,11 @@
         </a>
         {% elif hl.highlight_type == 'GALLERY' and hl.gallery_item %}
         <a href="{% url 'public:gallery' %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
+          {% if hl.gallery_item.image %}
           <div class="h-48 bg-auburn-blue/5 flex items-center justify-center overflow-hidden">
-            {% if hl.gallery_item.image %}
-              <img src="{{ hl.gallery_item.image.url }}" alt="{{ hl.gallery_item.title }}" class="h-full w-full object-cover group-hover:scale-105 transition duration-500">
-            {% else %}
-              <svg class="w-16 h-16 text-auburn-blue/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            {% endif %}
+            <img src="{{ hl.gallery_item.image.url }}" alt="{{ hl.gallery_item.title }}" class="h-full w-full object-cover group-hover:scale-105 transition duration-500">
           </div>
+          {% endif %}
           <div class="p-6 flex-1 flex flex-col">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 text-xs font-semibold w-fit mb-3">Gallery</span>
             <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ hl.gallery_item.title }}</h3>
@@ -175,9 +165,6 @@
         </a>
         {% elif hl.highlight_type == 'JOB' and hl.job_opening %}
         <a href="{% url 'public:jobs' %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
-          <div class="h-48 bg-auburn-blue/5 flex items-center justify-center">
-            <svg class="w-16 h-16 text-auburn-blue/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          </div>
           <div class="p-6 flex-1 flex flex-col">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-semibold w-fit mb-3">Open Position</span>
             <h3 class="text-lg font-bold text-auburn-blue mb-2">{{ hl.job_opening.title }}</h3>

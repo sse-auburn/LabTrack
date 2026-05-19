@@ -29,6 +29,7 @@ urlpatterns = [
 
     # News
     path('news/', views.news_view, name='news'),
+    path('news/<int:pk>/', views.news_detail_view, name='news_detail'),
 
     # Gallery
     path('gallery/', views.gallery_view, name='gallery'),

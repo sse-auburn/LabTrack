@@ -4,74 +4,85 @@
 
 {% block content %}
 <section class="py-20 bg-white">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h1 class="text-4xl font-bold text-auburn-blue mb-8">{{ page_sections.intro.title|default:"Research Projects" }}</h1>
-    <div class="text-lg text-slate-600 leading-relaxed mb-12">
-      {{ page_sections.intro.content|default:"<p>Our lab leads and collaborates on a diverse portfolio of research projects funded by federal agencies, industry partners, and foundations.</p>"|safe }}
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-auburn-blue mb-4">{{ page_sections.intro.title|default:"Research Projects" }}</h1>
+      <div class="text-lg text-slate-600 leading-relaxed max-w-3xl mx-auto">
+        {{ page_sections.intro.content|default:"<p>Our lab leads and collaborates on a diverse portfolio of research projects funded by federal agencies, industry partners, and foundations.</p>"|safe }}
+      </div>
     </div>
 
     {% if projects %}
-      <div class="space-y-8">
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for project in projects %}
-        <div class="p-6 rounded-xl border border-slate-200 bg-white hover:shadow-md transition">
+        <article class="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition flex flex-col">
           {% if project.image %}
-            <img src="{{ project.image.url }}" alt="{{ project.title }}" class="w-full h-48 object-cover rounded-lg mb-4">
-          {% endif %}
-          <div class="flex items-start justify-between mb-3 gap-2">
-            <h3 class="text-xl font-bold text-auburn-blue">{{ project.title }}</h3>
-            <span class="px-3 py-1 rounded-full {% if project.status == 'ACTIVE' %}bg-auburn-orange/10 text-auburn-orange{% else %}bg-slate-100 text-slate-600{% endif %} text-xs font-semibold whitespace-nowrap">
-              {{ project.get_status_display }}
-            </span>
+          <div class="h-48 bg-auburn-blue/5 flex items-center justify-center overflow-hidden">
+            <img src="{{ project.image.url }}" alt="{{ project.title }}" class="h-full w-full object-cover group-hover:scale-105 transition duration-500">
           </div>
-          <div class="text-slate-600 text-sm leading-relaxed mb-3">{{ project.description|safe }}</div>
-          {% if project.funding_source %}
-            <p class="text-xs text-slate-500 mb-2">Funded by {{ project.funding_source }}</p>
           {% endif %}
-          {% if project.external_link %}
-            <a href="{{ project.external_link }}" target="_blank" class="inline-flex items-center text-auburn-orange text-sm font-medium hover:underline">
-              Learn more
-              <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            </a>
-          {% endif %}
-        </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-start justify-between gap-2 mb-3">
+              <h3 class="text-lg font-bold text-auburn-blue line-clamp-2">{{ project.title }}</h3>
+              <span class="px-2.5 py-0.5 rounded-full {% if project.status == 'ACTIVE' %}bg-auburn-orange/10 text-auburn-orange{% else %}bg-slate-100 text-slate-600{% endif %} text-xs font-semibold whitespace-nowrap mt-0.5">
+                {{ project.get_status_display }}
+              </span>
+            </div>
+            <div class="text-slate-600 text-sm leading-relaxed line-clamp-3 mb-3 flex-1">
+              {{ project.description|striptags|truncatechars:160 }}
+            </div>
+            {% if project.funding_source %}
+              <p class="text-xs text-slate-500 mb-2">Funded by {{ project.funding_source }}</p>
+            {% endif %}
+            {% if project.external_link %}
+              <a href="{{ project.external_link }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-auburn-orange text-sm font-medium hover:underline mt-auto">
+                Learn more
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+              </a>
+            {% endif %}
+          </div>
+        </article>
         {% endfor %}
       </div>
     {% else %}
       <!-- Default placeholder projects -->
-      <div class="space-y-8">
-        <div class="p-6 rounded-xl border border-slate-200 bg-white hover:shadow-md transition">
-          <div class="flex items-start justify-between mb-3">
-            <h3 class="text-xl font-bold text-auburn-blue">Precision Horticulture Monitoring</h3>
-            <span class="px-3 py-1 rounded-full bg-auburn-orange/10 text-auburn-orange text-xs font-semibold">Active</span>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <article class="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition flex flex-col">
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-start justify-between gap-2 mb-3">
+              <h3 class="text-lg font-bold text-auburn-blue">Precision Horticulture Monitoring</h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-auburn-orange/10 text-auburn-orange text-xs font-semibold whitespace-nowrap mt-0.5">Active</span>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed line-clamp-3 mb-3 flex-1">
+              Development of low-cost, wireless sensor networks for real-time monitoring of environmental conditions in greenhouse and vertical farming systems.
+            </p>
+            <p class="text-xs text-slate-500">Funded by USDA NIFA</p>
           </div>
-          <p class="text-slate-600 text-sm leading-relaxed mb-3">
-            Development of low-cost, wireless sensor networks for real-time monitoring of
-            environmental conditions in greenhouse and vertical farming systems.
-          </p>
-          <p class="text-xs text-slate-500">Funded by USDA NIFA</p>
-        </div>
-        <div class="p-6 rounded-xl border border-slate-200 bg-white hover:shadow-md transition">
-          <div class="flex items-start justify-between mb-3">
-            <h3 class="text-xl font-bold text-auburn-blue">Autonomous Crop Scouting Robot</h3>
-            <span class="px-3 py-1 rounded-full bg-auburn-orange/10 text-auburn-orange text-xs font-semibold">Active</span>
+        </article>
+        <article class="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition flex flex-col">
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-start justify-between gap-2 mb-3">
+              <h3 class="text-lg font-bold text-auburn-blue">Autonomous Crop Scouting Robot</h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-auburn-orange/10 text-auburn-orange text-xs font-semibold whitespace-nowrap mt-0.5">Active</span>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed line-clamp-3 mb-3 flex-1">
+              Design and deployment of ground-based robotic platforms equipped with multi-spectral cameras and AI for early disease detection and yield estimation.
+            </p>
+            <p class="text-xs text-slate-500">Funded by NSF</p>
           </div>
-          <p class="text-slate-600 text-sm leading-relaxed mb-3">
-            Design and deployment of ground-based robotic platforms equipped with multi-spectral
-            cameras and AI for early disease detection and yield estimation.
-          </p>
-          <p class="text-xs text-slate-500">Funded by NSF</p>
-        </div>
-        <div class="p-6 rounded-xl border border-slate-200 bg-white hover:shadow-md transition">
-          <div class="flex items-start justify-between mb-3">
-            <h3 class="text-xl font-bold text-auburn-blue">AI-Driven Irrigation Optimization</h3>
-            <span class="px-3 py-1 rounded-full bg-auburn-bluePale text-auburn-blue text-xs font-semibold">Completed</span>
+        </article>
+        <article class="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition flex flex-col">
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-start justify-between gap-2 mb-3">
+              <h3 class="text-lg font-bold text-auburn-blue">AI-Driven Irrigation Optimization</h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-auburn-bluePale text-auburn-blue text-xs font-semibold whitespace-nowrap mt-0.5">Completed</span>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed line-clamp-3 mb-3 flex-1">
+              Machine learning models that integrate soil moisture, weather forecasts, and crop growth stages to optimize water use efficiency in row crops.
+            </p>
+            <p class="text-xs text-slate-500">Funded by Alabama Department of Agriculture</p>
           </div>
-          <p class="text-slate-600 text-sm leading-relaxed mb-3">
-            Machine learning models that integrate soil moisture, weather forecasts, and crop
-            growth stages to optimize water use efficiency in row crops.
-          </p>
-          <p class="text-xs text-slate-500">Funded by Alabama Department of Agriculture</p>
-        </div>
+        </article>
       </div>
     {% endif %}
   </div>

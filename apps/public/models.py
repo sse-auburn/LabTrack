@@ -229,14 +229,11 @@ class NewsItem(models.Model):
     """A short news announcement or update."""
     title = models.CharField(max_length=300)
     content = CKEditor5Field()
-    is_pinned = models.BooleanField(default=False, help_text='Pin to top of the news feed')
-    is_published = models.BooleanField(default=False)
     published_at = models.DateTimeField(blank=True, null=True)
-    expires_at = models.DateTimeField(blank=True, null=True, help_text='Optional expiration date')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-is_pinned', '-published_at', '-created_at']
+        ordering = ['-published_at', '-created_at']
 
     def __str__(self):
         return self.title

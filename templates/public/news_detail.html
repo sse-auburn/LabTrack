@@ -1,0 +1,22 @@
+{% extends 'public/base.html' %}
+
+{% block title %}{{ item.title }}{% endblock %}
+
+{% block content %}
+<section class="py-20 bg-white">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <a href="{% url 'public:news' %}" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-auburn-orange transition mb-8">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      Back to News
+    </a>
+
+    <article>
+      <p class="text-sm text-slate-400 font-medium mb-3">{{ item.published_at|date:"F j, Y"|default:"" }}</p>
+      <h1 class="text-3xl sm:text-4xl font-bold text-auburn-blue mb-8">{{ item.title }}</h1>
+      <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed">
+        {{ item.content|safe }}
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

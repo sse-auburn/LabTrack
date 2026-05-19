@@ -107,13 +107,10 @@ class BlogPostForm(forms.ModelForm):
 class NewsItemForm(forms.ModelForm):
     class Meta:
         model = models.NewsItem
-        fields = ['title', 'content', 'is_pinned', 'is_published', 'published_at', 'expires_at']
+        fields = ['title', 'content', 'published_at']
         widgets = {
             'title': forms.TextInput(attrs=_text_input()),
-            'is_pinned': forms.CheckboxInput(attrs=_checkbox()),
-            'is_published': forms.CheckboxInput(attrs=_checkbox()),
             'published_at': forms.DateTimeInput(attrs=_datetime()),
-            'expires_at': forms.DateTimeInput(attrs=_datetime()),
         }
 
 

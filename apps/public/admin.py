@@ -184,9 +184,7 @@ class BlogPostAdmin(admin.ModelAdmin):
 
 @admin.register(models.NewsItem)
 class NewsItemAdmin(admin.ModelAdmin):
-    list_display = ('title', 'is_pinned', 'is_published', 'published_at', 'expires_at')
-    list_editable = ('is_pinned', 'is_published')
-    list_filter = ('is_pinned', 'is_published')
+    list_display = ('title', 'published_at')
     search_fields = ('title', 'content')
     date_hierarchy = 'published_at'
 

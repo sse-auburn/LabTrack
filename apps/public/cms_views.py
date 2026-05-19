@@ -330,7 +330,7 @@ def newsitem_list_view(request):
         'create_url': 'public_cms:cms_newsitem_create',
         'edit_url': 'public_cms:cms_newsitem_edit',
         'delete_url': 'public_cms:cms_newsitem_delete',
-        'list_fields': ['title', 'is_pinned', 'is_published', 'published_at'],
+        'list_fields': ['title', 'published_at'],
     })
 
 

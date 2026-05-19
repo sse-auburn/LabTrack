@@ -19,11 +19,22 @@ def _page_sections(page):
 
 # ── Homepage ─────────────────────────────────────────────────────────────────
 
+def _highlight_has_image(hl):
+    """Return True if the highlight's content object has an image."""
+    if hl.highlight_type == 'PROJECT' and hl.project and hl.project.image:
+        return True
+    if hl.highlight_type == 'GALLERY' and hl.gallery_item and hl.gallery_item.image:
+        return True
+    return False
+
+
 def home_view(request):
     stats = models.HomepageStat.objects.filter(is_active=True)
-    highlights = models.HomepageHighlight.objects.filter(is_active=True).select_related(
+    highlights = list(models.HomepageHighlight.objects.filter(is_active=True).select_related(
         'project', 'publication', 'news_item', 'gallery_item', 'job_opening'
-    ).order_by('order')
+    ).order_by('order'))
+    # Image-bearing cards first, then others; preserve original order within each group
+    highlights.sort(key=lambda h: (0 if _highlight_has_image(h) else 1, h.order))
     sponsors = models.Sponsor.objects.filter(is_active=True).order_by('order')
     return render(request, 'public/home.html', {
         'stats': stats,
@@ -220,13 +231,14 @@ def blog_detail_view(request, slug):
 
 def news_view(request):
     """List news announcements."""
-    now = __import__('django.utils.timezone').utils.timezone.now()
-    items = models.NewsItem.objects.filter(
-        is_published=True,
-    ).filter(
-        Q(expires_at__isnull=True) | Q(expires_at__gt=now)
-    )
+    items = models.NewsItem.objects.all()
     return render(request, 'public/news.html', {'items': items})
+
+
+def news_detail_view(request, pk):
+    """Detail page for a single news item."""
+    item = get_object_or_404(models.NewsItem, pk=pk)
+    return render(request, 'public/news_detail.html', {'item': item})
 
 
 # ── Gallery ──────────────────────────────────────────────────────────────────

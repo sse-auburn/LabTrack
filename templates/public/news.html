@@ -4,30 +4,40 @@
 
 {% block content %}
 <section class="py-20 bg-white">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h1 class="text-4xl font-bold text-auburn-blue mb-4">News & Announcements</h1>
-    <p class="text-lg text-slate-600 mb-8">Latest updates from the Smart Systems Engineering.</p>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-auburn-blue mb-4">News & Announcements</h1>
+      <p class="text-lg text-slate-600">Latest updates from the Smart Systems Engineering Lab.</p>
+    </div>
 
     {% if items %}
-      <div class="space-y-6">
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for item in items %}
-        <div class="p-6 rounded-xl border {% if item.is_pinned %}border-auburn-orange/30 bg-auburn-orange/5{% else %}border-slate-200 bg-white{% endif %} hover:shadow-md transition">
-          {% if item.is_pinned %}
-            <div class="flex items-center gap-1 text-auburn-orange text-xs font-bold uppercase tracking-wide mb-2">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
-              Pinned
-            </div>
-          {% endif %}
-          <h3 class="text-xl font-bold text-auburn-blue mb-2">{{ item.title }}</h3>
-          <p class="text-sm text-slate-500 mb-3">{{ item.published_at|date:"F j, Y" }}</p>
-          <div class="prose prose-slate max-w-none text-slate-700">
-            {{ item.content|safe }}
+        <article class="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition flex flex-col">
+          <div class="h-40 bg-auburn-blue/5 flex items-center justify-center">
+            <svg class="w-14 h-14 text-auburn-blue/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+            </svg>
           </div>
-        </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <p class="text-xs text-slate-400 font-medium mb-2">{{ item.published_at|date:"F j, Y"|default:"" }}</p>
+            <h3 class="text-lg font-bold text-auburn-blue mb-3 line-clamp-2">{{ item.title }}</h3>
+            <div class="text-slate-600 text-sm leading-relaxed line-clamp-3 mb-4 flex-1">
+              {{ item.content|striptags|truncatechars:160 }}
+            </div>
+            <a href="{% url 'public:news_detail' item.pk %}" class="inline-flex items-center gap-1 text-sm font-semibold text-auburn-orange hover:text-auburn-orangeDark transition mt-auto">
+              Read More
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+          </div>
+        </article>
         {% endfor %}
       </div>
     {% else %}
-      <p class="text-slate-500">No news items at this time.</p>
+      <div class="text-center py-16">
+        <svg class="w-16 h-16 text-slate-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+        <p class="text-slate-500 text-lg">No news items at this time.</p>
+      </div>
     {% endif %}
   </div>
 </section>
