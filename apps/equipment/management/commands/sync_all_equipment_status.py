@@ -2,10 +2,7 @@
 Management command: sync_all_equipment_status
 
 One-off cleanup command to recalculate the status of every equipment item
-based on live reservations, maintenance logs, and borrow requests.
-
-Useful after merging borrowing with reservations, or after fixing the
-kit-reservation status sync bug.
+based on live reservations and maintenance logs.
 
 Usage:
     python manage.py sync_all_equipment_status
@@ -78,18 +75,6 @@ class Command(BaseCommand):
         ).exists():
             return 'BORROWED'
 
-        borrow_blocked = False
-        try:
-            from apps.borrowing.models import BorrowRequest
-            borrow_q = Q(equipment=equipment) | Q(kit__items__equipment=equipment)
-            borrow_blocked = BorrowRequest.objects.filter(
-                borrow_q, status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING']
-            ).exists()
-        except RuntimeError:
-            pass
-
-        if borrow_blocked:
-            return 'BORROWED'
         if MaintenanceLog.objects.filter(
             equipment=equipment, status__in=['SCHEDULED', 'IN_PROGRESS']
         ).exists():

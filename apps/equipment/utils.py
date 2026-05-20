@@ -27,25 +27,7 @@ def sync_equipment_status(equipment, exclude_borrow_pk=None):
         status__in=['ACTIVE', 'RETURN_PENDING'],
     ).exists():
         new_status = 'BORROWED'
-    else:
-        borrow_blocked = False
-        try:
-            from apps.borrowing.models import BorrowRequest
-            borrow_q = Q(equipment=equipment) | Q(kit__items__equipment=equipment)
-            borrow_qs = BorrowRequest.objects.filter(
-                borrow_q,
-                status__in=['APPROVED', 'ACTIVE', 'RETURN_PENDING'],
-            )
-            if exclude_borrow_pk:
-                borrow_qs = borrow_qs.exclude(pk=exclude_borrow_pk)
-            borrow_blocked = borrow_qs.exists()
-        except RuntimeError:
-            # Borrowing app is not in INSTALLED_APPS
-            pass
-
-        if borrow_blocked:
-            new_status = 'BORROWED'
-        elif MaintenanceLog.objects.filter(
+    elif MaintenanceLog.objects.filter(
             equipment=equipment,
             status__in=['SCHEDULED', 'IN_PROGRESS'],
         ).exists():

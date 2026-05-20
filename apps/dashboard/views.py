@@ -139,7 +139,7 @@ def admin_panel_view(request):
         'borrow_requests': Reservation.objects.count(),
         'reservations': Reservation.objects.count(),
         'incidents_open': IncidentReport.objects.filter(status__in=['OPEN', 'INVESTIGATING']).count(),
-        'consumables': 0,
+
         'categories': Category.objects.count(),
         'locations': Location.objects.count(),
         'kits': Kit.objects.filter(is_active=True).count(),

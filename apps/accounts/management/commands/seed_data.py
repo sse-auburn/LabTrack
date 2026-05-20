@@ -218,58 +218,6 @@ class Command(BaseCommand):
                 KitItem.objects.get_or_create(kit=kit, equipment=eq, defaults={'quantity': qty})
                 self.stdout.write(f'  Added {eq.name} to {kit.name} (qty={qty})')
 
-        # ── Projects ─────────────────────────────────────────────────
-        self.stdout.write('Seeding projects...')
-        from apps.projects.models import Project, ProjectMember
-        projects = {}
-        for row in self._load_sheet('projects.xlsx'):
-            name = row.get('name')
-            if not name:
-                continue
-            lead = users.get(row.get('lead_username'))
-            proj, created = Project.objects.get_or_create(name=name, defaults={
-                'description': row.get('description', ''),
-                'lead': lead,
-                'status': row.get('status', 'ACTIVE'),
-            })
-            if created:
-                self.stdout.write(f'  Created project: {name}')
-            projects[name] = proj
-
-        # ── Project Members ──────────────────────────────────────────
-        self.stdout.write('Seeding project members...')
-        for row in self._load_sheet('project_members.xlsx'):
-            proj_name = row.get('project_name')
-            user_name = row.get('user_username')
-            role = row.get('role', 'MEMBER')
-            if not proj_name or not user_name:
-                continue
-            proj = projects.get(proj_name)
-            user = users.get(user_name)
-            if proj and user:
-                ProjectMember.objects.get_or_create(project=proj, user=user, defaults={'role': role})
-                self.stdout.write(f'  Added {user_name} to {proj_name} as {role}')
-
-        # ── Consumables ──────────────────────────────────────────────
-        self.stdout.write('Seeding consumables...')
-        from apps.consumables.models import Consumable
-        for row in self._load_sheet('consumables.xlsx'):
-            name = row.get('name')
-            if not name:
-                continue
-            cat = categories.get(row.get('category_name'))
-            loc = locations.get(row.get('location_name'))
-            Consumable.objects.get_or_create(name=name, defaults={
-                'quantity': self._parse_decimal(row.get('quantity')) or 0,
-                'low_stock_threshold': self._parse_decimal(row.get('low_stock_threshold')) or 10,
-                'unit': row.get('unit', 'PIECE'),
-                'category': cat,
-                'location': loc,
-                'unit_cost': self._parse_decimal(row.get('unit_cost')),
-                'description': row.get('description', ''),
-            })
-            self.stdout.write(f'  Created consumable: {name}')
-
         # ── Reservations ─────────────────────────────────────────────
         self.stdout.write('Seeding reservations...')
         from apps.reservations.models import Reservation
