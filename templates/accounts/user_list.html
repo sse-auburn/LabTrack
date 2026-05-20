@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block title %}User Management{% endblock %}
-
 {% block page_title %}User Management{% endblock %}
 
 {% block breadcrumbs %}
@@ -10,354 +9,345 @@
 
 {% block content %}
 
-<!-- Page Header Banner -->
 <!-- Page Header -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-
-  <!-- LEFT SECTION -->
-  <div class="rounded-3xl px-6 py-5">
-    <h1 class="text-2xl font-bold tracking-tight text-slate-900">
-      User Management
-    </h1>
-
-    <p class="mt-1 text-sm text-slate-500">
-      Manage lab members and their access roles.
-    </p>
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900">User Management</h1>
+    <p class="mt-1 text-sm text-slate-500">Manage lab members and their access roles.</p>
   </div>
-
-  <!-- RIGHT SECTION -->
-  <div class="rounded-3xl px-6 py-5">
-    <div class="flex items-center justify-end gap-2 flex-wrap">
-
-      {% if pending_count > 0 %}
-      <a href="?status=pending"
-         class="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-800 text-sm font-semibold rounded-lg hover:bg-amber-200 transition-colors">
-        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block"></span>
-        {{ pending_count }} pending approval{{ pending_count|pluralize }}
-      </a>
-      {% endif %}
-
-      <a href="{% url 'accounts:user_create' %}"
-         class="inline-flex items-center px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors">
-        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 4v16m8-8H4"/>
-        </svg>
-        Add User
-      </a>
-
-      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 text-sm font-medium rounded-lg">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-        </svg>
-        {{ page_obj.paginator.count }} user{{ page_obj.paginator.count|pluralize }}
-      </span>
-
-    </div>
+  <div class="flex items-center gap-2">
+    {% if pending_count > 0 %}
+    <a href="?status=pending"
+       class="inline-flex items-center gap-1.5 px-3 py-2 bg-amber-50 text-amber-700 text-sm font-semibold rounded-lg border border-amber-200 hover:bg-amber-100 transition-colors">
+      <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block"></span>
+      {{ pending_count }} pending
+    </a>
+    {% endif %}
+    <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 text-slate-600 text-sm font-medium rounded-lg">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+      </svg>
+      {{ page_obj.paginator.count }} user{{ page_obj.paginator.count|pluralize }}
+    </span>
+    <a href="{% url 'accounts:user_create' %}"
+       class="inline-flex items-center px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500">
+      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Add User
+    </a>
   </div>
-
 </div>
 
-  <!-- ====== Filter + Search bar ====== -->
-  <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-4 mb-6">
-    <form method="get" action="" class="flex flex-col sm:flex-row gap-3">
+<!-- Filter Bar -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
+  <form method="get" action="" class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
 
-      <!-- Search input -->
-      <div class="relative flex-1">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-        <input type="text" name="q" value="{{ request.GET.q|default:'' }}"
-          placeholder="Search by name, email or username..." class="block w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400
-                    focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition" />
-      </div>
+    <!-- Search -->
+    <div class="relative flex-1 min-w-0">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
+           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input type="text" name="q" value="{{ request.GET.q|default:'' }}"
+             placeholder="Search by name, email or username…"
+             class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"/>
+    </div>
 
-      <!-- Role filter -->
-      <div class="flex items-center gap-2 flex-wrap">
-        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}"
-          class="px-3 py-2 rounded-lg text-sm font-medium transition-colors
-           {% if not request.GET.role %}bg-brand-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
-          All
-        </a>
-        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}role=MEMBER"
-          class="px-3 py-2 rounded-lg text-sm font-medium transition-colors
-           {% if request.GET.role == 'MEMBER' %}bg-auburn-blue text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
-          Members
-        </a>
-        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}role=ADMIN"
-          class="px-3 py-2 rounded-lg text-sm font-medium transition-colors
-           {% if request.GET.role == 'ADMIN' %}bg-brand-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
-          Admins
-        </a>
-      </div>
+    <!-- Role pills -->
+    <div class="inline-flex rounded-lg border border-slate-200 overflow-hidden shrink-0">
+      <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}"
+         class="px-3 py-2 text-sm font-medium transition-colors
+                {% if not request.GET.role %}bg-slate-900 text-white{% else %}text-slate-600 hover:bg-slate-50{% endif %}">
+        All
+      </a>
+      <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}role=MEMBER"
+         class="px-3 py-2 text-sm font-medium border-l border-slate-200 transition-colors
+                {% if request.GET.role == 'MEMBER' %}bg-slate-900 text-white{% else %}text-slate-600 hover:bg-slate-50{% endif %}">
+        Members
+      </a>
+      <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}role=ADMIN"
+         class="px-3 py-2 text-sm font-medium border-l border-slate-200 transition-colors
+                {% if request.GET.role == 'ADMIN' %}bg-slate-900 text-white{% else %}text-slate-600 hover:bg-slate-50{% endif %}">
+        Admins
+      </a>
+    </div>
 
-      <!-- Status filter -->
-      <div class="flex items-center gap-2">
-        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.role %}role={{ request.GET.role }}&{% endif %}status=active"
-          class="px-3 py-2 rounded-lg text-sm font-medium transition-colors
-           {% if status == 'active' %}bg-brand-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
-          Active
-        </a>
-        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.role %}role={{ request.GET.role }}&{% endif %}status=pending"
-          class="px-3 py-2 rounded-lg text-sm font-medium transition-colors
-           {% if status == 'pending' %}bg-amber-500 text-white shadow-sm{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
-          Pending
-          {% if pending_count > 0 %}<span
-            class="ml-1 px-1.5 py-0.5 rounded-full text-xs {% if status == 'pending' %}bg-white text-amber-700{% else %}bg-amber-100 text-amber-700{% endif %}">{{
-            pending_count }}</span>{% endif %}
-        </a>
-      </div>
+    <!-- Status pills -->
+    <div class="inline-flex rounded-lg border border-slate-200 overflow-hidden shrink-0">
+      <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.role %}role={{ request.GET.role }}&{% endif %}status=active"
+         class="px-3 py-2 text-sm font-medium transition-colors
+                {% if status == 'active' %}bg-slate-900 text-white{% else %}text-slate-600 hover:bg-slate-50{% endif %}">
+        Active
+      </a>
+      <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.role %}role={{ request.GET.role }}&{% endif %}status=pending"
+         class="px-3 py-2 text-sm font-medium border-l border-slate-200 transition-colors
+                {% if status == 'pending' %}bg-amber-500 text-white{% else %}text-slate-600 hover:bg-slate-50{% endif %}">
+        Pending
+        {% if pending_count > 0 %}
+        <span class="ml-1 px-1.5 py-0.5 rounded-full text-xs
+                     {% if status == 'pending' %}bg-white/30 text-white{% else %}bg-amber-100 text-amber-700{% endif %}">
+          {{ pending_count }}
+        </span>
+        {% endif %}
+      </a>
+    </div>
 
-      <button type="submit"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        Search
-      </button>
-    </form>
-  </div>
+    <button type="submit"
+            class="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg transition-colors shrink-0">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      Search
+    </button>
 
-  <!-- ====== Users Table ====== -->
-  <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 overflow-hidden">
+  </form>
+</div>
 
-    {% if page_obj.object_list %}
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="bg-slate-50 border-b border-slate-200">
-            <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">User</th>
-            <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Email</th>
-            <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Role</th>
-            <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
-            <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Joined</th>
-            <th class="px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
-          {% for member in page_obj %}
-          <tr class="hover:bg-slate-50 transition-colors">
+<!-- Users Table -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
 
-            <!-- Avatar + name -->
-            <td class="px-6 py-4">
-              <div class="flex items-center gap-3">
-                <a href="{% url 'accounts:profile_view' member.pk %}">
+  {% if page_obj.object_list %}
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-slate-50 border-b border-slate-200">
+          <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">User</th>
+          <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Email</th>
+          <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Role</th>
+          <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+          <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Joined</th>
+          <th class="px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for member in page_obj %}
+        <tr class="hover:bg-slate-50/60 transition-colors">
+
+          <!-- Avatar + name -->
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <a href="{% url 'accounts:profile_view' member.pk %}" class="shrink-0">
                 {% if member.profile.avatar %}
                 <img src="{{ member.profile.avatar.url }}" alt="{{ member.full_name }}"
-                  class="w-9 h-9 rounded-full object-cover flex-shrink-0 ring-1 ring-slate-200" />
+                     class="w-9 h-9 rounded-full object-cover ring-2 ring-white shadow-sm"/>
                 {% else %}
-                <div class="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center bg-brand-600">
-                  <span class="text-white text-xs font-bold">
-                    {{ member.get_initials }}
-                  </span>
+                <div class="w-9 h-9 rounded-full flex items-center justify-center bg-brand-600 ring-2 ring-white shadow-sm">
+                  <span class="text-white text-xs font-bold">{{ member.get_initials }}</span>
                 </div>
                 {% endif %}
-                </a>
-                <div class="min-w-0">
-                  <p class="font-semibold text-slate-800 leading-tight truncate"><a href="{% url 'accounts:profile_view' member.pk %}" class="hover:text-brand-600 hover:underline">{{ member.full_name }}</a></p>
-                  <p class="text-xs text-slate-500 truncate">@{{ member.username }}</p>
-                </div>
-              </div>
-            </td>
-
-            <!-- Email -->
-            <td class="px-6 py-4 text-slate-600 truncate max-w-[200px]">
-              {{ member.email }}
-            </td>
-
-            <!-- Role badge -->
-            <td class="px-6 py-4">
-              <span
-                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
-              {% if member.is_admin %}bg-brand-100 text-brand-700{% else %}bg-auburn-bluePale text-auburn-blue{% endif %}">
-                {{ member.get_role_display }}
-              </span>
-            </td>
-
-            <!-- Status badge -->
-            <td class="px-6 py-4">
-              {% if member.is_active %}
-              <span
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-brand-100 text-brand-700">
-                <span class="w-1.5 h-1.5 rounded-full bg-brand-500 inline-block"></span>
-                Active
-              </span>
-              {% else %}
-              <span
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse inline-block"></span>
-                Pending Approval
-              </span>
-              {% endif %}
-            </td>
-
-            <!-- Joined date -->
-            <td class="px-6 py-4 text-slate-500 text-xs whitespace-nowrap">
-              {{ member.date_joined|date:"N j, Y" }}
-            </td>
-
-            <!-- Actions -->
-            <td class="px-6 py-4">
-              <div class="flex items-center justify-end gap-2">
-                {% if not member.is_active and request.user != member %}
-                <form method="post" action="{% url 'accounts:toggle_active' member.pk %}">
-                  {% csrf_token %}
-                  <button type="submit"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg transition-colors">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Approve
-                  </button>
-                </form>
-                {% endif %}
+              </a>
+              <div class="min-w-0">
                 <a href="{% url 'accounts:profile_view' member.pk %}"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors"
-                  title="View profile">
+                   class="block text-sm font-semibold text-slate-800 truncate hover:text-brand-600 transition-colors">
+                  {{ member.full_name }}
+                </a>
+                <p class="text-xs text-slate-400 truncate">@{{ member.username }}</p>
+              </div>
+            </div>
+          </td>
+
+          <!-- Email -->
+          <td class="px-6 py-4">
+            <span class="text-sm text-slate-500 truncate block max-w-[200px]">{{ member.email }}</span>
+          </td>
+
+          <!-- Role badge -->
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
+                         {% if member.is_admin %}bg-brand-100 text-brand-700{% else %}bg-auburn-bluePale text-auburn-blue{% endif %}">
+              {{ member.get_role_display }}
+            </span>
+          </td>
+
+          <!-- Status badge -->
+          <td class="px-6 py-4">
+            {% if member.is_active %}
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+              Active
+            </span>
+            {% else %}
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse inline-block"></span>
+              Pending
+            </span>
+            {% endif %}
+          </td>
+
+          <!-- Joined -->
+          <td class="px-6 py-4 text-xs text-slate-400 whitespace-nowrap">
+            {{ member.date_joined|date:"N j, Y" }}
+          </td>
+
+          <!-- Actions -->
+          <td class="px-6 py-4">
+            <div class="flex items-center justify-end gap-1.5">
+
+              {% if not member.is_active and request.user != member %}
+              <form method="post" action="{% url 'accounts:toggle_active' member.pk %}">
+                {% csrf_token %}
+                <button type="submit"
+                        class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg transition-colors">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
-                  View
-                </a>
+                  Approve
+                </button>
+              </form>
+              {% endif %}
 
-                <a href="{% url 'accounts:user_edit' member.pk %}"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 text-xs font-semibold rounded-lg transition-colors"
-                  title="Edit user">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <!-- View icon button -->
+              <a href="{% url 'accounts:profile_view' member.pk %}"
+                 class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                 title="View profile">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+              </a>
+
+              <!-- Edit icon button -->
+              <a href="{% url 'accounts:user_edit' member.pk %}"
+                 class="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+                 title="Edit user">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </a>
+
+              <!-- Role / more actions dropdown -->
+              {% if request.user != member %}
+              <div class="relative" id="role-menu-{{ member.pk }}">
+                <button type="button" onclick="toggleRoleMenu({{ member.pk }})"
+                        class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                        title="More actions">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
                   </svg>
-                  Edit
-                </a>
+                </button>
 
-                <!-- Change role button (opens inline form / modal) -->
-                {% if request.user != member %}
-                <div class="relative" id="role-menu-{{ member.pk }}">
-                  <button type="button" onclick="toggleRoleMenu({{ member.pk }})"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 text-xs font-semibold rounded-lg transition-colors">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                    </svg>
-                    Role
-                  </button>
+                <!-- Dropdown -->
+                <div id="role-dropdown-{{ member.pk }}"
+                     class="hidden absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-1 z-20">
 
-                  <!-- Role dropdown -->
-                  <div id="role-dropdown-{{ member.pk }}"
-                    class="hidden absolute right-0 mt-1 w-40 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-1 z-10">
-                    <form method="post" action="{% url 'accounts:assign_role' member.pk %}">
-                      {% csrf_token %}
-                      <input type="hidden" name="role" value="MEMBER" />
-                      <button type="submit"
-                        class="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 text-left
-                              {% if member.role == 'MEMBER' %}font-semibold text-auburn-blue bg-auburn-bluePale{% endif %}">
-                        <span class="w-2 h-2 rounded-full bg-auburn-bluePale0 inline-block"></span>
-                        Member
-                      </button>
-                    </form>
-                    <form method="post" action="{% url 'accounts:assign_role' member.pk %}">
-                      {% csrf_token %}
-                      <input type="hidden" name="role" value="ADMIN" />
-                      <button type="submit" class="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 text-left
-                              {% if member.role == 'ADMIN' %}font-semibold text-brand-700 bg-brand-50{% endif %}">
-                        <span class="w-2 h-2 rounded-full bg-brand-500 inline-block"></span>
-                        Admin
-                      </button>
-                    </form>
-                    <div class="border-t border-slate-100 my-1"></div>
-                    <form method="post" action="{% url 'accounts:toggle_active' member.pk %}">
-                      {% csrf_token %}
-                      <button type="submit"
-                        class="w-full flex items-center gap-2 px-4 py-2 text-sm text-left
-                              {% if member.is_active %}text-red-600 hover:bg-red-50{% else %}text-brand-700 hover:bg-brand-50{% endif %}">
-                        {% if member.is_active %}
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                        </svg>
-                        Deactivate
-                        {% else %}
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Activate
-                        {% endif %}
-                      </button>
-                    </form>
-                    <div class="border-t border-slate-100 my-1"></div>
-                    <a href="{% url 'accounts:user_delete' member.pk %}"
-                      class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 text-left">
+                  <p class="px-4 pt-2 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wide">Set Role</p>
+
+                  <form method="post" action="{% url 'accounts:assign_role' member.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="role" value="MEMBER"/>
+                    <button type="submit"
+                            class="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 text-left
+                                   {% if member.role == 'MEMBER' %}font-semibold text-auburn-blue bg-auburn-bluePale{% endif %}">
+                      <span class="w-2 h-2 rounded-full bg-auburn-blueLight inline-block"></span>
+                      Member
+                    </button>
+                  </form>
+                  <form method="post" action="{% url 'accounts:assign_role' member.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="role" value="ADMIN"/>
+                    <button type="submit"
+                            class="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 text-left
+                                   {% if member.role == 'ADMIN' %}font-semibold text-brand-700 bg-brand-50{% endif %}">
+                      <span class="w-2 h-2 rounded-full bg-brand-500 inline-block"></span>
+                      Admin
+                    </button>
+                  </form>
+
+                  <div class="border-t border-slate-100 my-1"></div>
+
+                  <form method="post" action="{% url 'accounts:toggle_active' member.pk %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="w-full flex items-center gap-2 px-4 py-2 text-sm text-left
+                                   {% if member.is_active %}text-red-600 hover:bg-red-50{% else %}text-brand-700 hover:bg-brand-50{% endif %}">
+                      {% if member.is_active %}
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                       </svg>
-                      Delete
-                    </a>
-                  </div>
+                      Deactivate
+                      {% else %}
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      Activate
+                      {% endif %}
+                    </button>
+                  </form>
+
+                  <div class="border-t border-slate-100 my-1"></div>
+
+                  <a href="{% url 'accounts:user_delete' member.pk %}"
+                     class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Delete user
+                  </a>
                 </div>
-                {% endif %}
               </div>
-            </td>
+              {% endif %}
 
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+            </div>
+          </td>
 
-    {% else %}
-    <!-- Empty state -->
-    <div class="flex flex-col items-center justify-center py-16 text-center">
-      <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-      </div>
-      <h3 class="text-base font-semibold text-slate-700 mb-1">No users found</h3>
-      <p class="text-sm text-slate-400 max-w-xs">
-        No users match your current filters.
-        <a href="{% url 'accounts:user_list' %}" class="text-brand-600 hover:underline">Clear filters</a>
-      </p>
-    </div>
-    {% endif %}
-
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
-  <!-- ====== Pagination ====== -->
-  {% include 'partials/_pagination.html' with page_obj=page_obj %}
+  {% else %}
+  <!-- Empty state -->
+  <div class="flex flex-col items-center justify-center py-20 text-center">
+    <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
+      <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+      </svg>
+    </div>
+    <h3 class="text-base font-semibold text-slate-700 mb-1">No users found</h3>
+    <p class="text-sm text-slate-400 max-w-xs">
+      No users match your current filters.
+      <a href="{% url 'accounts:user_list' %}" class="text-brand-600 hover:underline">Clear filters</a>
+    </p>
+  </div>
+  {% endif %}
 
-  {% endblock %}
-
-  {% block extra_js %}
-  <script>
-    function toggleRoleMenu(userId) {
-      const dropdown = document.getElementById('role-dropdown-' + userId);
-      // Close all other dropdowns first
-      document.querySelectorAll('[id^="role-dropdown-"]').forEach(function (d) {
-        if (d.id !== 'role-dropdown-' + userId) d.classList.add('hidden');
-      });
-      dropdown.classList.toggle('hidden');
-    }
-
-    // Close dropdowns on outside click
-    document.addEventListener('click', function (e) {
-      if (!e.target.closest('[id^="role-menu-"]')) {
-        document.querySelectorAll('[id^="role-dropdown-"]').forEach(function (d) {
-          d.classList.add('hidden');
-        });
-      }
-    });
-  </script>
 </div>
+
+<!-- Pagination -->
+{% include 'partials/_pagination.html' with page_obj=page_obj %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function toggleRoleMenu(userId) {
+    const dropdown = document.getElementById('role-dropdown-' + userId);
+    document.querySelectorAll('[id^="role-dropdown-"]').forEach(function (d) {
+      if (d.id !== 'role-dropdown-' + userId) d.classList.add('hidden');
+    });
+    dropdown.classList.toggle('hidden');
+  }
+
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('[id^="role-menu-"]')) {
+      document.querySelectorAll('[id^="role-dropdown-"]').forEach(function (d) {
+        d.classList.add('hidden');
+      });
+    }
+  });
+</script>
 {% endblock %}

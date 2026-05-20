@@ -3,637 +3,587 @@
 
 {% block title %}Dashboard{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
-
 {% block messages %}{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
 
 <!-- Page Header -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-
-  <!-- LEFT SECTION -->
-  <div class="rounded-3xl px-6 py-5">
+<div class="flex items-start justify-between">
+  <div>
     {% if user.is_admin %}
-      <p class="text-slate-500 text-sm font-medium">Lab Management Overview</p>
-      <h2 class="text-2xl font-bold mt-0.5 text-slate-900">
-        Welcome, {{ request.user.full_name }}
-      </h2>
-      <p class="text-slate-500 text-sm mt-1">
-        System-wide stats and your personal activity.
+    <p class="text-xs font-semibold text-brand-600 uppercase tracking-wider mb-1">Lab Management</p>
+    {% endif %}
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Welcome back, {{ request.user.first_name|default:request.user.username }}</h1>
+    <p class="mt-1 text-sm text-slate-500">
+      {% if user.is_admin %}System-wide overview and your personal activity.
+      {% else %}Here's a summary of your lab activity.{% endif %}
+    </p>
+  </div>
+  {% if recent_notifications %}
+  <div class="shrink-0">
+    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold rounded-lg">
+      <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse inline-block"></span>
+      {{ recent_notifications|length }} unread notification{{ recent_notifications|length|pluralize }}
+    </span>
+  </div>
+  {% endif %}
+</div>
+
+<!-- ── [ADMIN] Priority Alerts (shown only when non-zero) ── -->
+{% if user.is_admin and overdue_reservations or pending_equipment or pending_users %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+  {% if overdue_reservations %}
+  <a href="#overdue-reservations"
+     class="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 hover:bg-red-100 transition-colors group">
+    <div class="w-9 h-9 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
+      <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-bold text-red-800">{{ overdue_reservations|length }} Overdue</p>
+      <p class="text-xs text-red-600">Not returned by end date</p>
+    </div>
+    <svg class="w-4 h-4 text-red-400 group-hover:text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+    </svg>
+  </a>
+  {% endif %}
+  {% if pending_equipment %}
+  <a href="{% url 'equipment:pending_list' %}"
+     class="flex items-center gap-3 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 hover:bg-yellow-100 transition-colors group">
+    <div class="w-9 h-9 rounded-lg bg-yellow-100 flex items-center justify-center shrink-0">
+      <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-bold text-yellow-800">{{ pending_equipment }} Pending Equipment</p>
+      <p class="text-xs text-yellow-600">Awaiting approval</p>
+    </div>
+    <svg class="w-4 h-4 text-yellow-400 group-hover:text-yellow-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+    </svg>
+  </a>
+  {% endif %}
+  {% if pending_users %}
+  <a href="{% url 'accounts:user_list' %}?status=pending"
+     class="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 hover:bg-amber-100 transition-colors group">
+    <div class="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+      <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+      </svg>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-bold text-amber-800">{{ pending_users }} User{{ pending_users|pluralize }} Pending</p>
+      <p class="text-xs text-amber-600">Awaiting account activation</p>
+    </div>
+    <svg class="w-4 h-4 text-amber-400 group-hover:text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+    </svg>
+  </a>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- ── Stat Cards ── -->
+{% if user.is_admin %}
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+
+  <a href="{% url 'equipment:list' %}"
+     class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col gap-2 hover:border-brand-300 hover:shadow-md transition-all group">
+    <div class="w-9 h-9 rounded-lg bg-brand-100 flex items-center justify-center group-hover:bg-brand-200 transition-colors">
+      <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+    </div>
+    <div>
+      <p class="text-2xl font-bold text-slate-800 leading-none">{{ total_equipment }}</p>
+      <p class="text-xs text-slate-500 mt-1 font-medium group-hover:text-brand-600 transition-colors">Total Equipment</p>
+    </div>
+  </a>
+
+  <a href="{% url 'equipment:list' %}?status=AVAILABLE"
+     class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col gap-2 hover:border-emerald-300 hover:shadow-md transition-all group">
+    <div class="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+      <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <div>
+      <p class="text-2xl font-bold text-slate-800 leading-none">{{ available_equipment }}</p>
+      <p class="text-xs text-slate-500 mt-1 font-medium group-hover:text-emerald-600 transition-colors">Available</p>
+    </div>
+  </a>
+
+  <a href="{% url 'reservations:list' %}?status=ACTIVE"
+     class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col gap-2 hover:border-auburn-blueLight hover:shadow-md transition-all group">
+    <div class="w-9 h-9 rounded-lg bg-auburn-bluePale flex items-center justify-center group-hover:bg-auburn-bluePale transition-colors">
+      <svg class="w-4 h-4 text-auburn-blueLight" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+      </svg>
+    </div>
+    <div>
+      <p class="text-2xl font-bold text-slate-800 leading-none">{{ active_reservations_count }}</p>
+      <p class="text-xs text-slate-500 mt-1 font-medium group-hover:text-auburn-blueLight transition-colors">Active Reservations</p>
+    </div>
+  </a>
+
+  <a href="{% url 'reservations:list' %}?status=RETURN_PENDING"
+     class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col gap-2 hover:border-amber-300 hover:shadow-md transition-all group">
+    <div class="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center group-hover:bg-amber-200 transition-colors">
+      <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <div>
+      <p class="text-2xl font-bold text-slate-800 leading-none">{{ pending_returns_count }}</p>
+      <p class="text-xs text-slate-500 mt-1 font-medium group-hover:text-amber-600 transition-colors">Returns Pending</p>
+    </div>
+  </a>
+
+  <a href="{% url 'incidents:list' %}"
+     class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col gap-2 hover:border-red-300 hover:shadow-md transition-all group">
+    <div class="w-9 h-9 rounded-lg bg-red-100 flex items-center justify-center group-hover:bg-red-200 transition-colors">
+      <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+    </div>
+    <div>
+      <p class="text-2xl font-bold text-slate-800 leading-none">{{ open_incidents }}</p>
+      <p class="text-xs text-slate-500 mt-1 font-medium group-hover:text-red-600 transition-colors">Open Incidents</p>
+    </div>
+  </a>
+
+  <a href="{% url 'kits:list' %}"
+     class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col gap-2 hover:border-auburn-blueLight hover:shadow-md transition-all group">
+    <div class="w-9 h-9 rounded-lg bg-auburn-bluePale flex items-center justify-center group-hover:bg-auburn-bluePale transition-colors">
+      <svg class="w-4 h-4 text-auburn-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+      </svg>
+    </div>
+    <div>
+      <p class="text-2xl font-bold text-slate-800 leading-none">{{ total_kits }}</p>
+      <p class="text-xs text-slate-500 mt-1 font-medium group-hover:text-auburn-blue transition-colors">
+        Kits
+        {% if shared_kits %}<span class="text-slate-400 font-normal">({{ shared_kits }} shared)</span>{% endif %}
       </p>
+    </div>
+  </a>
+
+</div>
+
+{% else %}
+
+<!-- ── Member Stat Cards ── -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+  <a href="{% url 'reservations:list' %}?status=ACTIVE"
+     class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4 hover:border-auburn-blueLight hover:shadow-md transition-all group">
+    <div class="w-12 h-12 rounded-xl bg-auburn-bluePale flex items-center justify-center shrink-0">
+      <svg class="w-5 h-5 text-auburn-blueLight" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+      </svg>
+    </div>
+    <div>
+      <p class="text-2xl font-bold text-slate-800">{{ active_reservations.count }}</p>
+      <p class="text-sm text-slate-500 font-medium group-hover:text-auburn-blueLight transition-colors">Active Reservations</p>
+    </div>
+  </a>
+
+  <a href="{% url 'reservations:list' %}?status=RETURN_PENDING"
+     class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4 hover:border-amber-300 hover:shadow-md transition-all group">
+    <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+      <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <div>
+      <p class="text-2xl font-bold text-slate-800">{{ return_approvals.count }}</p>
+      <p class="text-sm text-slate-500 font-medium group-hover:text-amber-600 transition-colors">Returns to Approve</p>
+    </div>
+  </a>
+
+  <a href="{% url 'reservations:list' %}"
+     class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4 hover:border-brand-300 hover:shadow-md transition-all group">
+    <div class="w-12 h-12 rounded-xl bg-brand-100 flex items-center justify-center shrink-0">
+      <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+      </svg>
+    </div>
+    <div>
+      <p class="text-2xl font-bold text-slate-800">{{ upcoming_reservations.count }}</p>
+      <p class="text-sm text-slate-500 font-medium group-hover:text-brand-600 transition-colors">Upcoming</p>
+    </div>
+  </a>
+
+</div>
+{% endif %}
+
+<!-- ── Action Items (equipment approvals + return confirmations) ── -->
+{% if pending_owned_equipment %}
+<div class="bg-white rounded-xl border border-yellow-200 shadow-sm overflow-hidden">
+  <div class="px-5 py-3.5 border-b border-yellow-100 bg-yellow-50 flex items-center justify-between">
+    <h3 class="text-sm font-semibold text-yellow-800 flex items-center gap-2">
+      <svg class="w-4 h-4 text-yellow-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+      Equipment Assigned to You — Approval Required
+    </h3>
+    <a href="{% url 'equipment:pending_list' %}" class="text-xs text-yellow-700 hover:underline font-medium">View all</a>
+  </div>
+  <div class="divide-y divide-slate-100">
+    {% for equipment in pending_owned_equipment %}
+    <div class="px-5 py-3 flex items-center justify-between gap-3">
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-medium text-slate-800 truncate">{{ equipment.name }}</p>
+        <p class="text-xs text-slate-500 mt-0.5">Added by {% if equipment.created_by %}<a href="{% url 'accounts:profile_view' equipment.created_by.pk %}" class="hover:text-brand-600 hover:underline">{{ equipment.created_by.full_name }}</a>{% else %}Unknown{% endif %}</p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <a href="{% url 'equipment:approve' equipment.pk %}"
+           class="px-3 py-1.5 bg-brand-600 text-white text-xs font-semibold rounded-lg hover:bg-brand-700 transition-colors">Approve</a>
+        <a href="{% url 'equipment:reject' equipment.pk %}"
+           class="px-3 py-1.5 bg-white border border-red-300 text-red-700 text-xs font-semibold rounded-lg hover:bg-red-50 transition-colors"
+           onclick="return confirm('Reject this equipment?')">Reject</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if return_approvals %}
+<div class="bg-white rounded-xl border border-orange-200 shadow-sm overflow-hidden">
+  <div class="px-5 py-3.5 border-b border-orange-100 flex items-center justify-between">
+    <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-orange-400 inline-block animate-pulse"></span>
+      Returns Awaiting Your Confirmation
+    </h3>
+    <a href="{% url 'reservations:list' %}?status=RETURN_PENDING" class="text-xs text-brand-600 hover:underline font-medium">View all</a>
+  </div>
+  <div class="divide-y divide-slate-100">
+    {% for reservation in return_approvals %}
+    <div class="px-5 py-3 flex items-center justify-between gap-3">
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-medium text-slate-800 truncate">{{ reservation.equipment|default:reservation.kit }}</p>
+        <p class="text-xs text-slate-500 mt-0.5">
+          By <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name }}</a>
+          {% if reservation.return_condition %} &mdash; {{ reservation.return_condition }}{% endif %}
+        </p>
+      </div>
+      <a href="{% url 'reservations:return_confirm' reservation.pk %}"
+         class="shrink-0 px-3 py-1.5 bg-brand-600 text-white text-xs font-semibold rounded-lg hover:bg-brand-700 transition-colors">Confirm</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if my_pending_returns %}
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+  <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+    <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-brand-400 inline-block"></span>
+      My Pending Returns
+    </h3>
+    <a href="{% url 'reservations:list' %}?status=RETURN_PENDING" class="text-xs text-brand-600 hover:underline font-medium">View all</a>
+  </div>
+  <div class="divide-y divide-slate-100">
+    {% for reservation in my_pending_returns %}
+    <div class="px-5 py-3 flex items-center justify-between gap-3">
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-medium text-slate-800 truncate">{{ reservation.equipment|default:reservation.kit }}</p>
+        <p class="text-xs text-slate-500 mt-0.5">Ended {{ reservation.end_date|date:"M j, Y" }} — awaiting owner confirmation</p>
+      </div>
+      <a href="{% url 'reservations:detail' reservation.pk %}" class="shrink-0 text-xs text-brand-600 hover:underline font-medium">View</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- ── Active + Upcoming Reservations ── -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+        Active Reservations
+      </h3>
+      <a href="{% url 'reservations:list' %}?status=ACTIVE" class="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">View all</a>
+    </div>
+    {% if active_reservations %}
+    <div class="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+      {% for reservation in active_reservations %}
+      <a href="{% url 'reservations:detail' reservation.pk %}"
+         class="px-5 py-3 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-medium text-slate-800 truncate">{{ reservation.equipment|default:reservation.kit }}</p>
+          <p class="text-xs text-slate-400 mt-0.5">Due {{ reservation.end_date|date:"M j, Y" }}</p>
+        </div>
+        <span class="shrink-0 inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">Active</span>
+      </a>
+      {% endfor %}
+    </div>
     {% else %}
-      <p class="text-slate-500 text-sm font-medium">Welcome back,</p>
-      <h2 class="text-2xl font-bold mt-0.5 text-slate-900">
-        {{ request.user.full_name }}
-      </h2>
-      <p class="text-slate-500 text-sm mt-1">
-        Here's a summary of your lab activity today.
-      </p>
+    <div class="flex flex-col items-center justify-center py-10 text-center">
+      <svg class="w-7 h-7 text-slate-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+      </svg>
+      <p class="text-sm text-slate-400">No active reservations</p>
+    </div>
     {% endif %}
   </div>
 
-  <!-- RIGHT SECTION -->
-  <div class="rounded-3xl px-6 py-5">
-    <!-- intentionally empty for future stats/actions -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-brand-500 inline-block"></span>
+        Upcoming Reservations
+        <span class="text-xs font-normal text-slate-400">(next 7 days)</span>
+      </h3>
+      <a href="{% url 'reservations:list' %}" class="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">View all</a>
+    </div>
+    {% if upcoming_reservations %}
+    <div class="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+      {% for reservation in upcoming_reservations %}
+      <a href="{% url 'reservations:detail' reservation.pk %}"
+         class="px-5 py-3 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-medium text-slate-800 truncate">{{ reservation.equipment|default:reservation.kit }}</p>
+          <p class="text-xs text-slate-400 mt-0.5">{{ reservation.start_date|date:"M j" }} &mdash; {{ reservation.end_date|date:"M j, Y" }}</p>
+        </div>
+        <span class="shrink-0 inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full
+          {% if reservation.status == 'CONFIRMED' %}bg-brand-100 text-brand-700
+          {% elif reservation.status == 'PENDING' %}bg-yellow-100 text-yellow-700
+          {% else %}bg-slate-100 text-slate-600{% endif %}">
+          {{ reservation.get_status_display }}
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="flex flex-col items-center justify-center py-10 text-center">
+      <svg class="w-7 h-7 text-slate-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+      </svg>
+      <p class="text-sm text-slate-400">No upcoming reservations</p>
+    </div>
+    {% endif %}
   </div>
 
 </div>
 
-  <!-- ── Stat Cards ── -->
-  {% if user.is_admin %}
-  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-
-    <a href="{% url 'equipment:list' %}"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-brand-400 hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-brand-100 flex items-center justify-center group-hover:bg-brand-200 transition-colors">
-        <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-xl font-bold text-slate-800">{{ total_equipment }}</p>
-        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-brand-600 transition-colors">Total Equipment</p>
-      </div>
-    </a>
-
-    <a href="{% url 'equipment:list' %}?status=AVAILABLE"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-green-400 hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-brand-100 flex items-center justify-center group-hover:bg-green-200 transition-colors">
-        <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-xl font-bold text-slate-800">{{ available_equipment }}</p>
-        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-brand-600 transition-colors">Available</p>
-      </div>
-    </a>
-
-    <a href="{% url 'equipment:pending_list' %}"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-yellow-400 hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
-        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-xl font-bold text-slate-800">{{ pending_equipment }}</p>
-        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-yellow-600 transition-colors">Pending Approval</p>
-      </div>
-    </a>
-
-    <a href="{% url 'incidents:list' %}"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-red-400 hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center group-hover:bg-red-200 transition-colors">
-        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-xl font-bold text-slate-800">{{ open_incidents }}</p>
-        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-red-600 transition-colors">Open Incidents</p>
-      </div>
-    </a>
-
-    <a href="{% url 'kits:list' %}"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-auburn-blueLight hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-brand-100 flex items-center justify-center group-hover:bg-auburn-bluePale transition-colors">
-        <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-xl font-bold text-slate-800">{{ total_kits }}</p>
-        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-brand-600 transition-colors">Total Kits</p>
-      </div>
-    </a>
-
-    <a href="{% url 'kits:list' %}"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-auburn-blueLight hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-auburn-bluePale flex items-center justify-center group-hover:bg-auburn-bluePale transition-colors">
-        <svg class="w-5 h-5 text-auburn-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-xl font-bold text-slate-800">{{ shared_kits }}</p>
-        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-auburn-blue transition-colors">Shared Kits</p>
-      </div>
-    </a>
-
-    <a href="{% url 'reservations:list' %}?status=RETURN_PENDING"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-amber-400 hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center group-hover:bg-amber-200 transition-colors">
-        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-xl font-bold text-slate-800">{{ pending_approvals }}</p>
-        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-amber-600 transition-colors">Returns Pending</p>
-      </div>
-    </a>
-
-    <a href="{% url 'reservations:list' %}?status=ACTIVE"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-auburn-blueLight hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-auburn-bluePale flex items-center justify-center group-hover:bg-auburn-bluePale transition-colors">
-        <svg class="w-5 h-5 text-auburn-blueLight" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-xl font-bold text-slate-800">{{ active_reservations.count }}</p>
-        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-auburn-blueLight transition-colors">Active Reservations</p>
-      </div>
-    </a>
-
-    <a href="{% url 'reservations:list' %}?status=RETURN_PENDING"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-yellow-400 hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
-        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-xl font-bold text-slate-800">{{ return_approvals.count }}</p>
-        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-yellow-600 transition-colors">Returns to Approve</p>
-      </div>
-    </a>
-
-    <a href="{% url 'reservations:list' %}"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-3 hover:border-brand-400 hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-brand-100 flex items-center justify-center group-hover:bg-brand-200 transition-colors">
-        <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-xl font-bold text-slate-800">{{ upcoming_reservations.count }}</p>
-        <p class="text-xs text-slate-500 font-medium leading-tight group-hover:text-brand-600 transition-colors">Upcoming Reservations</p>
-      </div>
-    </a>
-
+<!-- ── [ADMIN] Overdue Reservations Table ── -->
+{% if user.is_admin and overdue_reservations %}
+<div id="overdue-reservations" class="bg-white rounded-xl border border-red-200 shadow-sm overflow-hidden">
+  <div class="px-5 py-3.5 border-b border-red-100 bg-red-50 flex items-center gap-3">
+    <svg class="w-4 h-4 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <h3 class="text-sm font-semibold text-red-800">Overdue Reservations</h3>
+    <span class="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-red-200 text-red-800">
+      {{ overdue_reservations|length }}
+    </span>
   </div>
-
-  <!-- [ADMIN] Alert Cards -->
-  {% if overdue_reservations or pending_equipment %}
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    {% if pending_equipment %}
-    <div class="flex items-center gap-4 bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-4">
-      <div class="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
-        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
-        </svg>
-      </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-sm font-bold text-yellow-800">{{ pending_equipment }} Pending Approval</p>
-        <p class="text-xs text-yellow-600">New equipment awaiting review</p>
-      </div>
-      <a href="{% url 'equipment:pending_list' %}" class="text-xs font-semibold text-yellow-700 hover:text-yellow-900 hover:underline flex-shrink-0">Review &rarr;</a>
-    </div>
-    {% endif %}
-    {% if overdue_reservations %}
-    <div class="flex items-center gap-4 bg-red-50 border border-red-200 rounded-xl px-5 py-4">
-      <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-      </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-sm font-bold text-red-800">{{ overdue_reservations|length }} Overdue Reservation{{ overdue_reservations|length|pluralize }}</p>
-        <p class="text-xs text-red-600">Not returned by end date</p>
-      </div>
-      <a href="#overdue-reservations" class="text-xs font-semibold text-red-700 hover:text-red-900 hover:underline flex-shrink-0">View &darr;</a>
-    </div>
-    {% endif %}
-  </div>
-  {% endif %}
-  {% else %}
-
-  <!-- ── Personal Stat Cards (members) ── -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-    <a href="{% url 'reservations:list' %}?status=ACTIVE"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4 hover:border-auburn-blueLight hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-auburn-bluePale flex items-center justify-center group-hover:bg-auburn-bluePale transition-colors">
-        <svg class="w-6 h-6 text-auburn-blueLight" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-2xl font-bold text-slate-800">{{ active_reservations.count }}</p>
-        <p class="text-sm text-slate-500 font-medium group-hover:text-auburn-blueLight transition-colors">Active Reservations</p>
-      </div>
-    </a>
-
-    <a href="{% url 'reservations:list' %}?status=RETURN_PENDING"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4 hover:border-yellow-400 hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
-        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-2xl font-bold text-slate-800">{{ return_approvals.count }}</p>
-        <p class="text-sm text-slate-500 font-medium group-hover:text-yellow-600 transition-colors">Returns to Approve</p>
-      </div>
-    </a>
-
-    <a href="{% url 'reservations:list' %}"
-       class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4 hover:border-brand-400 hover:shadow-md transition-all group">
-      <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-brand-100 flex items-center justify-center group-hover:bg-brand-200 transition-colors">
-        <svg class="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-2xl font-bold text-slate-800">{{ upcoming_reservations.count }}</p>
-        <p class="text-sm text-slate-500 font-medium group-hover:text-brand-600 transition-colors">Upcoming Reservations</p>
-      </div>
-    </a>
-
-  </div>
-  {% endif %}
-
-  <!-- ── Active Reservations + Upcoming Reservations ── -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-          <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-          Active Reservations
-        </h3>
-        <a href="{% url 'reservations:list' %}?status=ACTIVE" class="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">View all</a>
-      </div>
-      {% if active_reservations %}
-        <div class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
-          {% for reservation in active_reservations %}
-          <div class="px-5 py-3 flex items-center justify-between gap-3">
-            <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium text-slate-800 truncate">{{ reservation.equipment|default:reservation.kit }}</p>
-              <p class="text-xs text-slate-500 mt-0.5">Ends: {{ reservation.end_date|date:"M j, Y" }}</p>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 border-b border-slate-200">
+        <tr>
+          <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Item</th>
+          <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Reserved By</th>
+          <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">End Date</th>
+          <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Overdue By</th>
+          <th class="text-right px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Action</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for reservation in overdue_reservations %}
+        <tr class="hover:bg-red-50/50 transition-colors">
+          <td class="px-5 py-3 font-medium text-slate-800">{{ reservation.equipment|default:reservation.kit }}</td>
+          <td class="px-5 py-3">
+            <div class="flex items-center gap-2">
+              {% if reservation.requester.profile.avatar %}
+              <img src="{{ reservation.requester.profile.avatar.url }}" alt="" class="w-6 h-6 rounded-full object-cover shrink-0">
+              {% else %}
+              <div class="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center shrink-0">
+                <span class="text-white text-xs font-semibold">{{ reservation.requester.get_initials }}</span>
+              </div>
+              {% endif %}
+              <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="text-slate-700 hover:text-brand-600 hover:underline">{{ reservation.requester.full_name }}</a>
             </div>
-            <div class="flex-shrink-0">
-              <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700" title="Item is currently checked out">
-                Active
-              </span>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="flex flex-col items-center justify-center py-8 text-center">
-          <svg class="w-7 h-7 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-          <p class="text-sm text-slate-500">No active reservations</p>
-        </div>
-      {% endif %}
-    </div>
-
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-          <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-          Upcoming Reservations
-          <span class="text-xs font-normal text-slate-400">(next 7 days)</span>
-        </h3>
-        <a href="{% url 'reservations:list' %}" class="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">View all</a>
-      </div>
-      {% if upcoming_reservations %}
-        <div class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
-          {% for reservation in upcoming_reservations %}
-          <div class="px-5 py-3 flex items-center justify-between gap-3">
-            <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium text-slate-800 truncate">{{ reservation.equipment|default:reservation.kit }}</p>
-              <p class="text-xs text-slate-500 mt-0.5">{{ reservation.start_date|date:"M j" }} &mdash; {{ reservation.end_date|date:"M j, Y" }}</p>
-            </div>
-            <span class="flex-shrink-0 inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full
-              {% if reservation.status == 'CONFIRMED' %}bg-brand-100 text-brand-700
-              {% elif reservation.status == 'PENDING' %}bg-yellow-100 text-yellow-700
-              {% else %}bg-slate-100 text-slate-600{% endif %}"
-              title="{% if reservation.status == 'CONFIRMED' %}Reservation confirmed{% elif reservation.status == 'PENDING' %}Awaiting confirmation{% else %}{{ reservation.get_status_display }}{% endif %}">
-              {{ reservation.get_status_display }}
+          </td>
+          <td class="px-5 py-3 text-slate-500">{{ reservation.end_date|date:"M j, Y" }}</td>
+          <td class="px-5 py-3">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
+              {{ reservation.end_date|timesince }}
             </span>
-          </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="flex flex-col items-center justify-center py-8 text-center">
-          <svg class="w-7 h-7 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-          <p class="text-sm text-slate-500">No upcoming reservations</p>
-        </div>
-      {% endif %}
-    </div>
-
+          </td>
+          <td class="px-5 py-3 text-right">
+            <a href="{% url 'reservations:detail' reservation.pk %}" class="text-xs font-semibold text-brand-600 hover:text-brand-700 hover:underline">View</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
+</div>
+{% endif %}
 
-  <!-- ── Pending Equipment / Return Approvals ── -->
-  {% if pending_owned_equipment %}
-  <div class="bg-white rounded-xl border border-yellow-300 shadow-sm overflow-hidden">
-    <div class="px-5 py-4 border-b border-yellow-100 bg-yellow-50 flex items-center justify-between">
-      <h3 class="text-sm font-semibold text-yellow-800 flex items-center gap-2">
-        <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-        </svg>
-        Equipment Assigned to You — Approval Required
-      </h3>
-      <a href="{% url 'equipment:pending_list' %}" class="text-xs text-yellow-700 hover:underline font-medium">View all</a>
-    </div>
-    <div class="divide-y divide-slate-100">
-      {% for equipment in pending_owned_equipment %}
-      <div class="px-5 py-3 flex items-center justify-between gap-3">
-        <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-slate-800 truncate">{{ equipment.name }}</p>
-          <p class="text-xs text-slate-500 mt-0.5">Added by {% if equipment.created_by %}<a href="{% url 'accounts:profile_view' equipment.created_by.pk %}" class="hover:text-brand-600 hover:underline">{{ equipment.created_by.full_name }}</a>{% else %}Unknown{% endif %}</p>
-        </div>
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <a href="{% url 'equipment:approve' equipment.pk %}" class="px-3 py-1.5 bg-brand-600 text-white text-xs font-medium rounded-lg hover:bg-brand-700">Approve</a>
-          <a href="{% url 'equipment:reject' equipment.pk %}" class="px-3 py-1.5 bg-red-50 border border-red-300 text-red-700 text-xs font-medium rounded-lg hover:bg-red-100" onclick="return confirm('Reject this equipment?')">Reject</a>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-  {% endif %}
+<!-- ── Notifications + Activity ── -->
+<div class="grid grid-cols-1 {% if user.is_admin %}lg:grid-cols-3{% else %}lg:grid-cols-2{% endif %} gap-6">
 
-  {% if my_pending_returns %}
-  <div class="bg-white rounded-xl border border-auburn-bluePale shadow-sm overflow-hidden">
-    <div class="px-5 py-4 border-b border-auburn-bluePale flex items-center justify-between">
-      <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-orange-400 inline-block"></span>
-        My Pending Returns
-      </h3>
-      <a href="{% url 'reservations:list' %}?status=RETURN_PENDING" class="text-xs text-brand-600 hover:underline font-medium">View all</a>
-    </div>
-    <div class="divide-y divide-slate-100">
-      {% for reservation in my_pending_returns %}
-      <div class="px-5 py-3 flex items-center justify-between gap-3">
-        <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-slate-800 truncate">{{ reservation.equipment|default:reservation.kit }}</p>
-          <p class="text-xs text-slate-500 mt-0.5">Ended {{ reservation.end_date|date:"M j, Y" }} &mdash; awaiting owner confirmation</p>
-        </div>
-        <a href="{% url 'reservations:detail' reservation.pk %}" class="flex-shrink-0 text-xs text-brand-600 hover:underline font-medium">View</a>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-  {% endif %}
-
-  {% if return_approvals %}
-  <div class="bg-white rounded-xl border border-orange-200 shadow-sm overflow-hidden">
-    <div class="px-5 py-4 border-b border-orange-100 flex items-center justify-between">
-      <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-orange-400 inline-block"></span>
-        Returns Awaiting Your Confirmation
-      </h3>
-      <a href="{% url 'reservations:list' %}?status=RETURN_PENDING" class="text-xs text-brand-600 hover:underline font-medium">View all</a>
-    </div>
-    <div class="divide-y divide-slate-100">
-      {% for reservation in return_approvals %}
-      <div class="px-5 py-3 flex items-center justify-between gap-3">
-        <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-slate-800 truncate">{{ reservation.equipment|default:reservation.kit }}</p>
-          <p class="text-xs text-slate-500 mt-0.5">Reserved by <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name }}</a>{% if reservation.return_condition %} &mdash; condition: {{ reservation.return_condition }}{% endif %}</p>
-        </div>
-        <a href="{% url 'reservations:return_confirm' reservation.pk %}" class="flex-shrink-0 px-3 py-1.5 bg-brand-600 text-white text-xs font-medium rounded-lg hover:bg-brand-700">Confirm</a>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- ── Quick Actions ── -->
+  <!-- Unread Notifications -->
+  {% if recent_notifications %}
   <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-    <div class="px-5 py-4 border-b border-slate-100">
+    <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
       <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
         <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
         </svg>
-        Quick Actions
+        Notifications
+        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-brand-600 text-white">{{ recent_notifications|length }}</span>
       </h3>
     </div>
-    <div class="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <a href="{% url 'equipment:list' %}"
-         class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-brand-400 hover:bg-brand-50 text-slate-600 hover:text-brand-700 transition-all group">
-        <svg class="w-6 h-6 text-slate-400 group-hover:text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
-        </svg>
-        <span class="text-xs font-semibold text-center leading-tight">Browse Equipment</span>
+    <div class="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+      {% for notif in recent_notifications %}
+      <a href="{{ notif.link|default:'#' }}"
+         class="px-5 py-3 flex items-start gap-3 hover:bg-slate-50 transition-colors">
+        <span class="shrink-0 mt-0.5 w-2 h-2 rounded-full mt-1.5
+          {% if notif.level == 'error' %}bg-red-500
+          {% elif notif.level == 'warning' %}bg-amber-500
+          {% elif notif.level == 'success' %}bg-emerald-500
+          {% else %}bg-brand-500{% endif %}">
+        </span>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-semibold text-slate-800 truncate">{{ notif.title }}</p>
+          <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ notif.message }}</p>
+        </div>
+        <span class="shrink-0 text-xs text-slate-400 whitespace-nowrap">{{ notif.created_at|timesince }} ago</span>
       </a>
-      <a href="{% url 'reservations:list' %}"
-         class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-auburn-blueLight hover:bg-auburn-bluePale text-slate-600 hover:text-auburn-blue transition-all group">
-        <svg class="w-6 h-6 text-slate-400 group-hover:text-auburn-blueLight" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-        </svg>
-        <span class="text-xs font-semibold text-center leading-tight">My Reservations</span>
-      </a>
-      <a href="{% url 'reservations:create' %}"
-         class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-brand-400 hover:bg-brand-50 text-slate-600 hover:text-brand-700 transition-all group">
-        <svg class="w-6 h-6 text-slate-400 group-hover:text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-        </svg>
-        <span class="text-xs font-semibold text-center leading-tight">Make Reservation</span>
-      </a>
-      <a href="{% url 'incidents:create' %}"
-         class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-red-400 hover:bg-red-50 text-slate-600 hover:text-red-700 transition-all group">
-        <svg class="w-6 h-6 text-slate-400 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-        </svg>
-        <span class="text-xs font-semibold text-center leading-tight">Report Incident</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- ── [ADMIN] Overdue Reservations Table ── -->
-  {% if user.is_admin and overdue_reservations %}
-  <div id="overdue-reservations" class="bg-white rounded-xl border border-red-200 shadow-sm overflow-hidden">
-    <div class="px-5 py-4 border-b border-red-100 bg-red-50 flex items-center gap-3">
-      <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-      </svg>
-      <h3 class="text-base font-semibold text-red-800">Overdue Reservations</h3>
-      <span class="ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-200 text-red-800">
-        {{ overdue_reservations|length }} item{{ overdue_reservations|length|pluralize }}
-      </span>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead class="bg-slate-50 border-b border-slate-200">
-          <tr>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Item</th>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Reserved By</th>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">End Date</th>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Overdue</th>
-            <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Action</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
-          {% for reservation in overdue_reservations %}
-          <tr class="hover:bg-red-50 transition-colors">
-            <td class="px-5 py-3"><span class="font-medium text-slate-800">{{ reservation.equipment|default:reservation.kit }}</span></td>
-            <td class="px-5 py-3">
-              <div class="flex items-center gap-2">
-                {% if reservation.requester.profile.avatar %}
-                <img src="{{ reservation.requester.profile.avatar.url }}" alt="" class="w-6 h-6 rounded-full object-cover flex-shrink-0">
-                {% else %}
-                <div class="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
-                  <span class="text-white text-xs font-semibold">{{ reservation.requester.get_initials }}</span>
-                </div>
-                {% endif %}
-                <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline"><span class="text-slate-700">{{ reservation.requester.full_name }}</span></a>
-              </div>
-            </td>
-            <td class="px-5 py-3 text-slate-600">{{ reservation.end_date|date:"M j, Y" }}</td>
-            <td class="px-5 py-3">
-              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
-                {{ reservation.end_date|timesince }}
-              </span>
-            </td>
-            <td class="px-5 py-3">
-              <a href="{% url 'reservations:detail' reservation.pk %}" class="text-xs font-medium text-brand-600 hover:text-brand-700 hover:underline">View</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      {% endfor %}
     </div>
   </div>
   {% endif %}
 
-
-  <!-- ── System Activity + My Recent Activity (side by side) ── -->
-  <div class="grid grid-cols-1 {% if user.is_admin %}lg:grid-cols-2{% endif %} gap-6">
-
-    {% if user.is_admin %}
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-          <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+  <!-- System Activity (admin only) -->
+  {% if user.is_admin %}
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+        </svg>
+        System Activity
+      </h3>
+      <a href="{% url 'activity:feed' %}" class="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">View all</a>
+    </div>
+    {% if system_activity %}
+    <div class="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+      {% for log in system_activity %}
+      <div class="px-5 py-3 flex items-start gap-3">
+        <span class="shrink-0 mt-0.5 flex items-center justify-center w-6 h-6 rounded-full
+          {% if 'DELETED' in log.action or 'OVERDUE' in log.action or 'REJECTED' in log.action %}bg-red-100
+          {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action or 'COMPLETED' in log.action %}bg-emerald-100
+          {% elif 'CREATED' in log.action or 'REGISTERED' in log.action %}bg-brand-100
+          {% elif 'REPORTED' in log.action or 'CANCELLED' in log.action %}bg-amber-100
+          {% else %}bg-slate-100{% endif %}">
+          <svg class="w-3 h-3
+            {% if 'DELETED' in log.action or 'OVERDUE' in log.action or 'REJECTED' in log.action %}text-red-600
+            {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action or 'COMPLETED' in log.action %}text-emerald-600
+            {% elif 'CREATED' in log.action or 'REGISTERED' in log.action %}text-brand-600
+            {% elif 'REPORTED' in log.action or 'CANCELLED' in log.action %}text-amber-600
+            {% else %}text-slate-500{% endif %}"
+               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {% if 'DELETED' in log.action %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            {% elif 'CREATED' in log.action or 'REGISTERED' in log.action %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            {% elif 'REPORTED' in log.action %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            {% else %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            {% endif %}
           </svg>
-          System Activity
-        </h3>
-        <a href="{% url 'activity:feed' %}" class="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">View all</a>
+        </span>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-medium text-slate-700 truncate">
+            {% if log.actor %}<a href="{% url 'accounts:profile_view' log.actor.pk %}" class="hover:text-brand-600 hover:underline">{{ log.actor.full_name }}</a>{% else %}System{% endif %}
+          </p>
+          <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ log.description }}</p>
+        </div>
+        <span class="shrink-0 text-xs text-slate-400 whitespace-nowrap">{{ log.timestamp|timesince }} ago</span>
       </div>
-      {% if system_activity %}
-        <div class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
-          {% for log in system_activity %}
-          <div class="px-5 py-3 flex items-start gap-3">
-            <div class="flex-shrink-0 mt-0.5">
-              <span class="flex items-center justify-center w-7 h-7 rounded-full
-                {% if 'CREATED' in log.action or 'REGISTERED' in log.action %}bg-brand-100
-                {% elif 'DELETED' in log.action or 'OVERDUE' in log.action %}bg-red-100
-                {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action %}bg-auburn-bluePale
-                {% elif 'REJECTED' in log.action or 'CANCELLED' in log.action %}bg-orange-100
-                {% elif 'REPORTED' in log.action %}bg-brand-100
-                {% else %}bg-slate-100{% endif %}">
-                <svg class="w-3 h-3
-                  {% if 'CREATED' in log.action or 'REGISTERED' in log.action %}text-brand-600
-                  {% elif 'DELETED' in log.action or 'OVERDUE' in log.action %}text-red-600
-                  {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action %}text-auburn-blueLight
-                  {% elif 'REJECTED' in log.action or 'CANCELLED' in log.action %}text-orange-600
-                  {% elif 'REPORTED' in log.action %}text-brand-600
-                  {% else %}text-slate-500{% endif %}"
-                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-              </span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-slate-700 leading-snug">
-                {% if log.actor %}<a href="{% url 'accounts:profile_view' log.actor.pk %}" class="hover:text-brand-600 hover:underline">{{ log.actor.full_name }}</a>{% else %}System{% endif %}
-              </p>
-              <p class="text-xs text-slate-500 mt-0.5 line-clamp-2">{{ log.description }}</p>
-            </div>
-            <span class="flex-shrink-0 text-xs text-slate-400 whitespace-nowrap">{{ log.timestamp|timesince }} ago</span>
-          </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="flex flex-col items-center justify-center py-10 text-center">
-          <p class="text-sm text-slate-500">No activity yet</p>
-        </div>
-      {% endif %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="flex flex-col items-center justify-center py-10">
+      <p class="text-sm text-slate-400">No activity yet</p>
     </div>
     {% endif %}
-
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-          </svg>
-          My Recent Activity
-        </h3>
-        <a href="{% url 'activity:feed' %}" class="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">View all</a>
-      </div>
-      {% if my_recent_activity %}
-        <div class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
-          {% for log in my_recent_activity %}
-          <div class="px-5 py-3 flex items-start gap-3">
-            <div class="flex-shrink-0 mt-0.5">
-              <span class="flex items-center justify-center w-7 h-7 rounded-full
-                {% if 'CREATED' in log.action or 'REGISTERED' in log.action %}bg-brand-100
-                {% elif 'DELETED' in log.action or 'OVERDUE' in log.action %}bg-red-100
-                {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action %}bg-auburn-bluePale
-                {% elif 'REJECTED' in log.action or 'CANCELLED' in log.action %}bg-orange-100
-                {% else %}bg-slate-100{% endif %}">
-                <svg class="w-3 h-3
-                  {% if 'CREATED' in log.action or 'REGISTERED' in log.action %}text-brand-600
-                  {% elif 'DELETED' in log.action or 'OVERDUE' in log.action %}text-red-600
-                  {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action %}text-auburn-blueLight
-                  {% elif 'REJECTED' in log.action or 'CANCELLED' in log.action %}text-orange-600
-                  {% else %}text-slate-500{% endif %}"
-                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-              </span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs text-slate-600 leading-snug line-clamp-2">{{ log.description }}</p>
-            </div>
-            <span class="flex-shrink-0 text-xs text-slate-400 whitespace-nowrap">{{ log.timestamp|timesince }} ago</span>
-          </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="flex flex-col items-center justify-center py-10 text-center">
-          <p class="text-sm text-slate-500">No activity yet</p>
-        </div>
-      {% endif %}
-    </div>
-
   </div>
+  {% endif %}
+
+  <!-- My Recent Activity -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        My Recent Activity
+      </h3>
+      <a href="{% url 'activity:feed' %}" class="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">View all</a>
+    </div>
+    {% if my_recent_activity %}
+    <div class="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+      {% for log in my_recent_activity %}
+      <div class="px-5 py-3 flex items-start gap-3">
+        <span class="shrink-0 mt-0.5 flex items-center justify-center w-6 h-6 rounded-full
+          {% if 'DELETED' in log.action or 'OVERDUE' in log.action or 'REJECTED' in log.action %}bg-red-100
+          {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action or 'COMPLETED' in log.action %}bg-emerald-100
+          {% elif 'CREATED' in log.action or 'REGISTERED' in log.action %}bg-brand-100
+          {% elif 'REPORTED' in log.action or 'CANCELLED' in log.action %}bg-amber-100
+          {% else %}bg-slate-100{% endif %}">
+          <svg class="w-3 h-3
+            {% if 'DELETED' in log.action or 'OVERDUE' in log.action or 'REJECTED' in log.action %}text-red-600
+            {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action or 'COMPLETED' in log.action %}text-emerald-600
+            {% elif 'CREATED' in log.action or 'REGISTERED' in log.action %}text-brand-600
+            {% elif 'REPORTED' in log.action or 'CANCELLED' in log.action %}text-amber-600
+            {% else %}text-slate-500{% endif %}"
+               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {% if 'DELETED' in log.action %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            {% elif 'APPROVED' in log.action or 'RETURNED' in log.action or 'RESOLVED' in log.action %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            {% elif 'CREATED' in log.action or 'REGISTERED' in log.action %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            {% elif 'REPORTED' in log.action %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            {% else %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            {% endif %}
+          </svg>
+        </span>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs text-slate-600 line-clamp-2">{{ log.description }}</p>
+        </div>
+        <span class="shrink-0 text-xs text-slate-400 whitespace-nowrap">{{ log.timestamp|timesince }} ago</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="flex flex-col items-center justify-center py-10">
+      <p class="text-sm text-slate-400">No activity yet</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
 
 </div>
 {% endblock %}

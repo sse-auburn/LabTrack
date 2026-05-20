@@ -80,19 +80,16 @@ def dashboard_home_view(request):
     # ── Admin-only system data ────────────────────────────────────────────────
     if is_admin:
         total_equipment = Equipment.objects.filter(is_active=True).count()
-        available_equipment = Equipment.objects.filter(is_active=True).exclude(
-            status__in=['BORROWED', 'MAINTENANCE', 'DAMAGED', 'RETIRED']
-        ).count()
+        available_equipment = Equipment.objects.filter(is_active=True, status='AVAILABLE').count()
         pending_equipment = Equipment.objects.filter(approval_status='PENDING', is_active=True).count()
-        pending_approvals = Reservation.objects.filter(
-            status='RETURN_PENDING',
-        ).count()
         open_incidents = IncidentReport.objects.filter(
             status__in=['OPEN', 'INVESTIGATING']
         ).count()
-
         total_kits = Kit.objects.filter(is_active=True).count()
         shared_kits = Kit.objects.filter(is_active=True, is_shared=True).count()
+        pending_users = CustomUser.objects.filter(is_active=False).count()
+        active_reservations_count = Reservation.objects.filter(status='ACTIVE').count()
+        pending_returns_count = Reservation.objects.filter(status='RETURN_PENDING').count()
 
         overdue_reservations = Reservation.objects.filter(
             end_date__lt=today,
@@ -105,10 +102,12 @@ def dashboard_home_view(request):
             'total_equipment': total_equipment,
             'available_equipment': available_equipment,
             'pending_equipment': pending_equipment,
-            'pending_approvals': pending_approvals,
             'open_incidents': open_incidents,
             'total_kits': total_kits,
             'shared_kits': shared_kits,
+            'pending_users': pending_users,
+            'active_reservations_count': active_reservations_count,
+            'pending_returns_count': pending_returns_count,
             'overdue_reservations': overdue_reservations,
             'system_activity': system_activity,
         })
