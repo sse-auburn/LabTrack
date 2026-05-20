@@ -205,7 +205,7 @@
                   </div>
                 </td>
                 <td class="px-6 py-4 text-sm text-slate-700">{{ kit.items.count }} item{{ kit.items.count|pluralize }}</td>
-                <td class="px-6 py-4 text-sm text-slate-700">{{ kit.created_by.full_name|default:"—" }}</td>
+                <td class="px-6 py-4 text-sm text-slate-700">{% if kit.created_by %}<a href="{% url 'accounts:profile_view' kit.created_by.pk %}" class="hover:text-brand-600 hover:underline">{{ kit.created_by.full_name|default:"—" }}</a>{% else %}—{% endif %}</td>
                 <td class="px-6 py-4 text-right">
                   <div class="flex items-center justify-end gap-2">
                     <a href="{% url 'kits:detail' kit.pk %}" class="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium rounded-lg border border-slate-300 transition-colors">View</a>

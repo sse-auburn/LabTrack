@@ -132,7 +132,6 @@
             <option value="">All Statuses</option>
             <option value="AVAILABLE" {% if request.GET.status == 'AVAILABLE' %}selected{% endif %}>Available</option>
             <option value="BORROWED" {% if request.GET.status == 'BORROWED' %}selected{% endif %}>Borrowed</option>
-            <option value="RESERVED" {% if request.GET.status == 'RESERVED' %}selected{% endif %}>Reserved</option>
             <option value="MAINTENANCE" {% if request.GET.status == 'MAINTENANCE' %}selected{% endif %}>Maintenance</option>
             <option value="DAMAGED" {% if request.GET.status == 'DAMAGED' %}selected{% endif %}>Damaged</option>
             <option value="RETIRED" {% if request.GET.status == 'RETIRED' %}selected{% endif %}>Retired</option>
@@ -259,33 +258,43 @@
               </td>
               <td class="px-4 py-3">
                 {% if item.category %}
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white"
-                      style="background-color: {{ item.category.color }};">{{ item.category.name }}</span>
+                <a href="{% url 'equipment:list' %}?category={{ item.category.pk }}" class="hover:underline">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white"
+                        style="background-color: {{ item.category.color }};">{{ item.category.name }}</span>
+                </a>
                 {% else %}<span class="text-slate-400">—</span>{% endif %}
               </td>
-              <td class="px-4 py-3 text-slate-600 text-xs">{{ item.location.name|default:"—" }}</td>
+              <td class="px-4 py-3 text-slate-600 text-xs">
+                {% if item.location %}
+                <a href="{% url 'equipment:list' %}?location={{ item.location.pk }}" class="hover:underline">{{ item.location.name }}</a>
+                {% else %}—{% endif %}
+              </td>
               <td class="px-4 py-3">
                 {% if item.approval_status == 'PENDING' %}
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
-                {% elif item.status == 'AVAILABLE' %}
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-100 text-brand-700">Available</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800" title="Awaiting owner approval">Pending</span>
                 {% elif item.status == 'BORROWED' %}
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Borrowed</span>
-                {% elif item.status == 'RESERVED' %}
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-auburn-bluePale text-brand-700">Reserved</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700" title="Item is currently checked out">Borrowed</span>
                 {% elif item.status == 'MAINTENANCE' %}
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">Maintenance</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700" title="Item is under maintenance">Maintenance</span>
                 {% elif item.status == 'DAMAGED' %}
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">Damaged</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700" title="Item is damaged and unavailable">Damaged</span>
+                {% elif item.status == 'AVAILABLE' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600" title="Item is checked in and available">Available</span>
+                {% elif item.status == 'RETIRED' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600" title="Item is retired from service">Retired</span>
                 {% else %}
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">{{ item.get_status_display }}</span>
                 {% endif %}
               </td>
               <td class="px-4 py-3 text-slate-600 text-xs">{{ item.get_condition_display }}</td>
-              <td class="px-4 py-3 text-slate-600 text-xs truncate max-w-[120px]">{{ item.owner.full_name|default:"—" }}</td>
+              <td class="px-4 py-3 text-slate-600 text-xs truncate max-w-[120px]">
+                {% if item.owner %}
+                <a href="{% url 'accounts:profile_view' item.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ item.owner.full_name }}</a>
+                {% else %}—{% endif %}
+              </td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-end gap-1.5">
-                  {% if item.status == 'AVAILABLE' and item.approval_status == 'APPROVED' and user.is_authenticated %}
+                  {% if item.status != 'DAMAGED' and item.status != 'RETIRED' and item.status != 'MAINTENANCE' and item.approval_status == 'APPROVED' and user.is_authenticated %}
                   <a href="{% url 'reservations:create' %}?equipment={{ item.pk }}"
                      class="inline-flex items-center px-2.5 py-1.5 bg-brand-100 hover:bg-auburn-bluePale text-brand-700 text-xs font-medium rounded-lg transition-colors">Reserve</a>
                   {% endif %}
@@ -302,7 +311,7 @@
     <div id="equipment-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
       {% for item in equipment_list %}
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col relative
-        {% if item.status == 'AVAILABLE' %} equipment-selectable{% endif %}"
+        {% if item.status != 'DAMAGED' and item.status != 'RETIRED' and item.status != 'MAINTENANCE' %} equipment-selectable{% endif %}"
         data-id="{{ item.pk }}" data-name="{{ item.name }}">
 
         <!-- Equipment Image with overlays -->
@@ -329,25 +338,21 @@
           <!-- Status badge — top right -->
           <div class="absolute top-3 right-3 flex flex-col gap-1 items-end">
             {% if item.approval_status == 'PENDING' %}
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 shadow-sm">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 shadow-sm" title="Awaiting owner approval">
               <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
               Pending
             </span>
             {% endif %}
-            {% if item.status == 'AVAILABLE' %}
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-500 text-white shadow-sm">Available</span>
-            {% elif item.status == 'BORROWED' %}
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500 text-white shadow-sm">Borrowed</span>
-            {% elif item.status == 'RESERVED' %}
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-auburn-bluePale0 text-white shadow-sm">Reserved</span>
+            {% if item.status == 'BORROWED' %}
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500 text-white shadow-sm" title="Item is currently checked out">Borrowed</span>
             {% elif item.status == 'MAINTENANCE' %}
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-500 text-white shadow-sm">Maintenance</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-500 text-white shadow-sm" title="Item is under maintenance">Maintenance</span>
             {% elif item.status == 'DAMAGED' %}
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-500 text-white shadow-sm">Damaged</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-500 text-white shadow-sm" title="Item is damaged and unavailable">Damaged</span>
             {% elif item.status == 'RETIRED' %}
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-500 text-white shadow-sm">Retired</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-500 text-white shadow-sm" title="Item is retired from service">Retired</span>
             {% endif %}
           </div>
 
@@ -359,10 +364,12 @@
                 <p class="text-xs text-white/50">#{{ item.pk }}</p>
               </a>
               {% if item.category %}
-              <span class="shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white border border-white/30"
-                    style="background-color: {{ item.category.color }};">
-                {{ item.category.name }}
-              </span>
+              <a href="{% url 'equipment:list' %}?category={{ item.category.pk }}" class="hover:underline">
+                <span class="shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white border border-white/30"
+                      style="background-color: {{ item.category.color }};">
+                  {{ item.category.name }}
+                </span>
+              </a>
               {% endif %}
             </div>
             <div class="flex flex-wrap gap-x-3 gap-y-1">
@@ -371,7 +378,7 @@
                 <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
-                <span class="truncate max-w-[10rem]">{{ item.owner.full_name }}</span>
+                <a href="{% url 'accounts:profile_view' item.owner.pk %}" class="hover:text-brand-600 hover:underline truncate max-w-[10rem]">{{ item.owner.full_name }}</a>
               </div>
               {% endif %}
               {% if item.location %}
@@ -380,7 +387,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
-                <span>{{ item.location.name }}</span>
+                <a href="{% url 'equipment:list' %}?location={{ item.location.pk }}" class="hover:underline">{{ item.location.name }}</a>
               </div>
               {% endif %}
               <div class="flex items-center gap-1 text-xs text-white/80">
@@ -393,7 +400,7 @@
 
             <!-- Action Buttons -->
             <div class="flex items-center gap-1.5 pt-2">
-              {% if item.status == 'AVAILABLE' and item.approval_status == 'APPROVED' and user.is_authenticated %}
+              {% if item.status != 'DAMAGED' and item.status != 'RETIRED' and item.status != 'MAINTENANCE' and item.approval_status == 'APPROVED' and user.is_authenticated %}
               <a href="{% url 'reservations:create' %}?equipment={{ item.pk }}"
                  class="flex-1 text-center px-2 py-1.5 bg-auburn-blueLight/80 hover:bg-auburn-blueLight backdrop-blur-sm text-white text-xs font-medium rounded-lg transition-colors duration-150">
                 Reserve

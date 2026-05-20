@@ -28,24 +28,24 @@
         {% if reservation.equipment %}{{ reservation.equipment.name }}{% elif reservation.kit %}{{ reservation.kit.name }}{% endif %}
       </h1>
       <p class="mt-1 text-sm text-slate-500">
-        Reserved by {{ reservation.requester.full_name|default:reservation.requester.username }}
+        Reserved by <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>
       </p>
     </div>
     <div class="flex items-center gap-2">
       {% if reservation.status == 'PENDING' %}
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">Pending</span>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800" title="Awaiting owner confirmation">Pending</span>
       {% elif reservation.status == 'CONFIRMED' %}
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800">Confirmed</span>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800" title="Reservation confirmed, not yet started">Confirmed</span>
       {% elif reservation.status == 'ACTIVE' %}
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800">Active — In Your Possession</span>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800" title="Item is currently in your possession">Active — In Your Possession</span>
       {% elif reservation.status == 'RETURN_PENDING' %}
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">Return Pending</span>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800" title="Return submitted, awaiting owner confirmation">Return Pending</span>
       {% elif reservation.status == 'RETURNED' %}
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800">Returned</span>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800" title="Return confirmed, reservation complete">Returned</span>
       {% elif reservation.status == 'CANCELLED' %}
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">Cancelled</span>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800" title="Reservation was cancelled">Cancelled</span>
       {% elif reservation.status == 'EXPIRED' %}
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-600">Expired</span>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-600" title="Reservation expired without pickup">Expired</span>
       {% endif %}
     </div>
   </div>
@@ -72,6 +72,29 @@
               {{ reservation.kit.name }}
             </a>
             <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-600">Kit</span>
+          {% endif %}
+        </dd>
+      </div>
+
+      <!-- Return To (Owner) -->
+      <div class="px-6 py-4 grid grid-cols-3 gap-4">
+        <dt class="text-sm font-medium text-slate-500">Return To</dt>
+        <dd class="col-span-2 text-sm text-slate-900">
+          {% if reservation.equipment %}
+            <a href="{% url 'accounts:profile_view' reservation.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.owner.full_name|default:reservation.equipment.owner.username }}</a>
+            <span class="text-slate-400 ml-1">({{ reservation.equipment.owner.email }})</span>
+          {% elif reservation.kit %}
+            <div class="space-y-1">
+              {% for ki in reservation.kit.items.all %}
+                {% if ki.equipment.owner %}
+                  <div>
+                    <a href="{% url 'accounts:profile_view' ki.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}</a>
+                    <span class="text-slate-400 ml-1">({{ ki.equipment.owner.email }})</span>
+                    <span class="text-xs text-slate-400 ml-1">— {{ ki.equipment.name }}</span>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
           {% endif %}
         </dd>
       </div>
@@ -108,7 +131,7 @@
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
         <dt class="text-sm font-medium text-slate-500">Requested By</dt>
         <dd class="col-span-2 text-sm text-slate-900">
-          {{ reservation.requester.full_name|default:reservation.requester.username }}
+          <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>
           <span class="text-slate-400 ml-1">({{ reservation.requester.email }})</span>
         </dd>
       </div>
@@ -119,22 +142,51 @@
         <dd class="col-span-2 text-sm text-slate-900">{{ reservation.returned_date|date:"F j, Y \a\t g:i A" }}</dd>
       </div>
       {% endif %}
-      {% if reservation.return_condition %}
+      {% if reservation.equipment and reservation.return_condition %}
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
         <dt class="text-sm font-medium text-slate-500">Return Condition</dt>
         <dd class="col-span-2 text-sm text-slate-900">{{ reservation.return_condition }}</dd>
       </div>
       {% endif %}
-      {% if reservation.return_notes %}
+      {% if reservation.equipment and reservation.return_notes %}
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
         <dt class="text-sm font-medium text-slate-500">Return Notes</dt>
         <dd class="col-span-2 text-sm text-slate-900 whitespace-pre-line">{{ reservation.return_notes }}</dd>
       </div>
       {% endif %}
+      {% if reservation.kit and reservation.item_returns.exists %}
+      <div class="px-6 py-4 grid grid-cols-3 gap-4">
+        <dt class="text-sm font-medium text-slate-500">Per-Item Return</dt>
+        <dd class="col-span-2 text-sm text-slate-900">
+          <div class="overflow-x-auto rounded-lg border border-slate-200">
+            <table class="min-w-full text-sm">
+              <thead class="bg-slate-50">
+                <tr>
+                  <th class="px-3 py-2 text-left text-xs font-semibold text-slate-500">Item</th>
+                  <th class="px-3 py-2 text-left text-xs font-semibold text-slate-500">Condition</th>
+                  <th class="px-3 py-2 text-left text-xs font-semibold text-slate-500">Notes</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 bg-white">
+                {% for ir in reservation.item_returns.all %}
+                <tr>
+                  <td class="px-3 py-2 font-medium text-slate-800">
+                    <a href="{% url 'equipment:detail' ir.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ ir.equipment.name }}</a>
+                  </td>
+                  <td class="px-3 py-2 text-slate-600">{{ ir.condition|default:"—" }}</td>
+                  <td class="px-3 py-2 text-slate-600">{{ ir.notes|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </dd>
+      </div>
+      {% endif %}
       {% if reservation.return_approved_by %}
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
         <dt class="text-sm font-medium text-slate-500">Approved By</dt>
-        <dd class="col-span-2 text-sm text-slate-900">{{ reservation.return_approved_by.full_name }}</dd>
+        <dd class="col-span-2 text-sm text-slate-900"><a href="{% url 'accounts:profile_view' reservation.return_approved_by.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.return_approved_by.full_name }}</a></dd>
       </div>
       {% endif %}
 
@@ -150,29 +202,7 @@
   <div class="flex flex-wrap items-center gap-3">
 
     {% if reservation.status == 'PENDING' %}
-      {% if reservation.equipment and reservation.equipment.owner == request.user %}
-      <form method="post" action="{% url 'reservations:confirm' reservation.pk %}">
-        {% csrf_token %}
-        <button type="submit"
-                class="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-          </svg>
-          Confirm Reservation
-        </button>
-      </form>
-      {% elif reservation.kit and reservation.kit.created_by == request.user %}
-      <form method="post" action="{% url 'reservations:confirm' reservation.pk %}">
-        {% csrf_token %}
-        <button type="submit"
-                class="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-          </svg>
-          Confirm Reservation
-        </button>
-      </form>
-      {% elif request.user.is_admin %}
+      {% if reservation.equipment and reservation.equipment.owner == request.user or reservation.kit and is_owner or request.user.is_admin %}
       <form method="post" action="{% url 'reservations:confirm' reservation.pk %}">
         {% csrf_token %}
         <button type="submit"
@@ -197,8 +227,8 @@
     </a>
     {% endif %}
 
-    {% if reservation.status in 'RETURN_PENDING,ACTIVE,CONFIRMED' %}
-      {% if reservation.equipment and reservation.equipment.owner == request.user or reservation.kit and reservation.kit.created_by == request.user or request.user.is_admin %}
+    {% if reservation.status == 'RETURN_PENDING' %}
+      {% if reservation.equipment and reservation.equipment.owner == request.user or reservation.kit and is_owner or request.user.is_admin %}
       <a href="{% url 'reservations:return_confirm' reservation.pk %}"
          class="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,6 +236,18 @@
         </svg>
         Confirm Return
       </a>
+      {% endif %}
+      {% if reservation.requester == request.user or request.user.is_admin %}
+      <form method="post" action="{% url 'reservations:remind' reservation.pk %}" class="inline">
+        {% csrf_token %}
+        <button type="submit"
+                class="inline-flex items-center px-4 py-2 bg-yellow-50 text-yellow-700 border border-yellow-300 rounded-lg text-sm font-medium hover:bg-yellow-100 transition">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          Send Reminder
+        </button>
+      </form>
       {% endif %}
     {% endif %}
 

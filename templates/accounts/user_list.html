@@ -146,19 +146,20 @@
             <!-- Avatar + name -->
             <td class="px-6 py-4">
               <div class="flex items-center gap-3">
+                <a href="{% url 'accounts:profile_view' member.pk %}">
                 {% if member.profile.avatar %}
                 <img src="{{ member.profile.avatar.url }}" alt="{{ member.full_name }}"
                   class="w-9 h-9 rounded-full object-cover flex-shrink-0 ring-1 ring-slate-200" />
                 {% else %}
-                <div class="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center
-                  {% if member.is_admin %}bg-brand-600{% else %}bg-brand-600{% endif %}">
+                <div class="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center bg-brand-600">
                   <span class="text-white text-xs font-bold">
-                    {{ member.first_name|first|upper }}{{ member.last_name|first|upper }}
+                    {{ member.get_initials }}
                   </span>
                 </div>
                 {% endif %}
+                </a>
                 <div class="min-w-0">
-                  <p class="font-semibold text-slate-800 leading-tight truncate">{{ member.full_name }}</p>
+                  <p class="font-semibold text-slate-800 leading-tight truncate"><a href="{% url 'accounts:profile_view' member.pk %}" class="hover:text-brand-600 hover:underline">{{ member.full_name }}</a></p>
                   <p class="text-xs text-slate-500 truncate">@{{ member.username }}</p>
                 </div>
               </div>

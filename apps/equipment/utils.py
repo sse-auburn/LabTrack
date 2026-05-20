@@ -5,14 +5,13 @@ from datetime import date
 
 
 def sync_equipment_status(equipment, exclude_borrow_pk=None):
-    """Compute and save the correct status for *equipment* by querying live data.
+    """Compute and save the physical possession status for *equipment*.
 
     Priority (highest first):
     1. DAMAGED / RETIRED — never overridden automatically.
     2. BORROWED  — any active BorrowRequest or ACTIVE/RETURN_PENDING Reservation.
     3. MAINTENANCE — any active MaintenanceLog (SCHEDULED / IN_PROGRESS).
-    4. RESERVED  — a CONFIRMED Reservation whose window spans today.
-    5. AVAILABLE — nothing else blocking.
+    4. AVAILABLE — nothing else blocking.
     """
     if equipment.status in ('DAMAGED', 'RETIRED'):
         return
@@ -21,7 +20,6 @@ def sync_equipment_status(equipment, exclude_borrow_pk=None):
     from apps.incidents.models import MaintenanceLog
     from apps.reservations.models import Reservation
 
-    today = date.today()
     res_q = Q(equipment=equipment) | Q(kit__items__equipment=equipment)
 
     if Reservation.objects.filter(
@@ -52,13 +50,6 @@ def sync_equipment_status(equipment, exclude_borrow_pk=None):
             status__in=['SCHEDULED', 'IN_PROGRESS'],
         ).exists():
             new_status = 'MAINTENANCE'
-        elif Reservation.objects.filter(
-            res_q,
-            status='CONFIRMED',
-            start_date__lte=today,
-            end_date__gte=today,
-        ).exists():
-            new_status = 'RESERVED'
         else:
             new_status = 'AVAILABLE'
 

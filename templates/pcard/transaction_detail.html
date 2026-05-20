@@ -37,7 +37,7 @@
         <h1 class="text-2xl font-bold text-slate-900">Transaction on {{ transaction.transaction_date|date:"F j, Y" }}</h1>
         <p class="mt-1 text-sm text-slate-500">
           Recorded {{ transaction.created_at|timesince }} ago
-          {% if transaction.created_by %}by {{ transaction.created_by.full_name }}{% endif %}
+          {% if transaction.created_by %}by <a href="{% url 'accounts:profile_view' transaction.created_by.pk %}" class="hover:text-brand-600 hover:underline">{{ transaction.created_by.full_name }}</a>{% endif %}
         </p>
         {% if pending_request %}
         <span class="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">
@@ -192,7 +192,7 @@
             <div class="flex justify-between">
               <span class="text-slate-500">Recorded By</span>
               <span class="font-medium text-slate-800">
-                {% if transaction.created_by %}{{ transaction.created_by.full_name }}{% else %}Unknown{% endif %}
+                {% if transaction.created_by %}<a href="{% url 'accounts:profile_view' transaction.created_by.pk %}" class="hover:text-brand-600 hover:underline">{{ transaction.created_by.full_name }}</a>{% else %}Unknown{% endif %}
               </span>
             </div>
             <div class="flex justify-between">

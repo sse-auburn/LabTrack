@@ -58,9 +58,11 @@ class ReservationForm(forms.ModelForm):
             if start_date < timezone.now().date():
                 raise forms.ValidationError('Start date must be today or a future date.')
 
-            # Overlap check: no CONFIRMED reservation for the same item in this window.
+            # Overlap check: no blocking reservation for the same item in this window.
             from django.db.models import Q
-            overlap_qs = Reservation.objects.filter(status='CONFIRMED')
+            overlap_qs = Reservation.objects.filter(
+                status__in=['PENDING', 'CONFIRMED', 'ACTIVE', 'RETURN_PENDING']
+            )
             # Exclude the current instance when editing.
             if self.instance and self.instance.pk:
                 overlap_qs = overlap_qs.exclude(pk=self.instance.pk)

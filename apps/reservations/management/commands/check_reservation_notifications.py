@@ -54,16 +54,10 @@ class Command(BaseCommand):
                 category='reservations',
             )
 
-            # Notify equipment/kit owner
-            owner = None
+            # Notify equipment owner(s)
             if res.equipment and res.equipment.owner and res.equipment.owner != res.requester:
-                owner = res.equipment.owner
-            elif res.kit and res.kit.created_by and res.kit.created_by != res.requester:
-                owner = res.kit.created_by
-
-            if owner:
                 notify(
-                    recipient=owner,
+                    recipient=res.equipment.owner,
                     title='Equipment reservation now active',
                     message=(
                         f'{res.requester.full_name} now has "{item_name}" '
@@ -73,6 +67,20 @@ class Command(BaseCommand):
                     link=f'/reservations/{res.pk}/',
                     category='reservations',
                 )
+            elif res.kit:
+                for ki in res.kit.items.select_related('equipment__owner'):
+                    if ki.equipment.owner and ki.equipment.owner != res.requester:
+                        notify(
+                            recipient=ki.equipment.owner,
+                            title='Equipment reservation now active (via kit)',
+                            message=(
+                                f'{res.requester.full_name} now has "{item_name}" '
+                                f'(includes your "{ki.equipment.name}" — active until {res.end_date}).'
+                            ),
+                            level='info',
+                            link=f'/reservations/{res.pk}/',
+                            category='reservations',
+                        )
 
             res.status = 'ACTIVE'
             res.start_notified = True
@@ -93,15 +101,9 @@ class Command(BaseCommand):
         for res in qs:
             item_name = str(res.equipment or res.kit or 'item')
 
-            owner = None
             if res.equipment and res.equipment.owner:
-                owner = res.equipment.owner
-            elif res.kit and res.kit.created_by:
-                owner = res.kit.created_by
-
-            if owner:
                 notify(
-                    recipient=owner,
+                    recipient=res.equipment.owner,
                     title='Return approval needed',
                     message=(
                         f'{res.requester.full_name}\'s reservation for "{item_name}" '
@@ -111,6 +113,21 @@ class Command(BaseCommand):
                     link=f'/reservations/{res.pk}/',
                     category='reservations',
                 )
+            elif res.kit:
+                for ki in res.kit.items.select_related('equipment__owner'):
+                    if ki.equipment.owner:
+                        notify(
+                            recipient=ki.equipment.owner,
+                            title='Return approval needed',
+                            message=(
+                                f'{res.requester.full_name}\'s reservation for "{item_name}" '
+                                f'(includes your "{ki.equipment.name}") ended today. '
+                                f'Please confirm that you received it back.'
+                            ),
+                            level='warning',
+                            link=f'/reservations/{res.pk}/',
+                            category='reservations',
+                        )
 
             # Also remind the requester
             notify(

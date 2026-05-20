@@ -409,7 +409,7 @@
           {% else %}
           <div class="w-9 h-9 rounded-full bg-brand-700 flex items-center justify-center ring-2 ring-slate-700 group-hover:ring-brand-500 transition-all flex-shrink-0">
             <span class="text-white text-sm font-semibold">
-              {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+              {{ user.get_initials }}
             </span>
           </div>
           {% endif %}

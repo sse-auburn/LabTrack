@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load reservation_extras %}
 
 {% block content %}
 
@@ -34,7 +35,11 @@
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
         <dt class="text-sm font-medium text-slate-500">Item</dt>
         <dd class="col-span-2 text-sm text-slate-900 font-medium">
-          {% if reservation.equipment %}{{ reservation.equipment.name }}{% elif reservation.kit %}{{ reservation.kit.name }}{% endif %}
+          {% if reservation.equipment %}
+            <a href="{% url 'equipment:detail' reservation.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.name }}</a>
+          {% elif reservation.kit %}
+            <a href="{% url 'kits:detail' reservation.kit.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.kit.name }}</a>
+          {% endif %}
         </dd>
       </div>
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
@@ -43,13 +48,13 @@
           {{ reservation.requester.full_name|default:reservation.requester.username }}
         </dd>
       </div>
-      {% if reservation.return_condition %}
+      {% if reservation.equipment and reservation.return_condition %}
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
         <dt class="text-sm font-medium text-slate-500">Condition</dt>
         <dd class="col-span-2 text-sm text-slate-900">{{ reservation.get_return_condition_display|default:reservation.return_condition }}</dd>
       </div>
       {% endif %}
-      {% if reservation.return_notes %}
+      {% if reservation.equipment and reservation.return_notes %}
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
         <dt class="text-sm font-medium text-slate-500">Notes</dt>
         <dd class="col-span-2 text-sm text-slate-900 whitespace-pre-line">{{ reservation.return_notes }}</dd>
@@ -62,6 +67,37 @@
       </div>
       {% endif %}
     </dl>
+
+    {% if reservation.kit %}
+    <!-- Per-item conditions for kits -->
+    <div class="px-6 py-4 border-t border-slate-100">
+      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Per-Item Condition</p>
+      <div class="overflow-x-auto rounded-lg border border-slate-200">
+        <table class="min-w-full text-sm">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-500">Item</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-500">Condition</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-500">Notes</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 bg-white">
+            {% for ki in reservation.kit.items.all %}
+            {% with ir=kit_item_returns|get_item:ki.equipment.pk %}
+            <tr>
+              <td class="px-4 py-2 font-medium text-slate-800">
+                <a href="{% url 'equipment:detail' ki.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.name }}</a>
+              </td>
+              <td class="px-4 py-2 text-slate-600">{{ ir.condition|default:"—" }}</td>
+              <td class="px-4 py-2 text-slate-600">{{ ir.notes|default:"—" }}</td>
+            </tr>
+            {% endwith %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
   </div>
 
   <p class="text-sm text-slate-600 mb-6">
@@ -70,6 +106,23 @@
 
   <form method="post" class="space-y-4">
     {% csrf_token %}
+    {% if not is_owner %}
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+      <p class="text-sm text-yellow-800">
+        You are confirming this return as an admin on behalf of the owner. Please enter your password to continue.
+      </p>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">
+        Confirm with Password <span class="text-red-500">*</span>
+      </label>
+      <input type="password" name="password" required
+             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+             placeholder="Enter your current password">
+    </div>
+    {% endif %}
+
+    {% if reservation.equipment %}
     <div>
       <label class="block text-sm font-medium text-slate-700 mb-1">Return Condition</label>
       <select name="return_condition"
@@ -87,6 +140,46 @@
                 class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 placeholder="Any damage, issues, or notes about the return…">{{ form.notes.value|default:'' }}</textarea>
     </div>
+    {% elif reservation.kit %}
+    <p class="text-sm text-slate-600">Review or adjust the condition for each item before confirming.</p>
+    <div class="space-y-4">
+      {% for ki in reservation.kit.items.all %}
+      {% with ir=kit_item_returns|get_item:ki.equipment.pk %}
+      <div class="border border-slate-200 rounded-lg p-4">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-sm font-semibold text-slate-800">
+            <a href="{% url 'equipment:detail' ki.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.name }}</a>
+          </p>
+          {% if ki.equipment.owner %}
+          <span class="text-xs text-slate-500">Owner: <a href="{% url 'accounts:profile_view' ki.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}</a></span>
+          {% endif %}
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-1">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Condition</label>
+            <select name="condition_{{ ki.equipment.pk }}"
+                    class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="EXCELLENT" {% if ir.condition == 'EXCELLENT' %}selected{% endif %}>Excellent</option>
+              <option value="GOOD" {% if not ir or ir.condition == 'GOOD' %}selected{% endif %}>Good</option>
+              <option value="FAIR" {% if ir.condition == 'FAIR' %}selected{% endif %}>Fair</option>
+              <option value="POOR" {% if ir.condition == 'POOR' %}selected{% endif %}>Poor</option>
+              <option value="DAMAGED" {% if ir.condition == 'DAMAGED' %}selected{% endif %}>Damaged</option>
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Notes <span class="text-slate-400 font-normal">(optional)</span></label>
+            <input type="text" name="notes_{{ ki.equipment.pk }}"
+                   value="{{ ir.notes|default:'' }}"
+                   class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                   placeholder="Any issues with this item…">
+          </div>
+        </div>
+      </div>
+      {% endwith %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
     {% if form.errors %}
     <div class="text-sm text-red-600">{{ form.errors }}</div>
     {% endif %}

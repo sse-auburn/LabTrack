@@ -49,12 +49,12 @@
               {% else %}—{% endif %}
             </td>
             <td class="px-6 py-4">
-              {% if log.status == 'PASS' %}<span class="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs rounded-full">Pass</span>
-              {% elif log.status == 'FAIL' %}<span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">Fail</span>
-              {% else %}<span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs rounded-full">Pending</span>{% endif %}
+              {% if log.status == 'PASS' %}<span title="Calibration passed" class="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs rounded-full">Pass</span>
+              {% elif log.status == 'FAIL' %}<span title="Calibration failed" class="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">Fail</span>
+              {% else %}<span title="Calibration pending" class="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs rounded-full">Pending</span>{% endif %}
             </td>
             <td class="px-6 py-4 text-sm text-slate-500">{{ log.certificate_number|default:"—" }}</td>
-            <td class="px-6 py-4 text-sm text-slate-600">{{ log.calibrated_by.full_name|default:"—" }}</td>
+            <td class="px-6 py-4 text-sm text-slate-600">{% if log.calibrated_by %}<a href="{% url 'accounts:profile_view' log.calibrated_by.pk %}" class="hover:text-brand-600 hover:underline">{{ log.calibrated_by.full_name }}</a>{% else %}—{% endif %}</td>
             <td class="px-6 py-4 text-right">
               <div class="flex items-center justify-end gap-2">
                 {% if user.is_admin or log.calibrated_by == user %}

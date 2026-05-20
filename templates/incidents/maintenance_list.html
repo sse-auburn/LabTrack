@@ -41,14 +41,14 @@
             </td>
             <td class="px-6 py-4 text-sm text-slate-600">{{ log.get_maintenance_type_display }}</td>
             <td class="px-6 py-4">
-              {% if log.status == 'SCHEDULED' %}<span class="px-2 py-0.5 bg-auburn-bluePale text-auburn-blue text-xs rounded-full">Scheduled</span>
-              {% elif log.status == 'IN_PROGRESS' %}<span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">In Progress</span>
-              {% elif log.status == 'COMPLETED' %}<span class="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs rounded-full">Completed</span>
-              {% else %}<span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs rounded-full">Cancelled</span>{% endif %}
+              {% if log.status == 'SCHEDULED' %}<span title="Maintenance is scheduled" class="px-2 py-0.5 bg-auburn-bluePale text-auburn-blue text-xs rounded-full">Scheduled</span>
+              {% elif log.status == 'IN_PROGRESS' %}<span title="Maintenance is in progress" class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">In Progress</span>
+              {% elif log.status == 'COMPLETED' %}<span title="Maintenance completed" class="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs rounded-full">Completed</span>
+              {% else %}<span title="Maintenance cancelled" class="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs rounded-full">Cancelled</span>{% endif %}
             </td>
             <td class="px-6 py-4 text-sm text-slate-500">{{ log.scheduled_date|date:"M d, Y" }}</td>
             <td class="px-6 py-4 text-sm text-slate-500">{{ log.completed_date|date:"M d, Y"|default:"—" }}</td>
-            <td class="px-6 py-4 text-sm text-slate-600">{{ log.performed_by.full_name|default:"—" }}</td>
+            <td class="px-6 py-4 text-sm text-slate-600">{% if log.performed_by %}<a href="{% url 'accounts:profile_view' log.performed_by.pk %}" class="hover:text-brand-600 hover:underline">{{ log.performed_by.full_name }}</a>{% else %}—{% endif %}</td>
             <td class="px-6 py-4 text-right">
               <div class="flex items-center justify-end gap-2">
                 <a href="{% url 'incidents:maintenance_detail' log.pk %}" class="text-xs text-brand-600 hover:underline">View</a>

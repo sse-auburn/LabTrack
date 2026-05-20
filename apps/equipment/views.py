@@ -159,13 +159,14 @@ def equipment_detail_view(request, pk):
     for r in Reservation.objects.filter(
         Q(equipment=equipment) | Q(kit__items__equipment=equipment),
         status__in=['PENDING', 'CONFIRMED', 'ACTIVE', 'RETURN_PENDING'],
-    ).select_related('requester'):
+    ).select_related('requester', 'equipment', 'kit'):
         cal_events.append({
             'start': r.start_date.isoformat(),
             'end': r.end_date.isoformat(),
             'type': 'reservation',
             'status': r.status,
             'label': r.requester.full_name if r.requester else '',
+            'item': str(r.equipment or r.kit),
         })
 
     return render(request, 'equipment/equipment_detail.html', {

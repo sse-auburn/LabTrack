@@ -104,3 +104,31 @@ class WaitlistEntry(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+
+class ReservationItemReturn(models.Model):
+    """
+    Tracks the return condition for each individual equipment item
+    within a reservation. For kit reservations, one record per kit item.
+    For equipment reservations, one record for the single equipment.
+    """
+    reservation = models.ForeignKey(
+        Reservation,
+        on_delete=models.CASCADE,
+        related_name='item_returns',
+    )
+    equipment = models.ForeignKey(
+        'equipment.Equipment',
+        on_delete=models.CASCADE,
+    )
+    condition = models.CharField(max_length=20, blank=True)
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['reservation', 'equipment']
+        ordering = ['equipment__name']
+
+    def __str__(self):
+        return f"{self.equipment.name} — {self.condition or 'No condition'}"

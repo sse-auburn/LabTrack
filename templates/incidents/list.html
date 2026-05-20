@@ -75,15 +75,15 @@
               {% else %}<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">Low</span>{% endif %}
             </td>
             <td class="px-6 py-4">
-              {% if incident.status == 'OPEN' %}<span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">Open</span>
-              {% elif incident.status == 'INVESTIGATING' %}<span class="px-2 py-0.5 bg-auburn-bluePale text-auburn-blue text-xs rounded-full">Investigating</span>
-              {% elif incident.status == 'RESOLVED' %}<span class="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs rounded-full">Resolved</span>
-              {% else %}<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">Closed</span>{% endif %}
+              {% if incident.status == 'OPEN' %}<span title="Incident is open and needs attention" class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">Open</span>
+              {% elif incident.status == 'INVESTIGATING' %}<span title="Incident is being investigated" class="px-2 py-0.5 bg-auburn-bluePale text-auburn-blue text-xs rounded-full">Investigating</span>
+              {% elif incident.status == 'RESOLVED' %}<span title="Incident has been resolved" class="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs rounded-full">Resolved</span>
+              {% else %}<span title="Incident is closed" class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">Closed</span>{% endif %}
             </td>
-            <td class="px-6 py-4 text-sm text-slate-600">{{ incident.reported_by.full_name|default:"—" }}</td>
+            <td class="px-6 py-4 text-sm text-slate-600">{% if incident.reported_by %}<a href="{% url 'accounts:profile_view' incident.reported_by.pk %}" class="hover:text-brand-600 hover:underline">{{ incident.reported_by.full_name }}</a>{% else %}—{% endif %}</td>
             <td class="px-6 py-4 text-sm">
               {% if incident.assigned_to %}
-                <span class="text-brand-700 font-medium">{{ incident.assigned_to.full_name }}</span>
+                <a href="{% url 'accounts:profile_view' incident.assigned_to.pk %}" class="text-brand-700 font-medium hover:text-brand-600 hover:underline">{{ incident.assigned_to.full_name }}</a>
               {% else %}
                 <span class="text-slate-400 italic">Unassigned</span>
               {% endif %}

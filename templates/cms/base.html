@@ -181,20 +181,6 @@
         <span>Sponsors</span>
       </a>
 
-      <a href="{% url 'public_cms:cms_pagesection_list' %}"
-         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
-         {% if 'pagesection' in request.resolver_match.url_name %}
-           bg-white text-auburn-orange font-semibold
-         {% else %}
-           text-white/90 hover:bg-white/10
-         {% endif %}">
-        <svg class="flex-shrink-0 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
-        </svg>
-        <span>Page Sections</span>
-      </a>
-
       <a href="{% url 'public_cms:cms_contactmessage_list' %}"
          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
          {% if 'contactmessage' in request.resolver_match.url_name %}

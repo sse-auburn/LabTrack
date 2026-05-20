@@ -66,7 +66,7 @@
                   <div class="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
                     <span class="text-white text-xs font-semibold">{{ req.requested_by.first_name|first|upper }}</span>
                   </div>
-                  <span class="text-slate-700 text-xs">{{ req.requested_by.full_name }}</span>
+                  <a href="{% url 'accounts:profile_view' req.requested_by.pk %}" class="text-slate-700 text-xs hover:text-brand-600 hover:underline">{{ req.requested_by.full_name }}</a>
                 </div>
               </td>
               <td class="px-5 py-3 text-slate-600 max-w-xs">
@@ -132,12 +132,12 @@
               <td class="px-5 py-3 text-slate-700 text-xs">{{ req.requested_by.full_name }}</td>
               <td class="px-5 py-3">
                 {% if req.status == 'APPROVED' %}
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-100 text-brand-700 border border-brand-200">Approved</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-100 text-brand-700 border border-brand-200" title="Approved">Approved</span>
                 {% else %}
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 border border-red-200">Rejected</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 border border-red-200" title="Rejected">Rejected</span>
                 {% endif %}
               </td>
-              <td class="px-5 py-3 text-slate-700 text-xs">{{ req.resolved_by.full_name }}</td>
+              <td class="px-5 py-3 text-slate-700 text-xs"><a href="{% url 'accounts:profile_view' req.resolved_by.pk %}" class="hover:text-brand-600 hover:underline">{{ req.resolved_by.full_name }}</a></td>
               <td class="px-5 py-3 whitespace-nowrap text-slate-500 text-xs">
                 {{ req.resolved_at|timesince }} ago
               </td>

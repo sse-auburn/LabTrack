@@ -19,7 +19,7 @@
   </div>
   <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
     {% if incident.assigned_to %}
-      <p class="text-sm text-slate-600">Currently assigned to <strong>{{ incident.assigned_to.full_name }}</strong>.</p>
+      <p class="text-sm text-slate-600">Currently assigned to <strong><a href="{% url 'accounts:profile_view' incident.assigned_to.pk %}" class="hover:text-brand-600 hover:underline">{{ incident.assigned_to.full_name }}</a></strong>.</p>
     {% else %}
       <p class="text-sm text-slate-400 italic">Currently unassigned.</p>
     {% endif %}

@@ -185,10 +185,14 @@
           <td class="px-5 py-3 whitespace-nowrap">
             {% if tx.created_by %}
             <div class="flex items-center gap-2">
+              {% if tx.created_by.profile.avatar %}
+              <img src="{{ tx.created_by.profile.avatar.url }}" alt="" class="w-6 h-6 rounded-full object-cover flex-shrink-0">
+              {% else %}
               <div class="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
-                <span class="text-white text-xs font-semibold">{{ tx.created_by.first_name|first|upper }}</span>
+                <span class="text-white text-xs font-semibold">{{ tx.created_by.get_initials }}</span>
               </div>
-              <span class="text-slate-700 text-xs">{{ tx.created_by.full_name }}</span>
+              {% endif %}
+              <a href="{% url 'accounts:profile_view' tx.created_by.pk %}" class="text-slate-700 text-xs hover:text-brand-600 hover:underline">{{ tx.created_by.full_name }}</a>
             </div>
             {% else %}
             <span class="text-xs text-slate-400">Unknown</span>

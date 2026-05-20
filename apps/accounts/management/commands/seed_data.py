@@ -297,11 +297,11 @@ class Command(BaseCommand):
                 # Update equipment status for confirmed reservations
                 if status == 'CONFIRMED':
                     if eq:
-                        eq.status = 'RESERVED'
+                        eq.status = 'AVAILABLE'
                         eq.save(update_fields=['status'])
                     elif kit:
                         for ki in kit.items.select_related('equipment'):
-                            ki.equipment.status = 'RESERVED'
+                            ki.equipment.status = 'AVAILABLE'
                             ki.equipment.save(update_fields=['status'])
                 self.stdout.write(f'  Created reservation: {res}')
 

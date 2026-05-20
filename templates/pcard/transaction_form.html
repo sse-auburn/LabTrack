@@ -112,7 +112,7 @@
           <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
             <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
               <h2 class="text-base font-semibold text-slate-900">Itemized Products</h2>
-              <span class="text-xs text-slate-500">At least one item required</span>
+              <span class="text-xs text-slate-500">Optional — itemize if needed</span>
             </div>
 
             {{ formset.management_form }}
@@ -130,7 +130,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <!-- Item Name -->
                   <div class="sm:col-span-2">
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Item Name <span class="text-red-500">*</span></label>
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Item Name</label>
                     <input type="text" name="{{ item_form.name.html_name }}" id="{{ item_form.name.id_for_label }}"
                            value="{{ item_form.name.value|default:'' }}"
                            class="w-full px-3 py-2 text-sm border {% if item_form.name.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-auburn-orange"
@@ -151,10 +151,10 @@
 
                   <!-- Quantity -->
                   <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Quantity <span class="text-red-500">*</span></label>
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Quantity</label>
                     <input type="number" name="{{ item_form.quantity.html_name }}" id="{{ item_form.quantity.id_for_label }}"
-                           value="{{ item_form.quantity.value|default:'1' }}"
-                           min="1" step="1"
+                           value="{{ item_form.quantity.value|default:'' }}"
+                           min="0.01" step="0.01"
                            class="w-full px-3 py-2 text-sm border {% if item_form.quantity.errors %}border-red-300 bg-red-50{% else %}border-slate-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-auburn-orange">
                     {% for error in item_form.quantity.errors %}
                     <p class="mt-1 text-xs text-red-600">{{ error }}</p>

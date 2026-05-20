@@ -95,15 +95,19 @@ def transaction_create_view(request):
             transaction = form.save(commit=False)
             transaction.created_by = request.user
             transaction.save()
-            formset.instance = transaction
-            formset.save()
+            # Save only non-empty items
+            for item_form in formset:
+                if item_form.cleaned_data and item_form.cleaned_data.get('name'):
+                    item = item_form.save(commit=False)
+                    item.transaction = transaction
+                    item.save()
             messages.success(
                 request,
                 f'P-Card transaction on {transaction.transaction_date} recorded successfully.'
             )
             return redirect('pcard:detail', pk=transaction.pk)
     else:
-        form = PcardTransactionForm()
+        form = PcardTransactionForm(initial={'transaction_date': date.today()})
         formset = PcardItemFormSet()
 
     return render(request, 'pcard/transaction_form.html', {
@@ -141,7 +145,15 @@ def transaction_edit_view(request, pk):
         formset = PcardItemFormSet(request.POST, instance=transaction)
         if form.is_valid() and formset.is_valid():
             form.save()
-            formset.save()
+            # Save new non-empty items and handle deletions
+            for item_form in formset:
+                if item_form.cleaned_data:
+                    if item_form.cleaned_data.get('DELETE') and item_form.instance.pk:
+                        item_form.instance.delete()
+                    elif item_form.cleaned_data.get('name'):
+                        item = item_form.save(commit=False)
+                        item.transaction = transaction
+                        item.save()
             messages.success(request, 'P-Card transaction updated successfully.')
             return redirect('pcard:detail', pk=transaction.pk)
     else:

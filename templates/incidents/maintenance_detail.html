@@ -30,12 +30,12 @@
       <div><dt class="text-slate-500">Equipment</dt><dd class="font-medium"><a href="{% url 'equipment:detail' log.equipment.pk %}" class="text-brand-600 hover:underline">{{ log.equipment.name }}</a></dd></div>
       <div><dt class="text-slate-500">Type</dt><dd class="font-medium">{{ log.get_maintenance_type_display }}</dd></div>
       <div><dt class="text-slate-500">Status</dt><dd>
-        {% if log.status == 'COMPLETED' %}<span class="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs rounded-full">Completed</span>
-        {% elif log.status == 'IN_PROGRESS' %}<span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">In Progress</span>
-        {% elif log.status == 'SCHEDULED' %}<span class="px-2 py-0.5 bg-auburn-bluePale text-auburn-blue text-xs rounded-full">Scheduled</span>
-        {% else %}<span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs rounded-full">Cancelled</span>{% endif %}
+        {% if log.status == 'COMPLETED' %}<span title="Maintenance completed" class="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs rounded-full">Completed</span>
+        {% elif log.status == 'IN_PROGRESS' %}<span title="Maintenance is in progress" class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">In Progress</span>
+        {% elif log.status == 'SCHEDULED' %}<span title="Maintenance is scheduled" class="px-2 py-0.5 bg-auburn-bluePale text-auburn-blue text-xs rounded-full">Scheduled</span>
+        {% else %}<span title="Maintenance cancelled" class="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs rounded-full">Cancelled</span>{% endif %}
       </dd></div>
-      <div><dt class="text-slate-500">Performed By</dt><dd class="font-medium">{{ log.performed_by.full_name|default:"—" }}</dd></div>
+      <div><dt class="text-slate-500">Performed By</dt><dd class="font-medium">{% if log.performed_by %}<a href="{% url 'accounts:profile_view' log.performed_by.pk %}" class="hover:text-brand-600 hover:underline">{{ log.performed_by.full_name }}</a>{% else %}—{% endif %}</dd></div>
       <div><dt class="text-slate-500">Scheduled</dt><dd>{{ log.scheduled_date|date:"M d, Y" }}</dd></div>
       <div><dt class="text-slate-500">Completed</dt><dd>{{ log.completed_date|date:"M d, Y"|default:"—" }}</dd></div>
       {% if log.cost %}<div><dt class="text-slate-500">Cost</dt><dd>${{ log.cost }}</dd></div>{% endif %}

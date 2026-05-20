@@ -1,6 +1,7 @@
 """Views for the reservations app."""
 
 from django.contrib import messages
+from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import transaction
@@ -14,7 +15,7 @@ from apps.equipment.models import Equipment
 from apps.equipment.utils import sync_equipment_status
 from apps.notifications.utils import notify, notify_admins
 from apps.reservations.forms import BulkReservationForm, ReservationForm, ReturnForm, WaitlistEntryForm
-from apps.reservations.models import Reservation, WaitlistEntry
+from apps.reservations.models import Reservation, ReservationItemReturn, WaitlistEntry
 
 
 def _is_admin(user):
@@ -23,7 +24,14 @@ def _is_admin(user):
 
 @login_required
 def reservation_list_view(request):
-    """List reservations: members see their own; admins see all. Supports ?status=, ?from_date=, ?to_date= filters."""
+    """List reservations: members see their own; admins see all.
+
+    Also surfaces two quick-access tables for RETURN_PENDING:
+      - return_approvals  : user is the owner who must confirm
+      - my_pending_returns: user is the requester waiting for owner confirmation
+    """
+    from django.db.models import Q
+
     if _is_admin(request.user):
         qs = Reservation.objects.select_related('requester', 'equipment', 'kit')
     else:
@@ -45,6 +53,46 @@ def reservation_list_view(request):
     paginator = Paginator(qs.order_by('-start_date'), 25)
     page_obj = paginator.get_page(request.GET.get('page'))
 
+    # ── Quick-access tables ───────────────────────────────────────────────
+    # 1. Returns the current user needs to confirm as owner
+    returns_i_must_confirm = Reservation.objects.filter(
+        status='RETURN_PENDING'
+    ).filter(
+        Q(equipment__owner=request.user) |
+        Q(kit__items__equipment__owner=request.user)
+    ).distinct().select_related('requester', 'equipment', 'kit').order_by('returned_date')
+
+    # 2. Returns the current user submitted, waiting for owner to confirm
+    my_returns_waiting = Reservation.objects.filter(
+        status='RETURN_PENDING',
+        requester=request.user,
+    ).exclude(
+        Q(equipment__owner=request.user) |
+        Q(kit__items__equipment__owner=request.user)
+    ).distinct().select_related('requester', 'equipment', 'kit').order_by('-returned_date')
+
+    # 3. Current & future reservations (pending, confirmed, active)
+    my_current_future_reservations = Reservation.objects.filter(
+        status__in=['PENDING', 'CONFIRMED', 'ACTIVE'],
+        requester=request.user,
+    ).select_related('requester', 'equipment', 'kit').order_by('start_date')
+
+    # 5. Past reservations (returned, cancelled, expired, completed)
+    my_past_reservations = Reservation.objects.filter(
+        status__in=['RETURNED', 'CANCELLED', 'EXPIRED', 'COMPLETED'],
+        requester=request.user,
+    ).select_related('requester', 'equipment', 'kit').order_by('-end_date')
+
+    # 4. Admin: returns for OTHER owners that admin can approve on behalf
+    other_owner_returns = None
+    if _is_admin(request.user):
+        other_owner_returns = Reservation.objects.filter(
+            status='RETURN_PENDING'
+        ).exclude(
+            Q(equipment__owner=request.user) |
+            Q(kit__items__equipment__owner=request.user)
+        ).distinct().select_related('requester', 'equipment', 'kit').order_by('returned_date')
+
     return render(request, 'reservations/reservation_list.html', {
         'reservations': page_obj,
         'page_obj': page_obj,
@@ -53,6 +101,11 @@ def reservation_list_view(request):
         'from_date': from_date,
         'to_date': to_date,
         'status_choices': Reservation.STATUS_CHOICES,
+        'returns_i_must_confirm': returns_i_must_confirm,
+        'my_returns_waiting': my_returns_waiting,
+        'my_current_future_reservations': my_current_future_reservations,
+        'my_past_reservations': my_past_reservations,
+        'other_owner_returns': other_owner_returns,
     })
 
 
@@ -205,18 +258,25 @@ def reservation_create_view(request):
                     link=f'/reservations/{reservation.pk}/',
                     category='reservations',
                 )
-            elif reservation.kit and reservation.kit.created_by and reservation.kit.created_by != request.user:
-                notify(
-                    recipient=reservation.kit.created_by,
-                    title='Your Kit Was Reserved',
-                    message=(
-                        f'{request.user.full_name or request.user.username} has reserved '
-                        f'"{reservation.kit.name}" ({reservation.start_date} – {reservation.end_date}).'
-                    ),
-                    level='info',
-                    link=f'/reservations/{reservation.pk}/',
-                    category='reservations',
-                )
+            elif reservation.kit:
+                # Notify all individual equipment owners in the kit
+                owner_equipment = {}
+                for ki in reservation.kit.items.select_related('equipment__owner'):
+                    if ki.equipment.owner and ki.equipment.owner != request.user:
+                        owner_equipment.setdefault(ki.equipment.owner, []).append(ki.equipment.name)
+                for owner, eq_names in owner_equipment.items():
+                    notify(
+                        recipient=owner,
+                        title='Your Equipment Was Reserved (via Kit)',
+                        message=(
+                            f'{request.user.full_name or request.user.username} has reserved '
+                            f'"{reservation.kit.name}" which includes your equipment '
+                            f'"{", ".join(eq_names)}" ({reservation.start_date} – {reservation.end_date}).'
+                        ),
+                        level='info',
+                        link=f'/reservations/{reservation.pk}/',
+                        category='reservations',
+                    )
 
             messages.success(request, 'Reservation confirmed.')
             return redirect('reservations:detail', pk=reservation.pk)
@@ -242,11 +302,9 @@ def reservation_bulk_create_view(request):
             messages.error(request, 'No items selected.')
             return redirect('equipment:list')
 
-        items = Equipment.objects.filter(
-            pk__in=equipment_ids, is_active=True
-        ).exclude(status__in=['BORROWED', 'RETIRED'])
+        items = Equipment.objects.filter(pk__in=equipment_ids, is_active=True)
         if not items.exists():
-            messages.error(request, 'None of the selected items are available for reservation.')
+            messages.error(request, 'No valid items selected.')
             return redirect('equipment:list')
 
         form = BulkReservationForm(request.POST)
@@ -264,7 +322,7 @@ def reservation_bulk_create_view(request):
                     # Check for overlapping confirmed reservations (direct or via kit)
                     from django.db.models import Q
                     overlap = Reservation.objects.filter(
-                        status='CONFIRMED',
+                        status__in=['PENDING', 'CONFIRMED', 'ACTIVE', 'RETURN_PENDING'],
                         start_date__lte=end_date,
                         end_date__gte=start_date,
                     ).filter(Q(equipment=item) | Q(kit__items__equipment=item)).exists()
@@ -279,9 +337,6 @@ def reservation_bulk_create_view(request):
                         purpose=purpose,
                         status='CONFIRMED',
                     )
-                    if start_date <= timezone.now().date() and item.status == 'AVAILABLE':
-                        item.status = 'RESERVED'
-                        item.save(update_fields=['status'])
                     created.append(item.name)
 
             if created:
@@ -303,9 +358,7 @@ def reservation_bulk_create_view(request):
 
             return redirect('reservations:list')
 
-        items = Equipment.objects.filter(
-            pk__in=equipment_ids, is_active=True
-        ).exclude(status__in=['BORROWED', 'RETIRED'])
+        items = Equipment.objects.filter(pk__in=equipment_ids, is_active=True)
         return render(request, 'reservations/reservation_bulk_form.html', {
             'form': form,
             'items': items,
@@ -318,9 +371,7 @@ def reservation_bulk_create_view(request):
             messages.error(request, 'No items selected.')
             return redirect('equipment:list')
 
-        items = Equipment.objects.filter(
-            pk__in=equipment_ids, is_active=True
-        ).exclude(status__in=['BORROWED', 'RETIRED'])
+        items = Equipment.objects.filter(pk__in=equipment_ids, is_active=True)
         unavailable = Equipment.objects.filter(
             pk__in=equipment_ids
         ).filter(status__in=['BORROWED', 'RETIRED'])
@@ -338,7 +389,8 @@ def reservation_bulk_create_view(request):
 def reservation_detail_view(request, pk):
     """Show the details of a single reservation."""
     reservation = get_object_or_404(
-        Reservation.objects.select_related('requester', 'equipment', 'kit'),
+        Reservation.objects.select_related('requester', 'equipment', 'kit')
+        .prefetch_related('kit__items__equipment__owner'),
         pk=pk,
     )
 
@@ -350,16 +402,23 @@ def reservation_detail_view(request, pk):
         waitlist_entries = WaitlistEntry.objects.filter(
             equipment=reservation.equipment
         ).select_related('user').order_by('position', 'created_at')
+        is_owner = reservation.equipment.owner == request.user
     elif reservation.kit:
         waitlist_entries = WaitlistEntry.objects.filter(
             kit=reservation.kit
         ).select_related('user').order_by('position', 'created_at')
+        is_owner = any(
+            ki.equipment.owner == request.user
+            for ki in reservation.kit.items.all()
+        )
     else:
         waitlist_entries = WaitlistEntry.objects.none()
+        is_owner = False
 
     return render(request, 'reservations/reservation_detail.html', {
         'reservation': reservation,
         'waitlist_entries': waitlist_entries,
+        'is_owner': is_owner,
     })
 
 
@@ -367,7 +426,9 @@ def reservation_detail_view(request, pk):
 def reservation_cancel_view(request, pk):
     """Cancel a reservation and notify the next person on the waitlist."""
     reservation = get_object_or_404(
-        Reservation.objects.select_related('requester', 'equipment', 'kit'),
+        Reservation.objects.select_related(
+            'requester', 'equipment', 'equipment__owner', 'equipment__location', 'kit'
+        ).prefetch_related('kit__items__equipment__owner', 'kit__items__equipment__location'),
         pk=pk,
     )
 
@@ -448,15 +509,16 @@ def reservation_confirm_view(request, pk):
         pk=pk,
     )
 
-    # Determine the owner of the reserved item.
-    if reservation.equipment:
-        item_owner = reservation.equipment.owner
+    # Determine if user is an owner of the reserved item.
+    is_owner = False
+    if reservation.equipment and request.user == reservation.equipment.owner:
+        is_owner = True
     elif reservation.kit:
-        item_owner = reservation.kit.created_by
-    else:
-        item_owner = None
+        kit_owner_pks = reservation.kit.items.values_list('equipment__owner', flat=True)
+        if request.user.pk in kit_owner_pks:
+            is_owner = True
 
-    if request.user != item_owner and not _is_admin(request.user):
+    if not is_owner and not _is_admin(request.user):
         messages.error(request, 'Only the equipment owner can confirm this reservation.')
         return redirect('reservations:detail', pk=reservation.pk)
 
@@ -515,7 +577,9 @@ def reservation_confirm_view(request, pk):
 def reservation_return_view(request, pk):
     """Requester submits the return of a reserved item — status goes to RETURN_PENDING."""
     reservation = get_object_or_404(
-        Reservation.objects.select_related('requester', 'equipment', 'kit'),
+        Reservation.objects.select_related(
+            'requester', 'equipment', 'equipment__owner', 'equipment__location', 'kit'
+        ).prefetch_related('kit__items__equipment__owner', 'kit__items__equipment__location'),
         pk=pk,
     )
 
@@ -528,42 +592,78 @@ def reservation_return_view(request, pk):
         return redirect('reservations:detail', pk=pk)
 
     if request.method == 'POST':
-        form = ReturnForm(request.POST)
-        if form.is_valid():
-            reservation.status = 'RETURN_PENDING'
-            reservation.returned_date = timezone.now()
-            reservation.return_condition = form.cleaned_data['return_condition']
-            reservation.return_notes = form.cleaned_data.get('notes', '')
+        reservation.status = 'RETURN_PENDING'
+        reservation.returned_date = timezone.now()
+        reservation.save()
+
+        if reservation.equipment:
+            form = ReturnForm(request.POST)
+            if form.is_valid():
+                reservation.return_condition = form.cleaned_data['return_condition']
+                reservation.return_notes = form.cleaned_data.get('notes', '')
+                reservation.save()
+                ReservationItemReturn.objects.update_or_create(
+                    reservation=reservation,
+                    equipment=reservation.equipment,
+                    defaults={
+                        'condition': form.cleaned_data['return_condition'],
+                        'notes': form.cleaned_data.get('notes', ''),
+                    },
+                )
+        elif reservation.kit:
+            reservation.return_condition = ''
+            reservation.return_notes = ''
             reservation.save()
+            for ki in reservation.kit.items.select_related('equipment'):
+                eq = ki.equipment
+                condition = request.POST.get(f'condition_{eq.pk}', 'GOOD')
+                notes = request.POST.get(f'notes_{eq.pk}', '')
+                ReservationItemReturn.objects.update_or_create(
+                    reservation=reservation,
+                    equipment=eq,
+                    defaults={'condition': condition, 'notes': notes},
+                )
 
-            log_activity(
-                actor=request.user,
-                action='RESERVATION_RETURN_SUBMITTED',
-                description=(
-                    f'{request.user.full_name or request.user.username} submitted return for reservation '
-                    f'#{reservation.pk} ({reservation.equipment or reservation.kit})'
+        log_activity(
+            actor=request.user,
+            action='RESERVATION_RETURN_SUBMITTED',
+            description=(
+                f'{request.user.full_name or request.user.username} submitted return for reservation '
+                f'#{reservation.pk} ({reservation.equipment or reservation.kit})'
+            ),
+            content_type_label='reservation',
+            object_id=reservation.pk,
+            object_repr=str(reservation),
+            request=request,
+        )
+
+        # Notify the equipment owner(s).
+        if reservation.equipment and reservation.equipment.owner and reservation.equipment.owner != request.user:
+            notify(
+                recipient=reservation.equipment.owner,
+                title='Reservation Return Awaiting Confirmation',
+                message=(
+                    f'{request.user.full_name or request.user.username} has returned '
+                    f'"{reservation.equipment.name}" from their reservation. '
+                    f'Please confirm the return.'
                 ),
-                content_type_label='reservation',
-                object_id=reservation.pk,
-                object_repr=str(reservation),
-                request=request,
+                level='info',
+                link=f'/reservations/{reservation.pk}/',
+                category='reservations',
             )
-
-            # Notify the equipment/kit owner.
-            if reservation.equipment and reservation.equipment.owner:
-                owner = reservation.equipment.owner
-            elif reservation.kit and reservation.kit.created_by:
-                owner = reservation.kit.created_by
-            else:
-                owner = None
-
-            if owner and owner != request.user:
+        elif reservation.kit:
+            kit_owners = {
+                ki.equipment.owner
+                for ki in reservation.kit.items.select_related('equipment__owner')
+                if ki.equipment.owner and ki.equipment.owner != request.user
+            }
+            for owner in kit_owners:
                 notify(
                     recipient=owner,
                     title='Reservation Return Awaiting Confirmation',
                     message=(
                         f'{request.user.full_name or request.user.username} has returned '
-                        f'"{reservation.equipment or reservation.kit}" from their reservation. '
+                        f'"{reservation.kit.name}" (includes your equipment) from their reservation. '
                         f'Please confirm the return.'
                     ),
                     level='info',
@@ -571,14 +671,22 @@ def reservation_return_view(request, pk):
                     category='reservations',
                 )
 
-            messages.success(request, 'Return submitted. Waiting for owner confirmation.')
-            return redirect('reservations:detail', pk=pk)
+        messages.success(request, 'Return submitted. Waiting for owner confirmation.')
+        return redirect('reservations:detail', pk=pk)
     else:
         form = ReturnForm()
+
+    kit_item_returns = {}
+    if reservation.kit:
+        kit_item_returns = {
+            ir.equipment_id: ir
+            for ir in reservation.item_returns.all()
+        }
 
     return render(request, 'reservations/reservation_return_form.html', {
         'form': form,
         'reservation': reservation,
+        'kit_item_returns': kit_item_returns,
     })
 
 
@@ -586,7 +694,9 @@ def reservation_return_view(request, pk):
 def reservation_return_confirm_view(request, pk):
     """Equipment/kit owner confirms the return of a reserved item."""
     reservation = get_object_or_404(
-        Reservation.objects.select_related('requester', 'equipment', 'kit'),
+        Reservation.objects.select_related(
+            'requester', 'equipment', 'equipment__owner', 'equipment__location', 'kit'
+        ).prefetch_related('kit__items__equipment__owner', 'kit__items__equipment__location', 'item_returns'),
         pk=pk,
     )
 
@@ -594,68 +704,111 @@ def reservation_return_confirm_view(request, pk):
         messages.error(request, 'This reservation is not awaiting a return confirmation.')
         return redirect('reservations:detail', pk=pk)
 
-    if reservation.equipment:
-        if request.user != reservation.equipment.owner and not _is_admin(request.user):
-            messages.error(request, 'Only the equipment owner can confirm this return.')
-            return redirect('reservations:detail', pk=pk)
+    # Determine if the user is an owner of the reserved item.
+    is_owner = False
+    if reservation.equipment and request.user == reservation.equipment.owner:
+        is_owner = True
     elif reservation.kit:
-        if request.user != reservation.kit.created_by and not _is_admin(request.user):
-            messages.error(request, 'Only the kit owner can confirm this return.')
-            return redirect('reservations:detail', pk=pk)
+        kit_owner_pks = reservation.kit.items.values_list('equipment__owner', flat=True)
+        if request.user.pk in kit_owner_pks:
+            is_owner = True
+
+    if not is_owner and not _is_admin(request.user):
+        messages.error(request, 'Only the equipment owner can confirm this return.')
+        return redirect('reservations:detail', pk=pk)
 
     if request.method == 'POST':
-        form = ReturnForm(request.POST)
-        if form.is_valid():
+        if not is_owner:
+            password = request.POST.get('password', '')
+            if not authenticate(request, username=request.user.email, password=password):
+                messages.error(request, 'Incorrect password. Admins must enter their password when confirming on behalf of another owner.')
+                return redirect('reservations:return_confirm', pk=pk)
+
+        if reservation.equipment:
+            form = ReturnForm(request.POST)
+            if form.is_valid():
+                reservation.status = 'RETURNED'
+                reservation.return_condition = form.cleaned_data['return_condition']
+                reservation.return_notes = form.cleaned_data.get('notes', '')
+                reservation.returned_date = timezone.now()
+                reservation.return_approved_by = request.user
+                reservation.return_approved_at = timezone.now()
+                reservation.save()
+                ReservationItemReturn.objects.update_or_create(
+                    reservation=reservation,
+                    equipment=reservation.equipment,
+                    defaults={
+                        'condition': form.cleaned_data['return_condition'],
+                        'notes': form.cleaned_data.get('notes', ''),
+                    },
+                )
+        elif reservation.kit:
             reservation.status = 'RETURNED'
-            reservation.return_condition = form.cleaned_data['return_condition']
-            reservation.return_notes = form.cleaned_data.get('notes', '')
             reservation.returned_date = timezone.now()
             reservation.return_approved_by = request.user
             reservation.return_approved_at = timezone.now()
             reservation.save()
+            for ki in reservation.kit.items.select_related('equipment'):
+                eq = ki.equipment
+                condition = request.POST.get(f'condition_{eq.pk}', 'GOOD')
+                notes = request.POST.get(f'notes_{eq.pk}', '')
+                ReservationItemReturn.objects.update_or_create(
+                    reservation=reservation,
+                    equipment=eq,
+                    defaults={'condition': condition, 'notes': notes},
+                )
 
-            if reservation.equipment:
-                sync_equipment_status(reservation.equipment)
-            if reservation.kit:
-                for kit_item in reservation.kit.items.select_related('equipment'):
-                    sync_equipment_status(kit_item.equipment)
+        if reservation.equipment:
+            sync_equipment_status(reservation.equipment)
+        if reservation.kit:
+            for kit_item in reservation.kit.items.select_related('equipment'):
+                sync_equipment_status(kit_item.equipment)
 
-            notify(
-                recipient=reservation.requester,
-                title='Reservation Return Confirmed',
-                message=(
-                    f'Your return of "{reservation.equipment or reservation.kit}" '
-                    f'has been confirmed. Thank you!'
-                ),
-                level='success',
-                link=f'/reservations/{reservation.pk}/',
-                category='reservations',
-            )
+        notify(
+            recipient=reservation.requester,
+            title='Reservation Return Confirmed',
+            message=(
+                f'Your return of "{reservation.equipment or reservation.kit}" '
+                f'has been confirmed. Thank you!'
+            ),
+            level='success',
+            link=f'/reservations/{reservation.pk}/',
+            category='reservations',
+        )
 
-            log_activity(
-                actor=request.user,
-                action='RESERVATION_RETURN_CONFIRMED',
-                description=(
-                    f'{request.user.full_name or request.user.username} confirmed return for reservation '
-                    f'#{reservation.pk} ({reservation.equipment or reservation.kit})'
-                ),
-                content_type_label='reservation',
-                object_id=reservation.pk,
-                object_repr=str(reservation),
-                request=request,
-            )
+        log_activity(
+            actor=request.user,
+            action='RESERVATION_RETURN_CONFIRMED',
+            description=(
+                f'{request.user.full_name or request.user.username} confirmed return for reservation '
+                f'#{reservation.pk} ({reservation.equipment or reservation.kit})'
+            ),
+            content_type_label='reservation',
+            object_id=reservation.pk,
+            object_repr=str(reservation),
+            request=request,
+        )
 
-            messages.success(request, 'Return confirmed.')
-            return redirect('reservations:detail', pk=pk)
+        messages.success(request, 'Return confirmed.')
+        return redirect('reservations:detail', pk=pk)
     else:
         form = ReturnForm(initial={
             'return_condition': reservation.return_condition or 'GOOD',
             'notes': reservation.return_notes,
         })
 
+    kit_item_returns = {}
+    if reservation.kit:
+        kit_item_returns = {
+            ir.equipment_id: ir
+            for ir in reservation.item_returns.all()
+        }
+
     return render(request, 'reservations/reservation_confirm_return.html', {
         'reservation': reservation,
         'form': form,
+        'is_owner': is_owner,
+        'kit_item_returns': kit_item_returns,
     })
 
 
@@ -764,6 +917,10 @@ def reservation_delete_view(request, pk):
         return redirect('reservations:list')
 
     if request.method == 'POST':
+        password = request.POST.get('password', '')
+        if not authenticate(request, username=request.user.email, password=password):
+            messages.error(request, 'Incorrect password. Please enter your current password to confirm deletion.')
+            return redirect('reservations:delete', pk=pk)
         item_name = str(reservation.equipment or reservation.kit)
         equipment = reservation.equipment
         kit = reservation.kit
@@ -810,3 +967,52 @@ def reservation_delete_view(request, pk):
     return render(request, 'reservations/reservation_confirm_delete.html', {
         'reservation': reservation,
     })
+
+
+@login_required
+def reservation_remind_view(request, pk):
+    """Send a reminder notification to the equipment/kit owner about a pending return."""
+    reservation = get_object_or_404(
+        Reservation.objects.select_related('requester', 'equipment', 'kit'),
+        pk=pk,
+    )
+
+    if reservation.status != 'RETURN_PENDING':
+        messages.error(request, 'This reservation is not awaiting a return confirmation.')
+        return redirect('reservations:detail', pk=pk)
+
+    # For kits, send reminders to all individual equipment owners
+    if reservation.equipment and reservation.equipment.owner:
+        owners = [reservation.equipment.owner]
+    elif reservation.kit:
+        owners = list({
+            ki.equipment.owner
+            for ki in reservation.kit.items.select_related('equipment__owner')
+            if ki.equipment.owner
+        })
+    else:
+        owners = []
+
+    if not owners:
+        messages.error(request, 'No owner is assigned to this item.')
+        return redirect('reservations:detail', pk=pk)
+
+    if request.method == 'POST':
+        item_name = str(reservation.equipment or reservation.kit)
+        for owner in owners:
+            notify(
+                recipient=owner,
+                title='Return Approval Reminder',
+                message=(
+                    f'{request.user.full_name or request.user.username} is reminding you to confirm '
+                    f'the return of "{item_name}" from reservation #{reservation.pk}.'
+                ),
+                level='warning',
+                link=f'/reservations/{reservation.pk}/',
+                category='reservations',
+            )
+        owner_names = ', '.join([o.full_name or o.username for o in owners])
+        messages.success(request, f'Reminder sent to {owner_names}.')
+        return redirect('reservations:detail', pk=pk)
+
+    return redirect('reservations:detail', pk=pk)

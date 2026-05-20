@@ -49,7 +49,7 @@
                 {% elif field == 'status' %}
                   {% with status=item|attr:field %}
                     {% if status == 'ACTIVE' or status == 'OPEN' %}
-                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-xs font-medium">{{ status }}</span>
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-xs font-medium" title="{% if status == 'ACTIVE' %}Item is currently checked out{% else %}Open{% endif %}">{{ status }}</span>
                     {% elif status == 'COMPLETED' or status == 'FILLED' %}
                       <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-auburn-bluePale text-auburn-blue text-xs font-medium">{{ status }}</span>
                     {% else %}
@@ -57,7 +57,7 @@
                     {% endif %}
                   {% endwith %}
                 {% elif field == 'author' %}
-                  {{ item.author.full_name|default:"—" }}
+                  {% if item.author %}<a href="{% url 'accounts:profile_view' item.author.pk %}" class="hover:text-brand-600 hover:underline">{{ item.author.full_name }}</a>{% else %}—{% endif %}
                 {% elif field == 'published_at' or field == 'created_at' %}
                   {{ item|attr:field|date:"M j, Y g:i A"|default:"—" }}
                 {% else %}

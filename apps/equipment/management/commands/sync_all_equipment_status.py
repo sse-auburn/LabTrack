@@ -64,7 +64,6 @@ class Command(BaseCommand):
 
     def _compute_status(self, equipment):
         """Mirror sync_equipment_status logic without saving."""
-        from datetime import date
         from django.db.models import Q
         from apps.incidents.models import MaintenanceLog
         from apps.reservations.models import Reservation
@@ -72,7 +71,6 @@ class Command(BaseCommand):
         if equipment.status in ('DAMAGED', 'RETIRED'):
             return equipment.status
 
-        today = date.today()
         res_q = Q(equipment=equipment) | Q(kit__items__equipment=equipment)
 
         if Reservation.objects.filter(
@@ -96,9 +94,5 @@ class Command(BaseCommand):
             equipment=equipment, status__in=['SCHEDULED', 'IN_PROGRESS']
         ).exists():
             return 'MAINTENANCE'
-        if Reservation.objects.filter(
-            res_q, status='CONFIRMED', start_date__lte=today, end_date__gte=today
-        ).exists():
-            return 'RESERVED'
 
         return 'AVAILABLE'

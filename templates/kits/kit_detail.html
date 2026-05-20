@@ -51,7 +51,7 @@
 
         <div class="mt-4 flex items-center gap-4 text-xs text-slate-400">
           <span>
-            Created by {{ kit.created_by.full_name|default:kit.created_by.username|default:"System" }}
+            Created by {% if kit.created_by %}<a href="{% url 'accounts:profile_view' kit.created_by.pk %}" class="hover:text-brand-600 hover:underline">{{ kit.created_by.full_name|default:kit.created_by.username|default:"System" }}</a>{% else %}System{% endif %}
           </span>
 
           <span>•</span>
@@ -138,63 +138,10 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <!-- Equipment Items -->
+    <!-- Equipment Items & Availability -->
     <div class="lg:col-span-2">
-      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-          <h2 class="text-base font-semibold text-slate-900">Equipment Items</h2>
-          <span class="text-sm text-slate-500">{{ kit.items.count }} item{{ kit.items.count|pluralize }}</span>
-        </div>
-        <div class="divide-y divide-slate-100">
-          {% for kit_item in kit.items.all %}
-          <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
-                </svg>
-              </div>
-              <div>
-                <a href="{% url 'equipment:detail' kit_item.equipment.pk %}"
-                   class="text-sm font-medium text-slate-900 hover:text-brand-600">
-                  {{ kit_item.equipment.name }}
-                </a>
-                {% if kit_item.notes %}
-                <p class="text-xs text-slate-400 mt-0.5">{{ kit_item.notes }}</p>
-                {% endif %}
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-auburn-bluePale text-brand-700">
-                ×{{ kit_item.quantity }}
-              </span>
-              <!-- Equipment Status -->
-              {% if kit_item.equipment.status == 'AVAILABLE' %}
-                <span class="w-2 h-2 rounded-full bg-green-400" title="Available"></span>
-              {% elif kit_item.equipment.status == 'IN_USE' %}
-                <span class="w-2 h-2 rounded-full bg-yellow-400" title="In Use"></span>
-              {% else %}
-                <span class="w-2 h-2 rounded-full bg-red-400" title="{{ kit_item.equipment.get_status_display }}"></span>
-              {% endif %}
-              {% if kit.created_by == request.user %}
-              <form method="post" action="{% url 'kits:remove_item' kit.pk kit_item.pk %}"
-                    onsubmit="return confirm('Remove this item from the kit?')">
-                {% csrf_token %}
-                <button type="submit" class="text-xs text-red-500 hover:text-red-700">Remove</button>
-              </form>
-              {% endif %}
-            </div>
-          </div>
-          {% empty %}
-          <div class="px-6 py-10 text-center text-sm text-slate-400">
-            No items in this kit yet.
-            {% if kit.created_by == request.user %}
-            <a href="{% url 'kits:add_item' kit.pk %}" class="text-brand-600 hover:underline ml-1">Add one.</a>
-            {% endif %}
-          </div>
-          {% endfor %}
-        </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        {% include 'partials/_weekly_availability_calendar.html' %}
       </div>
     </div>
 
@@ -210,7 +157,7 @@
           <div class="px-4 py-3">
             <div class="flex items-start justify-between">
               <div>
-                <p class="text-xs font-medium text-slate-800">{{ r.requester.full_name|default:r.requester.username }}</p>
+                <p class="text-xs font-medium text-slate-800"><a href="{% url 'accounts:profile_view' r.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ r.requester.full_name|default:r.requester.username }}</a></p>
                 <p class="text-xs text-slate-400 mt-0.5">{{ r.start_date|date:"M d" }} – {{ r.end_date|date:"M d, Y" }}</p>
               </div>
               {% if r.status == 'ACTIVE' %}
@@ -232,11 +179,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Availability Calendar (full width) -->
-  <div class="mt-6 bg-white rounded-xl border border-slate-200 p-6">
-    {% include 'partials/_availability_calendar.html' %}
   </div>
 
 </div>

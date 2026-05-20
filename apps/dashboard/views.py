@@ -80,7 +80,9 @@ def dashboard_home_view(request):
     # ── Admin-only system data ────────────────────────────────────────────────
     if is_admin:
         total_equipment = Equipment.objects.filter(is_active=True).count()
-        available_equipment = Equipment.objects.filter(status='AVAILABLE', is_active=True).count()
+        available_equipment = Equipment.objects.filter(is_active=True).exclude(
+            status__in=['BORROWED', 'MAINTENANCE', 'DAMAGED', 'RETIRED']
+        ).count()
         pending_equipment = Equipment.objects.filter(approval_status='PENDING', is_active=True).count()
         pending_approvals = Reservation.objects.filter(
             status='RETURN_PENDING',

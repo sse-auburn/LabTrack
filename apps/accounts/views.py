@@ -132,20 +132,40 @@ def logout_view(request):
 # ---------------------------------------------------------------------------
 
 @login_required
-def profile_view(request):
-    """Display the current user's profile."""
-    profile, _ = UserProfile.objects.get_or_create(user=request.user)
-    reservations = Reservation.objects.filter(requester=request.user).select_related('equipment', 'kit').order_by('-created_at')
+def profile_view(request, pk=None):
+    """Display a user's profile. Any authenticated member can view any profile."""
+    if pk:
+        profile_user = get_object_or_404(CustomUser, pk=pk)
+    else:
+        profile_user = request.user
+
+    profile, _ = UserProfile.objects.get_or_create(user=profile_user)
+    reservations = Reservation.objects.filter(requester=profile_user).select_related('equipment', 'kit').order_by('-created_at')
     today = date.today()
+
+    # Equipment owned by this user
+    from apps.equipment.models import Equipment
+    owned_equipment = Equipment.objects.filter(owner=profile_user).select_related('category', 'location')[:20]
+
+    # Kits created by this user
+    from apps.kits.models import Kit
+    owned_kits = Kit.objects.filter(created_by=profile_user).prefetch_related('items__equipment')[:20]
+
+    # Recent activity by this user
+    recent_activities = profile_user.activities.order_by('-timestamp')[:20]
+
     return render(request, 'accounts/profile.html', {
         'profile': profile,
-        'profile_user': request.user,
+        'profile_user': profile_user,
         'total_borrows': reservations.count(),
         'active_borrows': reservations.filter(status__in=['ACTIVE', 'RETURN_PENDING']).count(),
         'pending_borrows': reservations.filter(status='PENDING').count(),
         'overdue_borrows': reservations.filter(status__in=['CONFIRMED', 'ACTIVE'], end_date__lt=today).count(),
         'active_borrow_list': reservations.filter(status='ACTIVE'),
         'recent_borrows': reservations[:10],
+        'owned_equipment': owned_equipment,
+        'owned_kits': owned_kits,
+        'recent_activities': recent_activities,
     })
 
 

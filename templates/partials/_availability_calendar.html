@@ -127,7 +127,8 @@
             evs.map(e => {
               const icon = e.type === 'borrow' ? '📋' : '📅';
               const typeLabel = e.type === 'borrow' ? 'Borrow' : 'Reservation';
-              return `<p>${icon} <span class="font-medium">${typeLabel}</span> — ${e.label || 'Unknown'} <span class="text-slate-400">(${e.status})</span> · ${e.start} → ${e.end}</p>`;
+              const itemPart = e.item ? `<span class="text-slate-500">· ${e.item}</span>` : '';
+              return `<p>${icon} <span class="font-medium">${typeLabel}</span> — ${e.label || 'Unknown'} <span class="text-slate-400">(${e.status})</span> ${itemPart} · ${e.start} → ${e.end}</p>`;
             }).join('');
         });
       }

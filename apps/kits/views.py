@@ -53,35 +53,55 @@ def kit_detail_view(request, pk):
         'requester'
     ).order_by('-start_date')[:20]
 
-    # Calendar events — kit-level reservations + per-item equipment reservations
+    # Build weekly calendar data: rows = individual kit items.
+    # Kit-level reservations are exploded so every constituent item shows as busy.
     cal_events = []
     res_statuses = ['PENDING', 'CONFIRMED', 'ACTIVE', 'RETURN_PENDING']
 
-    for r in kit.reservations.filter(status__in=res_statuses).select_related('requester'):
-        cal_events.append({
-            'start': r.start_date.isoformat(),
-            'end': r.end_date.isoformat(),
-            'type': 'reservation',
-            'status': r.status,
-            'label': r.requester.full_name if r.requester else '',
+    # All equipment items in this kit
+    kit_equipment = [ki.equipment for ki in kit.items.select_related('equipment')]
+
+    calendar_items = []
+    for eq in kit_equipment:
+        calendar_items.append({
+            'name': eq.name,
+            'pk': eq.pk,
+            'location': eq.location.name if eq.location else None,
+            'condition': eq.get_condition_display(),
+            'owner': eq.owner.full_name if eq.owner else None,
+            'status': eq.status,
         })
 
-    # Also include individual equipment reservations so items reserved outside
-    # of this kit still appear as busy.
-    eq_pks = list(kit.items.values_list('equipment__pk', flat=True))
-    for r in _Res.objects.filter(equipment_id__in=eq_pks, status__in=res_statuses).select_related('requester'):
+    # Kit reservations → explode to each constituent item
+    for r in kit.reservations.filter(status__in=res_statuses).select_related('requester'):
+        for eq in kit_equipment:
+            cal_events.append({
+                'start': r.start_date.isoformat(),
+                'end': r.end_date.isoformat(),
+                'status': r.status,
+                'label': r.requester.full_name if r.requester else '',
+                'item': eq.name,
+            })
+
+    # Equipment reservations (direct or via other kits) for items in this kit
+    eq_pks = [eq.pk for eq in kit_equipment]
+    for r in _Res.objects.filter(
+        equipment_id__in=eq_pks,
+        status__in=res_statuses,
+    ).select_related('requester', 'equipment'):
         cal_events.append({
             'start': r.start_date.isoformat(),
             'end': r.end_date.isoformat(),
-            'type': 'reservation',
             'status': r.status,
             'label': r.requester.full_name if r.requester else '',
+            'item': r.equipment.name,
         })
 
     return render(request, 'kits/kit_detail.html', {
         'kit': kit,
         'reservation_history': reservation_history,
         'calendar_events_json': json.dumps(cal_events),
+        'calendar_items_json': json.dumps(calendar_items),
     })
 
 

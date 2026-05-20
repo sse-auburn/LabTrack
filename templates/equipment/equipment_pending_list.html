@@ -64,22 +64,32 @@
                   {% endif %}
                   <div>
                     <p class="text-sm font-semibold text-slate-900">{{ item.name }}</p>
-                    <p class="text-xs text-slate-500">{{ item.location.name|default:"—" }}</p>
+                    <p class="text-xs text-slate-500">
+                      {% if item.location %}
+                      <a href="{% url 'equipment:list' %}?location={{ item.location.pk }}" class="hover:underline">{{ item.location.name }}</a>
+                      {% else %}—{% endif %}
+                    </p>
                   </div>
                 </div>
               </td>
               <td class="px-6 py-4 text-sm text-slate-700">
                 {% if item.category %}
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-auburn-bluePale text-brand-700 border border-auburn-bluePale">
-                  {{ item.category.name }}
-                </span>
+                <a href="{% url 'equipment:list' %}?category={{ item.category.pk }}" class="hover:underline">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-auburn-bluePale text-brand-700 border border-auburn-bluePale">
+                    {{ item.category.name }}
+                  </span>
+                </a>
                 {% else %}—{% endif %}
               </td>
               <td class="px-6 py-4 text-sm text-slate-700">
-                {{ item.created_by.full_name|default:"—" }}
+                {% if item.created_by %}
+                <a href="{% url 'accounts:profile_view' item.created_by.pk %}" class="hover:text-brand-600 hover:underline">{{ item.created_by.full_name }}</a>
+                {% else %}—{% endif %}
               </td>
               <td class="px-6 py-4 text-sm text-slate-700">
-                {{ item.owner.full_name|default:"—" }}
+                {% if item.owner %}
+                <a href="{% url 'accounts:profile_view' item.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ item.owner.full_name }}</a>
+                {% else %}—{% endif %}
               </td>
               <td class="px-6 py-4 text-sm text-slate-500">
                 {{ item.created_at|date:"M j, Y" }}

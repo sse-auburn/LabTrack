@@ -198,7 +198,7 @@
                 <!-- Actor + action badge -->
                 <div class="flex flex-wrap items-center gap-2 mb-1">
                   {% if log.actor %}
-                    <span class="text-sm font-semibold text-slate-800">{{ log.actor.full_name }}</span>
+                    <a href="{% url 'accounts:profile_view' log.actor.pk %}" class="text-sm font-semibold text-slate-800 hover:text-brand-600 hover:underline">{{ log.actor.full_name }}</a>
                   {% else %}
                     <span class="text-sm font-semibold text-slate-400 italic">System</span>
                   {% endif %}

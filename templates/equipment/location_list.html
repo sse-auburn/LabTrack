@@ -6,154 +6,146 @@
 {% block content %}
 
 <!-- Page Header -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-
-  <!-- LEFT SECTION -->
-  <div class="rounded-3xl px-6 py-5">
-    <h1 class="text-2xl font-bold tracking-tight text-slate-900">
-      Locations
-    </h1>
-
-    <p class="mt-1 text-sm text-slate-500">
-      Manage physical storage locations within the lab.
-    </p>
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Locations</h1>
+    <p class="mt-1 text-sm text-slate-500">Manage physical storage locations within the lab.</p>
   </div>
-
-  <!-- RIGHT SECTION -->
-  <div class="rounded-3xl px-6 py-5">
-    <div class="flex items-center justify-end gap-2 flex-wrap">
-
-      {% if user.is_authenticated %}
-      <a href="{% url 'equipment:location_create' %}"
-         class="inline-flex items-center px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-brand-500">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 4v16m8-8H4"/>
-        </svg>
-        Add Location
-      </a>
-      {% endif %}
-
-    </div>
+  <div class="flex items-center gap-2">
+    <a href="{% url 'equipment:list' %}"
+       class="inline-flex items-center px-3 py-2 text-sm text-slate-600 hover:text-slate-900 border border-slate-300 hover:border-slate-400 rounded-lg bg-white transition-colors">
+      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Equipment
+    </a>
+    {% if user.is_authenticated and user.is_admin %}
+    <a href="{% url 'equipment:location_create' %}"
+       class="inline-flex items-center px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500">
+      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      New Location
+    </a>
+    {% endif %}
   </div>
-
 </div>
 
-    <!-- Breadcrumb -->
-    <nav class="flex mb-6" aria-label="Breadcrumb">
-      <ol class="inline-flex items-center space-x-1">
-        <li>
-          <a href="{% url 'equipment:list' %}"
-            class="text-sm text-slate-500 hover:text-brand-600 transition-colors">Equipment</a>
-        </li>
-        <li class="flex items-center">
-          <svg class="w-4 h-4 text-slate-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-          <span class="text-sm text-slate-700">Locations</span>
-        </li>
-      </ol>
-    </nav>
+{% if locations %}
 
-    <!-- Locations Table -->
-    {% if locations %}
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200">
-          <thead class="bg-slate-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Location Name
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Building</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Room</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Description
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Equipment
-                Count</th>
-              {% if user.is_authenticated and user.is_admin %}
-              <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-              {% endif %}
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-slate-100">
-            {% for location in locations %}
-            <tr class="hover:bg-slate-50 transition-colors duration-100">
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 bg-auburn-bluePale rounded-lg flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4 text-auburn-blueLight" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <span class="text-sm font-semibold text-slate-900">{{ location.name }}</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <span class="text-sm text-slate-600">{{ location.building|default:"—" }}</span>
-              </td>
-              <td class="px-6 py-4">
-                <span class="text-sm text-slate-600">{{ location.room|default:"—" }}</span>
-              </td>
-              <td class="px-6 py-4">
-                <p class="text-sm text-slate-600 max-w-xs truncate">{{ location.description|default:"—" }}</p>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
-                  <span
-                    class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-auburn-bluePale text-auburn-blue text-sm font-semibold">
-                    {{ location.equipment.count }}
-                  </span>
-                  <a href="{% url 'equipment:list' %}?location={{ location.pk }}"
-                    class="text-xs text-brand-600 hover:text-brand-700 font-medium">View</a>
-                </div>
-              </td>
-              {% if user.is_authenticated and user.is_admin %}
-              <td class="px-6 py-4 text-right">
-                <div class="flex items-center justify-end gap-2">
-                  <a href="{% url 'equipment:location_edit' location.pk %}"
-                    class="text-xs text-slate-500 hover:text-brand-600 font-medium transition-colors">Edit</a>
-                  <span class="text-slate-300">|</span>
-                  <a href="{% url 'equipment:location_delete' location.pk %}"
-                    class="text-xs text-slate-500 hover:text-red-600 font-medium transition-colors">Delete</a>
-                </div>
-              </td>
-              {% endif %}
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+<!-- Summary bar -->
+<p class="text-xs text-slate-400 mb-4 font-medium uppercase tracking-wide">
+  {{ locations|length }} location{{ locations|length|pluralize }}
+</p>
+
+<!-- Location Cards Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+  {% for location in locations %}
+  <div class="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col">
+
+    <!-- Card Header -->
+    <div class="bg-auburn-bluePale px-5 py-4 flex items-start gap-3">
+      <div class="w-9 h-9 rounded-lg bg-auburn-blue/10 border border-auburn-blueLight/20 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-auburn-blueLight" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
       </div>
-
-      <!-- Table Footer -->
-      <div class="px-6 py-3 bg-slate-50 border-t border-slate-100">
-        <p class="text-xs text-slate-500">{{ locations|length }} location{{ locations|length|pluralize }} total</p>
+      <div class="min-w-0 flex-1">
+        <h3 class="text-sm font-semibold text-slate-900 truncate">{{ location.name }}</h3>
+        <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+          {% if location.building %}
+          <span class="text-xs text-slate-500 truncate">{{ location.building }}</span>
+          {% endif %}
+          {% if location.building and location.room %}
+          <span class="text-slate-300 text-xs">·</span>
+          {% endif %}
+          {% if location.room %}
+          <span class="text-xs text-slate-500">Room {{ location.room }}</span>
+          {% endif %}
+          {% if not location.building and not location.room %}
+          <span class="text-xs text-slate-400 italic">No address set</span>
+          {% endif %}
+        </div>
       </div>
     </div>
 
-    {% else %}
-    <!-- Empty State -->
-    <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-slate-200">
-      <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-      <h3 class="mt-4 text-base font-semibold text-slate-900">No locations yet</h3>
-      <p class="mt-1 text-sm text-slate-500">Add locations to track where equipment is stored.</p>
+    <!-- Card Body -->
+    <div class="flex flex-col flex-1 px-5 py-4">
+
+      <!-- Description -->
+      <p class="text-xs text-slate-500 leading-relaxed flex-1 line-clamp-2">
+        {{ location.description|default:"No description provided." }}
+      </p>
+
+      <!-- Equipment Count -->
+      <div class="mt-4">
+        <a href="{% url 'equipment:list' %}?location={{ location.pk }}"
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 transition-colors w-full justify-between group/count">
+          <span class="flex items-center gap-1.5 text-xs text-slate-500 group-hover/count:text-brand-700">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            Equipment stored here
+          </span>
+          <span class="text-xs font-semibold text-slate-700 group-hover/count:text-brand-700">
+            {{ location.equipment.count }}
+            <svg class="w-3 h-3 inline ml-0.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </span>
+        </a>
+      </div>
+
+      <!-- Footer Actions -->
       {% if user.is_authenticated and user.is_admin %}
-      <div class="mt-6">
-        <a href="{% url 'equipment:location_create' %}"
-          class="inline-flex items-center px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors duration-150">
-          Add First Location
+      <div class="flex items-center justify-end gap-3 mt-3 pt-3 border-t border-slate-100">
+        <a href="{% url 'equipment:location_edit' location.pk %}"
+           class="text-xs text-slate-400 hover:text-slate-700 font-medium transition-colors">
+          Edit
+        </a>
+        <a href="{% url 'equipment:location_delete' location.pk %}"
+           class="text-xs text-slate-400 hover:text-red-600 font-medium transition-colors">
+          Delete
         </a>
       </div>
       {% endif %}
-    </div>
-    {% endif %}
 
+    </div>
   </div>
+  {% endfor %}
 </div>
+
+{% else %}
+
+<!-- Empty State -->
+<div class="text-center py-20 bg-white rounded-xl shadow-sm border border-slate-200">
+  <div class="mx-auto w-16 h-16 rounded-2xl bg-auburn-bluePale flex items-center justify-center mb-4">
+    <svg class="w-8 h-8 text-auburn-blueLight" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+    </svg>
+  </div>
+  <h3 class="text-base font-semibold text-slate-900">No locations yet</h3>
+  <p class="mt-1 text-sm text-slate-500 max-w-xs mx-auto">Add locations to track where equipment is stored across your lab.</p>
+  {% if user.is_authenticated and user.is_admin %}
+  <div class="mt-6">
+    <a href="{% url 'equipment:location_create' %}"
+       class="inline-flex items-center px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg transition-colors">
+      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Create First Location
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+{% endif %}
+
 {% endblock %}

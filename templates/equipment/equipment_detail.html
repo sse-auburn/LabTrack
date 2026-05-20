@@ -57,7 +57,7 @@
             </svg>
             <div class="flex-1">
               <p class="text-sm font-semibold text-yellow-800">Awaiting Owner Approval</p>
-              <p class="text-xs text-yellow-700">Submitted by {{ equipment.created_by.full_name|default:"Unknown" }} and assigned to {{ equipment.owner.full_name|default:"Unknown" }}. It will be visible to everyone once the owner approves it.</p>
+              <p class="text-xs text-yellow-700">Submitted by {% if equipment.created_by %}<a href="{% url 'accounts:profile_view' equipment.created_by.pk %}" class="hover:text-brand-600 hover:underline">{{ equipment.created_by.full_name }}</a>{% else %}Unknown{% endif %} and assigned to {% if equipment.owner %}<a href="{% url 'accounts:profile_view' equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ equipment.owner.full_name }}</a>{% else %}Unknown{% endif %}. It will be visible to everyone once the owner approves it.</p>
             </div>
             {% if can_approve %}
             <div class="flex items-center gap-2">
@@ -87,27 +87,23 @@
             
             <!-- Status Badge -->
             {% if equipment.status == 'AVAILABLE' %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800" title="Item is checked in and available">
               <span class="w-2 h-2 rounded-full bg-brand-500 mr-1.5"></span>Available
             </span>
             {% elif equipment.status == 'BORROWED' %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800" title="Item is currently checked out">
               <span class="w-2 h-2 rounded-full bg-amber-500 mr-1.5"></span>Borrowed
             </span>
-            {% elif equipment.status == 'RESERVED' %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-auburn-bluePale text-auburn-blue">
-              <span class="w-2 h-2 rounded-full bg-auburn-bluePale0 mr-1.5"></span>Reserved
-            </span>
             {% elif equipment.status == 'MAINTENANCE' %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800" title="Item is under maintenance">
               <span class="w-2 h-2 rounded-full bg-orange-500 mr-1.5"></span>Under Maintenance
             </span>
             {% elif equipment.status == 'DAMAGED' %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800" title="Item is damaged and unavailable">
               <span class="w-2 h-2 rounded-full bg-red-500 mr-1.5"></span>Damaged
             </span>
             {% elif equipment.status == 'RETIRED' %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-600">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-600" title="Item is retired from service">
               <span class="w-2 h-2 rounded-full bg-gray-400 mr-1.5"></span>Retired
             </span>
             {% endif %}
@@ -126,10 +122,12 @@
           </div>
           {% if equipment.category %}
           <p class="text-sm text-slate-500 flex items-center gap-2">Category:
-            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium text-white"
-                  style="background-color: {{ equipment.category.color }};">
-              {{ equipment.category.name }}
-            </span>
+            <a href="{% url 'equipment:list' %}?category={{ equipment.category.pk }}" class="hover:underline">
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium text-white"
+                    style="background-color: {{ equipment.category.color }};">
+                {{ equipment.category.name }}
+              </span>
+            </a>
           </p>
           {% endif %}
         </div>
@@ -230,19 +228,31 @@
         <!-- Category -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
           <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Category</h3>
-          <p class="text-sm font-medium text-slate-900">{{ equipment.category.name|default:"—" }}</p>
+          <p class="text-sm font-medium text-slate-900">
+            {% if equipment.category %}
+            <a href="{% url 'equipment:list' %}?category={{ equipment.category.pk }}" class="hover:underline">{{ equipment.category.name }}</a>
+            {% else %}—{% endif %}
+          </p>
         </div>
 
         <!-- Location -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
           <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Location</h3>
-          <p class="text-sm font-medium text-slate-900">{{ equipment.location|default:"—" }}</p>
+          <p class="text-sm font-medium text-slate-900">
+            {% if equipment.location %}
+            <a href="{% url 'equipment:list' %}?location={{ equipment.location.pk }}" class="hover:underline">{{ equipment.location }}</a>
+            {% else %}—{% endif %}
+          </p>
         </div>
 
         <!-- Owner -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
           <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Owner</h3>
-          <p class="text-sm font-medium text-slate-900">{{ equipment.owner.full_name|default:"—" }}</p>
+          <p class="text-sm font-medium text-slate-900">
+            {% if equipment.owner %}
+            <a href="{% url 'accounts:profile_view' equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ equipment.owner.full_name }}</a>
+            {% else %}—{% endif %}
+          </p>
         </div>
 
         <!-- Purchase Date -->
@@ -321,7 +331,11 @@
               <tbody class="bg-white divide-y divide-slate-100">
                 {% for res in reservation_history %}
                 <tr class="hover:bg-slate-50">
-                  <td class="px-4 py-3 text-sm text-slate-900">{{ res.requester.full_name }}</td>
+                  <td class="px-4 py-3 text-sm text-slate-900">
+                    {% if res.requester %}
+                    <a href="{% url 'accounts:profile_view' res.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ res.requester.full_name }}</a>
+                    {% else %}{{ res.requester.full_name|default:"—" }}{% endif %}
+                  </td>
                   <td class="px-4 py-3 text-sm text-slate-600 max-w-xs truncate">{{ res.purpose|default:"—" }}</td>
                   <td class="px-4 py-3 text-sm text-slate-600">{{ res.start_date|date:"M d, Y" }}</td>
                   <td class="px-4 py-3 text-sm text-slate-600">{{ res.end_date|date:"M d, Y" }}</td>
@@ -364,7 +378,7 @@
               <time class="block text-xs text-slate-400 mb-1">{{ event.timestamp|date:"M d, Y H:i" }}</time>
               <p class="text-sm text-slate-600">{{ event.description }}</p>
               {% if event.performed_by %}
-              <p class="text-xs text-slate-400 mt-1">By {{ event.performed_by.full_name }}</p>
+              <p class="text-xs text-slate-400 mt-1">By <a href="{% url 'accounts:profile_view' event.performed_by.pk %}" class="hover:text-brand-600 hover:underline">{{ event.performed_by.full_name }}</a></p>
               {% endif %}
             </li>
             {% endfor %}
@@ -394,7 +408,11 @@
                 <tr class="hover:bg-slate-50">
                   <td class="px-4 py-3 text-sm text-slate-600">{{ log.from_location|default:"—" }}</td>
                   <td class="px-4 py-3 text-sm text-slate-900 font-medium">{{ log.to_location|default:"—" }}</td>
-                  <td class="px-4 py-3 text-sm text-slate-600">{{ log.moved_by.full_name|default:"—" }}</td>
+                  <td class="px-4 py-3 text-sm text-slate-600">
+                    {% if log.moved_by %}
+                    <a href="{% url 'accounts:profile_view' log.moved_by.pk %}" class="hover:text-brand-600 hover:underline">{{ log.moved_by.full_name }}</a>
+                    {% else %}—{% endif %}
+                  </td>
                   <td class="px-4 py-3 text-sm text-slate-600">{{ log.reason|default:"—" }}</td>
                   <td class="px-4 py-3 text-sm text-slate-600">{{ log.timestamp|date:"M d, Y" }}</td>
                 </tr>
@@ -417,7 +435,7 @@
               <div class="flex items-start justify-between">
                 <div>
                   <h4 class="text-sm font-semibold text-slate-900">{{ incident.title|default:"Incident" }}</h4>
-                  <p class="text-xs text-slate-500 mt-0.5">{{ incident.created_at|date:"M d, Y H:i" }} — {% if incident.reported_by %}{{ incident.reported_by.full_name }}{% else %}Unknown{% endif %}</p>
+                  <p class="text-xs text-slate-500 mt-0.5">{{ incident.created_at|date:"M d, Y H:i" }} — {% if incident.reported_by %}<a href="{% url 'accounts:profile_view' incident.reported_by.pk %}" class="hover:text-brand-600 hover:underline">{{ incident.reported_by.full_name }}</a>{% else %}Unknown{% endif %}</p>
                 </div>
                 <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">{{ incident.get_severity_display|default:"Incident" }}</span>
               </div>
@@ -440,7 +458,7 @@
               <div class="flex items-start justify-between">
                 <div>
                   <h4 class="text-sm font-semibold text-slate-900">{{ log.get_maintenance_type_display|default:"Maintenance" }}</h4>
-                  <p class="text-xs text-slate-500 mt-0.5">{{ log.scheduled_date|date:"M d, Y" }} — {% if log.performed_by %}{{ log.performed_by.full_name }}{% else %}—{% endif %}</p>
+                  <p class="text-xs text-slate-500 mt-0.5">{{ log.scheduled_date|date:"M d, Y" }} — {% if log.performed_by %}<a href="{% url 'accounts:profile_view' log.performed_by.pk %}" class="hover:text-brand-600 hover:underline">{{ log.performed_by.full_name }}</a>{% else %}—{% endif %}</p>
                 </div>
                 <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">{{ log.get_status_display|default:"Maintenance" }}</span>
               </div>

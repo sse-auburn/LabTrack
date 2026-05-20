@@ -58,7 +58,6 @@ class Equipment(models.Model):
     STATUS_CHOICES = [
         ('AVAILABLE', 'Available'),
         ('BORROWED', 'Borrowed'),
-        ('RESERVED', 'Reserved'),
         ('MAINTENANCE', 'Under Maintenance'),
         ('DAMAGED', 'Damaged'),
         ('RETIRED', 'Retired'),

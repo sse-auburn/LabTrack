@@ -40,6 +40,12 @@ class PcardTransactionForm(forms.ModelForm):
             raise forms.ValidationError('Total price cannot be negative.')
         return total
 
+    def clean_receipt_file(self):
+        receipt = self.cleaned_data.get('receipt_file')
+        if not receipt:
+            raise forms.ValidationError('A receipt photo or PDF is required.')
+        return receipt
+
 
 class PcardItemForm(forms.ModelForm):
     """Create or edit an item line within a P-Card transaction."""
@@ -58,8 +64,8 @@ class PcardItemForm(forms.ModelForm):
             }),
             'quantity': forms.NumberInput(attrs={
                 'class': 'form-input',
-                'min': '1',
-                'step': '1',
+                'min': '0.01',
+                'step': '0.01',
             }),
             'unit_price': forms.NumberInput(attrs={
                 'class': 'form-input',
@@ -69,21 +75,14 @@ class PcardItemForm(forms.ModelForm):
             }),
         }
 
-    def clean_quantity(self):
-        qty = self.cleaned_data.get('quantity')
-        if qty is not None and qty < 1:
-            raise forms.ValidationError('Quantity must be at least 1.')
-        return qty
-
-
 PcardItemFormSet = inlineformset_factory(
     PcardTransaction,
     PcardItem,
     form=PcardItemForm,
     extra=1,
     can_delete=True,
-    min_num=1,
-    validate_min=True,
+    min_num=0,
+    validate_min=False,
 )
 
 

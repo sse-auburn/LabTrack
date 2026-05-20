@@ -21,10 +21,10 @@
         {% elif incident.severity == 'HIGH' %}<span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full">High</span>
         {% elif incident.severity == 'MEDIUM' %}<span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-semibold rounded-full">Medium</span>
         {% else %}<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">Low</span>{% endif %}
-        {% if incident.status == 'OPEN' %}<span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">Open</span>
-        {% elif incident.status == 'INVESTIGATING' %}<span class="px-2 py-0.5 bg-auburn-bluePale text-auburn-blue text-xs rounded-full">Investigating</span>
-        {% elif incident.status == 'RESOLVED' %}<span class="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs rounded-full">Resolved</span>
-        {% else %}<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">Closed</span>{% endif %}
+        {% if incident.status == 'OPEN' %}<span title="Incident is open and needs attention" class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">Open</span>
+        {% elif incident.status == 'INVESTIGATING' %}<span title="Incident is being investigated" class="px-2 py-0.5 bg-auburn-bluePale text-auburn-blue text-xs rounded-full">Investigating</span>
+        {% elif incident.status == 'RESOLVED' %}<span title="Incident has been resolved" class="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs rounded-full">Resolved</span>
+        {% else %}<span title="Incident is closed" class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">Closed</span>{% endif %}
       </div>
     </div>
     <div class="flex gap-2">
@@ -49,10 +49,10 @@
     <div class="p-6 grid grid-cols-2 gap-4 text-sm">
       <div><p class="text-slate-500">Equipment</p>
         <a href="{% url 'equipment:detail' incident.equipment.pk %}" class="font-medium text-brand-600 hover:underline">{{ incident.equipment.name }}</a></div>
-      <div><p class="text-slate-500">Reported By</p><p class="font-medium text-slate-900">{{ incident.reported_by.full_name|default:"—" }}</p></div>
+      <div><p class="text-slate-500">Reported By</p><p class="font-medium text-slate-900">{% if incident.reported_by %}<a href="{% url 'accounts:profile_view' incident.reported_by.pk %}" class="hover:text-brand-600 hover:underline">{{ incident.reported_by.full_name }}</a>{% else %}—{% endif %}</p></div>
       <div><p class="text-slate-500">Assigned To</p>
         {% if incident.assigned_to %}
-          <p class="font-medium text-brand-700">{{ incident.assigned_to.full_name }}</p>
+          <p class="font-medium"><a href="{% url 'accounts:profile_view' incident.assigned_to.pk %}" class="text-brand-700 hover:text-brand-600 hover:underline">{{ incident.assigned_to.full_name }}</a></p>
         {% else %}
           <p class="text-slate-400 italic">Unassigned</p>
         {% endif %}
@@ -74,7 +74,7 @@
     <div class="p-6 bg-brand-50">
       <p class="text-xs font-medium text-brand-700 uppercase mb-2">Resolution</p>
       <p class="text-sm text-slate-700 whitespace-pre-line">{{ incident.resolution }}</p>
-      {% if incident.resolved_by %}<p class="text-xs text-slate-500 mt-2">Resolved by {{ incident.resolved_by.full_name }}</p>{% endif %}
+      {% if incident.resolved_by %}<p class="text-xs text-slate-500 mt-2">Resolved by <a href="{% url 'accounts:profile_view' incident.resolved_by.pk %}" class="hover:text-brand-600 hover:underline">{{ incident.resolved_by.full_name }}</a></p>{% endif %}
     </div>
     {% endif %}
   </div>

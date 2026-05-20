@@ -293,7 +293,7 @@
               <p class="text-xs text-slate-500 mt-0.5">Ends: {{ reservation.end_date|date:"M j, Y" }}</p>
             </div>
             <div class="flex-shrink-0">
-              <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+              <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700" title="Item is currently checked out">
                 Active
               </span>
             </div>
@@ -332,7 +332,8 @@
             <span class="flex-shrink-0 inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full
               {% if reservation.status == 'CONFIRMED' %}bg-brand-100 text-brand-700
               {% elif reservation.status == 'PENDING' %}bg-yellow-100 text-yellow-700
-              {% else %}bg-slate-100 text-slate-600{% endif %}">
+              {% else %}bg-slate-100 text-slate-600{% endif %}"
+              title="{% if reservation.status == 'CONFIRMED' %}Reservation confirmed{% elif reservation.status == 'PENDING' %}Awaiting confirmation{% else %}{{ reservation.get_status_display }}{% endif %}">
               {{ reservation.get_status_display }}
             </span>
           </div>
@@ -368,7 +369,7 @@
       <div class="px-5 py-3 flex items-center justify-between gap-3">
         <div class="min-w-0 flex-1">
           <p class="text-sm font-medium text-slate-800 truncate">{{ equipment.name }}</p>
-          <p class="text-xs text-slate-500 mt-0.5">Added by {{ equipment.created_by.full_name|default:"Unknown" }}</p>
+          <p class="text-xs text-slate-500 mt-0.5">Added by {% if equipment.created_by %}<a href="{% url 'accounts:profile_view' equipment.created_by.pk %}" class="hover:text-brand-600 hover:underline">{{ equipment.created_by.full_name }}</a>{% else %}Unknown{% endif %}</p>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
           <a href="{% url 'equipment:approve' equipment.pk %}" class="px-3 py-1.5 bg-brand-600 text-white text-xs font-medium rounded-lg hover:bg-brand-700">Approve</a>
@@ -417,7 +418,7 @@
       <div class="px-5 py-3 flex items-center justify-between gap-3">
         <div class="min-w-0 flex-1">
           <p class="text-sm font-medium text-slate-800 truncate">{{ reservation.equipment|default:reservation.kit }}</p>
-          <p class="text-xs text-slate-500 mt-0.5">Reserved by {{ reservation.requester.full_name }}{% if reservation.return_condition %} &mdash; condition: {{ reservation.return_condition }}{% endif %}</p>
+          <p class="text-xs text-slate-500 mt-0.5">Reserved by <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name }}</a>{% if reservation.return_condition %} &mdash; condition: {{ reservation.return_condition }}{% endif %}</p>
         </div>
         <a href="{% url 'reservations:return_confirm' reservation.pk %}" class="flex-shrink-0 px-3 py-1.5 bg-brand-600 text-white text-xs font-medium rounded-lg hover:bg-brand-700">Confirm</a>
       </div>
@@ -500,10 +501,14 @@
             <td class="px-5 py-3"><span class="font-medium text-slate-800">{{ reservation.equipment|default:reservation.kit }}</span></td>
             <td class="px-5 py-3">
               <div class="flex items-center gap-2">
+                {% if reservation.requester.profile.avatar %}
+                <img src="{{ reservation.requester.profile.avatar.url }}" alt="" class="w-6 h-6 rounded-full object-cover flex-shrink-0">
+                {% else %}
                 <div class="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
-                  <span class="text-white text-xs font-semibold">{{ reservation.requester.first_name|first|upper }}</span>
+                  <span class="text-white text-xs font-semibold">{{ reservation.requester.get_initials }}</span>
                 </div>
-                <span class="text-slate-700">{{ reservation.requester.full_name }}</span>
+                {% endif %}
+                <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline"><span class="text-slate-700">{{ reservation.requester.full_name }}</span></a>
               </div>
             </td>
             <td class="px-5 py-3 text-slate-600">{{ reservation.end_date|date:"M j, Y" }}</td>
@@ -565,7 +570,7 @@
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-xs font-medium text-slate-700 leading-snug">
-                {% if log.actor %}{{ log.actor.full_name }}{% else %}System{% endif %}
+                {% if log.actor %}<a href="{% url 'accounts:profile_view' log.actor.pk %}" class="hover:text-brand-600 hover:underline">{{ log.actor.full_name }}</a>{% else %}System{% endif %}
               </p>
               <p class="text-xs text-slate-500 mt-0.5 line-clamp-2">{{ log.description }}</p>
             </div>
