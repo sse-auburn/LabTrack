@@ -9,7 +9,7 @@ def sync_equipment_status(equipment, exclude_borrow_pk=None):
 
     Priority (highest first):
     1. DAMAGED / RETIRED — never overridden automatically.
-    2. BORROWED  — any active BorrowRequest or ACTIVE/RETURN_PENDING Reservation.
+    2. BORROWED  — any ACTIVE/RETURN_PENDING Reservation.
     3. MAINTENANCE — any active MaintenanceLog (SCHEDULED / IN_PROGRESS).
     4. AVAILABLE — nothing else blocking.
     """
@@ -28,12 +28,12 @@ def sync_equipment_status(equipment, exclude_borrow_pk=None):
     ).exists():
         new_status = 'BORROWED'
     elif MaintenanceLog.objects.filter(
-            equipment=equipment,
-            status__in=['SCHEDULED', 'IN_PROGRESS'],
-        ).exists():
-            new_status = 'MAINTENANCE'
-        else:
-            new_status = 'AVAILABLE'
+        equipment=equipment,
+        status__in=['SCHEDULED', 'IN_PROGRESS'],
+    ).exists():
+        new_status = 'MAINTENANCE'
+    else:
+        new_status = 'AVAILABLE'
 
     if equipment.status != new_status:
         equipment.status = new_status
