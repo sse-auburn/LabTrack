@@ -1016,3 +1016,54 @@ def reservation_remind_view(request, pk):
         return redirect('reservations:detail', pk=pk)
 
     return redirect('reservations:detail', pk=pk)
+
+
+@login_required
+def reservation_remind_owner_view(request, pk, owner_pk):
+    """Send a return-confirmation reminder to a single specific owner."""
+    from apps.accounts.models import CustomUser
+    reservation = get_object_or_404(
+        Reservation.objects.select_related('requester', 'equipment', 'kit'),
+        pk=pk,
+    )
+
+    if reservation.status != 'RETURN_PENDING':
+        messages.error(request, 'This reservation is not awaiting a return confirmation.')
+        return redirect('reservations:detail', pk=pk)
+
+    if reservation.requester != request.user and not _is_admin(request.user):
+        messages.error(request, 'You do not have permission to send this reminder.')
+        return redirect('reservations:detail', pk=pk)
+
+    owner = get_object_or_404(CustomUser, pk=owner_pk)
+
+    # Verify the owner actually owns something in this reservation.
+    if reservation.equipment:
+        if reservation.equipment.owner_id != owner_pk:
+            messages.error(request, 'This person is not the owner of that equipment.')
+            return redirect('reservations:detail', pk=pk)
+    elif reservation.kit:
+        owns_something = reservation.kit.items.filter(
+            equipment__owner_id=owner_pk
+        ).exists()
+        if not owns_something:
+            messages.error(request, 'This person does not own any item in this kit.')
+            return redirect('reservations:detail', pk=pk)
+
+    if request.method == 'POST':
+        item_name = str(reservation.equipment or reservation.kit)
+        notify(
+            recipient=owner,
+            title='Return Approval Reminder',
+            message=(
+                f'{request.user.full_name or request.user.username} is reminding you to confirm '
+                f'the return of "{item_name}" from reservation #{reservation.pk}.'
+            ),
+            level='warning',
+            link=f'/reservations/{reservation.pk}/',
+            category='reservations',
+        )
+        messages.success(request, f'Reminder sent to {owner.full_name or owner.username}.')
+        return redirect('reservations:detail', pk=pk)
+
+    return redirect('reservations:detail', pk=pk)

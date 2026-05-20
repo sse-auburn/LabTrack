@@ -76,23 +76,45 @@
         </dd>
       </div>
 
-      <!-- Return To (Owner) -->
+      <!-- Return To (Owner + Location) -->
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
         <dt class="text-sm font-medium text-slate-500">Return To</dt>
         <dd class="col-span-2 text-sm text-slate-900">
           {% if reservation.equipment %}
-            <a href="{% url 'accounts:profile_view' reservation.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.owner.full_name|default:reservation.equipment.owner.username }}</a>
-            <span class="text-slate-400 ml-1">({{ reservation.equipment.owner.email }})</span>
+            <a href="{% url 'accounts:profile_view' reservation.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline font-medium">{{ reservation.equipment.owner.full_name|default:reservation.equipment.owner.username }}</a>
+            <span class="text-slate-400 ml-1 text-xs">({{ reservation.equipment.owner.email }})</span>
+            {% if reservation.equipment.location %}
+            <div class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+              <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              {{ reservation.equipment.location.name }}{% if reservation.equipment.location.building %} · {{ reservation.equipment.location.building }}{% if reservation.equipment.location.room %} {{ reservation.equipment.location.room }}{% endif %}{% endif %}
+            </div>
+            {% endif %}
           {% elif reservation.kit %}
-            <div class="space-y-1">
+            <div class="space-y-3">
               {% for ki in reservation.kit.items.all %}
-                {% if ki.equipment.owner %}
-                  <div>
-                    <a href="{% url 'accounts:profile_view' ki.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}</a>
-                    <span class="text-slate-400 ml-1">({{ ki.equipment.owner.email }})</span>
-                    <span class="text-xs text-slate-400 ml-1">— {{ ki.equipment.name }}</span>
+              <div class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0 mt-1.5"></span>
+                <div>
+                  <span class="font-medium text-slate-800">{{ ki.equipment.name }}</span>
+                  {% if ki.equipment.owner %}
+                  <span class="text-slate-400 mx-1">→</span>
+                  <a href="{% url 'accounts:profile_view' ki.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}</a>
+                  <span class="text-slate-400 ml-1 text-xs">({{ ki.equipment.owner.email }})</span>
+                  {% endif %}
+                  {% if ki.equipment.location %}
+                  <div class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+                    <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    {{ ki.equipment.location.name }}{% if ki.equipment.location.building %} · {{ ki.equipment.location.building }}{% if ki.equipment.location.room %} {{ ki.equipment.location.room }}{% endif %}{% endif %}
                   </div>
-                {% endif %}
+                  {% endif %}
+                </div>
+              </div>
               {% endfor %}
             </div>
           {% endif %}
@@ -238,16 +260,34 @@
       </a>
       {% endif %}
       {% if reservation.requester == request.user or request.user.is_admin %}
-      <form method="post" action="{% url 'reservations:remind' reservation.pk %}" class="inline">
-        {% csrf_token %}
-        <button type="submit"
-                class="inline-flex items-center px-4 py-2 bg-yellow-50 text-yellow-700 border border-yellow-300 rounded-lg text-sm font-medium hover:bg-yellow-100 transition">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-          </svg>
-          Send Reminder
-        </button>
-      </form>
+        {% if reservation.kit %}
+          {# Per-owner remind buttons for kits #}
+          {% for ki in reservation.kit.items.all %}
+          {% if ki.equipment.owner %}
+          <form method="post" action="{% url 'reservations:remind_owner' reservation.pk ki.equipment.owner.pk %}" class="inline">
+            {% csrf_token %}
+            <button type="submit"
+                    class="inline-flex items-center px-3 py-2 bg-yellow-50 text-yellow-700 border border-yellow-300 rounded-lg text-sm font-medium hover:bg-yellow-100 transition">
+              <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+              </svg>
+              Remind {{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}
+            </button>
+          </form>
+          {% endif %}
+          {% endfor %}
+        {% else %}
+          <form method="post" action="{% url 'reservations:remind' reservation.pk %}" class="inline">
+            {% csrf_token %}
+            <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-yellow-50 text-yellow-700 border border-yellow-300 rounded-lg text-sm font-medium hover:bg-yellow-100 transition">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+              </svg>
+              Send Reminder
+            </button>
+          </form>
+        {% endif %}
       {% endif %}
     {% endif %}
 

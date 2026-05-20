@@ -4,473 +4,517 @@
 {% block page_title %}Reservations{% endblock %}
 
 {% block content %}
-<div>
 
-  <!-- Page Header Banner -->
 <!-- Page Header -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-
-  <!-- LEFT SECTION -->
-  <div class="rounded-3xl px-6 py-5">
-    <h1 class="text-2xl font-bold tracking-tight text-slate-900">
-      Reservations
-    </h1>
-
-    <p class="text-slate-500 text-sm mt-1">
-      {% if request.user.is_staff %}
-        All lab reservations
-      {% else %}
-        Your reservations
-      {% endif %}
+<div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900">Reservations</h1>
+    <p class="text-sm text-slate-500 mt-0.5">
+      {% if request.user.is_staff %}All lab reservations{% else %}Your reservations{% endif %}
     </p>
   </div>
-
-  <!-- RIGHT SECTION -->
-  <div class="rounded-3xl px-6 py-5">
-    <div class="flex items-center justify-end gap-2 flex-wrap">
-
-      <a href="{% url 'reservations:calendar' %}"
-         class="inline-flex items-center px-3 py-1.5 border border-auburn-orange text-auburn-orange hover:bg-auburn-orange hover:text-white text-sm font-medium rounded-lg transition-colors">
-        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-        </svg>
-        Calendar
-      </a>
-
-      <a href="{% url 'reservations:create' %}"
-         class="inline-flex items-center px-4 py-1.5 bg-brand-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-700 transition-colors">
-        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 4v16m8-8H4"/>
-        </svg>
-        New Reservation
-      </a>
-
-    </div>
+  <div class="flex items-center gap-2">
+    <a href="{% url 'reservations:calendar' %}"
+       class="inline-flex items-center px-3 py-1.5 border border-slate-300 text-slate-700 hover:border-brand-500 hover:text-brand-700 text-sm font-medium rounded-lg transition-colors">
+      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+      </svg>
+      Calendar
+    </a>
+    <a href="{% url 'reservations:create' %}"
+       class="inline-flex items-center px-4 py-1.5 bg-brand-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-700 transition-colors">
+      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      New Reservation
+    </a>
   </div>
-
 </div>
 
-  <!-- ===== RETURNS YOU NEED TO CONFIRM ===== -->
-  {% if returns_i_must_confirm %}
-  <div class="mb-6">
-    <div class="mb-2">
-      <h2 class="text-base font-semibold text-slate-900 flex items-center gap-2">
-        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        Returns You Need to Confirm
-        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">{{ returns_i_must_confirm|length }}</span>
-      </h2>
-      <p class="text-xs text-slate-500 mt-0.5">
-        You are the owner of these items. Please confirm the return once you receive the item back.
-      </p>
-    </div>
-    <div class="bg-white rounded-xl border border-orange-200 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200">
-          <thead class="bg-orange-50">
-            <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Item</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Returned By</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Your Role</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Returned On</th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-slate-100">
-            {% for reservation in returns_i_must_confirm %}
-            <tr class="hover:bg-slate-50 transition">
-              <td class="px-4 py-3 whitespace-nowrap">
+{% if not returns_i_must_confirm and not my_returns_waiting and not my_current_future_reservations and not my_past_reservations and not other_owner_returns %}
+<div class="bg-white rounded-xl border border-slate-200 py-20 text-center">
+  <svg class="mx-auto w-12 h-12 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+  </svg>
+  <p class="text-slate-500 text-sm mb-4">No reservations yet.</p>
+  <a href="{% url 'reservations:create' %}"
+     class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-700 transition-colors">
+    Make a reservation
+  </a>
+</div>
+{% endif %}
+
+<!-- ===== RETURNS YOU NEED TO CONFIRM ===== -->
+{% if returns_i_must_confirm %}
+<div class="mb-5">
+  <div class="flex items-center gap-2 mb-2">
+    <svg class="w-4 h-4 text-orange-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <h2 class="text-sm font-semibold text-slate-900">Returns You Need to Confirm</h2>
+    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">{{ returns_i_must_confirm|length }}</span>
+    <span class="text-xs text-slate-400 hidden sm:inline">You are the owner — confirm once you receive the item back.</span>
+  </div>
+  <div class="bg-white rounded-xl border border-orange-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-100">
+        <thead class="bg-orange-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Item</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Returned By</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Location</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Returned On</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for reservation in returns_i_must_confirm %}
+          <tr class="hover:bg-slate-50 transition align-top">
+            {# Item #}
+            <td class="px-4 py-3">
+              {% if reservation.equipment %}
                 <div class="text-sm font-medium text-slate-900">
-                  {% if reservation.equipment %}
-                    <a href="{% url 'equipment:detail' reservation.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.name }}</a>
-                  {% elif reservation.kit %}
-                    <a href="{% url 'kits:detail' reservation.kit.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.kit.name }}</a>
-                  {% endif %}
+                  <a href="{% url 'equipment:detail' reservation.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.name }}</a>
                 </div>
-                <div class="text-xs text-slate-400">
-                  {% if reservation.equipment %}
-                    Equipment
-                  {% elif reservation.kit %}
-                    Kit
-                    <span class="block text-slate-400 mt-0.5 truncate max-w-[12rem]">
-                      {% for ki in reservation.kit.items.all %}{{ ki.equipment.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                    </span>
-                  {% endif %}
+              {% elif reservation.kit %}
+                <div class="text-sm font-medium text-slate-900 pb-1.5 mb-1 border-b border-slate-100">
+                  <a href="{% url 'kits:detail' reservation.kit.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.kit.name }}</a>
+                  <span class="ml-1.5 text-xs font-normal text-slate-400">Kit</span>
                 </div>
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
-                <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
-                {% if reservation.equipment and reservation.equipment.owner == user %}
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-600">Equipment Owner</span>
-                {% elif reservation.kit %}
-                  {% for ki in reservation.kit.items.all %}{% if ki.equipment.owner == user %}<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-600">Equipment Owner</span>{% endif %}{% endfor %}
-                {% endif %}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
-                {{ reservation.returned_date|date:"M d, Y \a\t g:i A" }}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-right text-sm">
-                <div class="flex items-center justify-end gap-2">
-                  <a href="{% url 'reservations:return_confirm' reservation.pk %}"
-                     class="inline-flex items-center px-2.5 py-1 bg-brand-600 text-white text-xs font-medium rounded-lg hover:bg-brand-700 transition">
-                    Confirm Return
-                  </a>
-                  <a href="{% url 'reservations:detail' reservation.pk %}"
-                     class="text-brand-600 hover:text-brand-800 font-medium">View</a>
+                {% for ki in reservation.kit.items.all %}
+                <div class="text-xs text-slate-700 {% if not forloop.last %}pb-1.5 mb-1 border-b border-slate-100{% endif %}">
+                  <a href="{% url 'equipment:detail' ki.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.name }}</a>
                 </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+                {% endfor %}
+              {% endif %}
+            </td>
+            {# Returned By #}
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700">
+              <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>
+            </td>
+            {# Location #}
+            <td class="px-4 py-3 text-xs text-slate-500">
+              {% if reservation.equipment %}
+                {% if reservation.equipment.location %}{{ reservation.equipment.location.name }}{% if reservation.equipment.location.building %} · {{ reservation.equipment.location.building }}{% if reservation.equipment.location.room %} {{ reservation.equipment.location.room }}{% endif %}{% endif %}{% else %}<span class="text-slate-300">—</span>{% endif %}
+              {% elif reservation.kit %}
+                <div class="text-sm pb-1.5 mb-1 border-b border-slate-100 invisible" aria-hidden="true">Kit</div>
+                {% for ki in reservation.kit.items.all %}
+                <div class="{% if not forloop.last %}pb-1.5 mb-1 border-b border-slate-100{% endif %}">
+                  {% if ki.equipment.location %}{{ ki.equipment.location.name }}{% if ki.equipment.location.building %} · {{ ki.equipment.location.building }}{% if ki.equipment.location.room %} {{ ki.equipment.location.room }}{% endif %}{% endif %}{% else %}<span class="text-slate-300">—</span>{% endif %}
+                </div>
+                {% endfor %}
+              {% endif %}
+            </td>
+            {# Returned On #}
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
+              {{ reservation.returned_date|date:"M d, Y" }}
+              <span class="block text-xs text-slate-400">{{ reservation.returned_date|date:"g:i A" }}</span>
+            </td>
+            {# Actions #}
+            <td class="px-4 py-3 whitespace-nowrap text-right align-top">
+              <div class="flex flex-col items-end gap-1.5">
+                <a href="{% url 'reservations:detail' reservation.pk %}" class="text-xs text-brand-600 hover:underline font-medium">View →</a>
+                <a href="{% url 'reservations:return_confirm' reservation.pk %}"
+                   class="inline-flex items-center px-3 py-1.5 bg-brand-600 text-white text-xs font-semibold rounded-lg hover:bg-brand-700 transition whitespace-nowrap">
+                  Confirm Return
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
-  {% endif %}
+</div>
+{% endif %}
 
-  <!-- ===== YOUR RETURNS WAITING FOR OWNER APPROVAL ===== -->
-  {% if my_returns_waiting %}
-  <div class="mb-6">
-    <div class="mb-2">
-      <h2 class="text-base font-semibold text-slate-900 flex items-center gap-2">
-        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-        </svg>
-        Returns Waiting for Owner Approval
-        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{{ my_returns_waiting|length }}</span>
-      </h2>
-      <p class="text-xs text-slate-500 mt-0.5">
-        You submitted these returns. The item owner needs to confirm before the reservation is fully closed.
-      </p>
-    </div>
-    <div class="bg-white rounded-xl border border-blue-200 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200">
-          <thead class="bg-blue-50">
-            <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Item</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Return To</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Returned On</th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-slate-100">
-            {% for reservation in my_returns_waiting %}
-            <tr class="hover:bg-slate-50 transition">
-              <td class="px-4 py-3 whitespace-nowrap">
+<!-- ===== YOUR RETURNS WAITING FOR OWNER APPROVAL ===== -->
+{% if my_returns_waiting %}
+<div class="mb-5">
+  <div class="flex items-center gap-2 mb-2">
+    <svg class="w-4 h-4 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+    </svg>
+    <h2 class="text-sm font-semibold text-slate-900">Returns Waiting for Owner Approval</h2>
+    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{{ my_returns_waiting|length }}</span>
+    <span class="text-xs text-slate-400 hidden sm:inline">The owner needs to confirm before the reservation is fully closed.</span>
+  </div>
+  <div class="bg-white rounded-xl border border-blue-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-100">
+        <thead class="bg-blue-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Item</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Return To</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Location</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Returned On</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for reservation in my_returns_waiting %}
+          <tr class="hover:bg-slate-50 transition align-top">
+            {# Item #}
+            <td class="px-4 py-3">
+              {% if reservation.equipment %}
                 <div class="text-sm font-medium text-slate-900">
-                  {% if reservation.equipment %}
-                    <a href="{% url 'equipment:detail' reservation.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.name }}</a>
-                  {% elif reservation.kit %}
-                    <a href="{% url 'kits:detail' reservation.kit.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.kit.name }}</a>
-                  {% endif %}
+                  <a href="{% url 'equipment:detail' reservation.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.name }}</a>
                 </div>
-                <div class="text-xs text-slate-400">
-                  {% if reservation.equipment %}
-                    Equipment
-                  {% elif reservation.kit %}
-                    Kit
-                    <span class="block text-slate-400 mt-0.5 truncate max-w-[12rem]">
-                      {% for ki in reservation.kit.items.all %}{{ ki.equipment.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                    </span>
-                  {% endif %}
+              {% elif reservation.kit %}
+                <div class="text-sm font-medium text-slate-900 pb-1.5 mb-1 border-b border-slate-100">
+                  <a href="{% url 'kits:detail' reservation.kit.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.kit.name }}</a>
+                  <span class="ml-1.5 text-xs font-normal text-slate-400">Kit</span>
                 </div>
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
-                {% if reservation.equipment %}
-                  <a href="{% url 'accounts:profile_view' reservation.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.owner.full_name|default:reservation.equipment.owner.username }}</a>
-                  <span class="text-xs text-slate-400 block">Equipment Owner</span>
-                {% elif reservation.kit %}
-                  {% for ki in reservation.kit.items.all %}
-                    {% if ki.equipment.owner %}
-                      <a href="{% url 'accounts:profile_view' ki.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}</a>{% if not forloop.last %}, {% endif %}
-                    {% endif %}
-                  {% endfor %}
-                  <span class="text-xs text-slate-400 block">Equipment Owner(s)</span>
+                {% for ki in reservation.kit.items.all %}
+                <div class="text-xs text-slate-700 {% if not forloop.last %}pb-1.5 mb-1 border-b border-slate-100{% endif %}">
+                  <a href="{% url 'equipment:detail' ki.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.name }}</a>
+                </div>
+                {% endfor %}
+              {% endif %}
+            </td>
+            {# Return To #}
+            <td class="px-4 py-3 text-sm text-slate-700">
+              {% if reservation.equipment %}
+                {% if reservation.equipment.owner %}
+                <a href="{% url 'accounts:profile_view' reservation.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.owner.full_name|default:reservation.equipment.owner.username }}</a>
                 {% endif %}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
-                {{ reservation.returned_date|date:"M d, Y \a\t g:i A" }}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-right text-sm">
-                <div class="flex items-center justify-end gap-2">
-                  <form method="post" action="{% url 'reservations:remind' reservation.pk %}" class="inline">
+              {% elif reservation.kit %}
+                <div class="text-sm pb-1.5 mb-1 border-b border-slate-100 invisible" aria-hidden="true">Kit</div>
+                {% for ki in reservation.kit.items.all %}
+                <div class="text-xs {% if not forloop.last %}pb-1.5 mb-1 border-b border-slate-100{% endif %}">
+                  {% if ki.equipment.owner %}<a href="{% url 'accounts:profile_view' ki.equipment.owner.pk %}" class="text-slate-700 hover:text-brand-600 hover:underline">{{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}</a>{% else %}<span class="text-slate-300">—</span>{% endif %}
+                </div>
+                {% endfor %}
+              {% endif %}
+            </td>
+            {# Location #}
+            <td class="px-4 py-3 text-xs text-slate-500">
+              {% if reservation.equipment %}
+                {% if reservation.equipment.location %}{{ reservation.equipment.location.name }}{% if reservation.equipment.location.building %} · {{ reservation.equipment.location.building }}{% if reservation.equipment.location.room %} {{ reservation.equipment.location.room }}{% endif %}{% endif %}{% else %}<span class="text-slate-300">—</span>{% endif %}
+              {% elif reservation.kit %}
+                <div class="text-sm pb-1.5 mb-1 border-b border-slate-100 invisible" aria-hidden="true">Kit</div>
+                {% for ki in reservation.kit.items.all %}
+                <div class="{% if not forloop.last %}pb-1.5 mb-1 border-b border-slate-100{% endif %}">
+                  {% if ki.equipment.location %}{{ ki.equipment.location.name }}{% if ki.equipment.location.building %} · {{ ki.equipment.location.building }}{% if ki.equipment.location.room %} {{ ki.equipment.location.room }}{% endif %}{% endif %}{% else %}<span class="text-slate-300">—</span>{% endif %}
+                </div>
+                {% endfor %}
+              {% endif %}
+            </td>
+            {# Returned On #}
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
+              {{ reservation.returned_date|date:"M d, Y" }}
+              <span class="block text-xs text-slate-400">{{ reservation.returned_date|date:"g:i A" }}</span>
+            </td>
+            {# Actions #}
+            <td class="px-4 py-3 whitespace-nowrap text-right align-top">
+              <div class="flex flex-col items-end gap-1.5">
+                <a href="{% url 'reservations:detail' reservation.pk %}" class="text-xs text-brand-600 hover:underline font-medium">View →</a>
+                {% if reservation.kit %}
+                  {% for ki in reservation.kit.items.all %}
+                  {% if ki.equipment.owner %}
+                  <form method="post" action="{% url 'reservations:remind_owner' reservation.pk ki.equipment.owner.pk %}">
                     {% csrf_token %}
-                    <button type="submit"
-                            class="inline-flex items-center px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-lg hover:bg-blue-200 transition">
+                    <button type="submit" class="inline-flex items-center px-2.5 py-1 border border-blue-300 text-blue-700 text-xs font-medium rounded-lg hover:bg-blue-50 transition whitespace-nowrap">
+                      Remind {{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}
+                    </button>
+                  </form>
+                  {% endif %}
+                  {% endfor %}
+                {% else %}
+                  <form method="post" action="{% url 'reservations:remind' reservation.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="inline-flex items-center px-2.5 py-1 border border-blue-300 text-blue-700 text-xs font-medium rounded-lg hover:bg-blue-50 transition whitespace-nowrap">
                       Send Reminder
                     </button>
                   </form>
-                  <a href="{% url 'reservations:detail' reservation.pk %}"
-                     class="text-brand-600 hover:text-brand-800 font-medium">View</a>
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- ===== MY CURRENT & FUTURE RESERVATIONS ===== -->
-  {% if my_current_future_reservations %}
-  <div class="mb-6">
-    <div class="mb-2">
-      <h2 class="text-base font-semibold text-slate-900 flex items-center gap-2">
-        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        Current & Future Reservations
-        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">{{ my_current_future_reservations|length }}</span>
-      </h2>
-      <p class="text-xs text-slate-500 mt-0.5">
-        Upcoming and in-progress reservations.
-      </p>
-    </div>
-    <div class="bg-white rounded-xl border border-emerald-200 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200">
-          <thead class="bg-emerald-50">
-            <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Item</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Start – End</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Return To</th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-slate-100">
-            {% for reservation in my_current_future_reservations %}
-            <tr class="hover:bg-slate-50 transition">
-              <td class="px-4 py-3 whitespace-nowrap">
-                <div class="text-sm font-medium text-slate-900">
-                  {% if reservation.equipment %}
-                    <a href="{% url 'equipment:detail' reservation.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.name }}</a>
-                  {% elif reservation.kit %}
-                    <a href="{% url 'kits:detail' reservation.kit.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.kit.name }}</a>
-                  {% endif %}
-                </div>
-                <div class="text-xs text-slate-400">
-                  {% if reservation.equipment %}
-                    Equipment
-                  {% elif reservation.kit %}
-                    Kit
-                    <span class="block text-slate-400 mt-0.5 truncate max-w-[12rem]">
-                      {% for ki in reservation.kit.items.all %}{{ ki.equipment.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                    </span>
-                  {% endif %}
-                </div>
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
-                {{ reservation.start_date|date:"M d" }} – {{ reservation.end_date|date:"M d, Y" }}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm">
-                {% if reservation.status == 'PENDING' %}
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
-                {% elif reservation.status == 'CONFIRMED' %}
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800">Confirmed</span>
-                {% elif reservation.status == 'ACTIVE' %}
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
                 {% endif %}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
-                {% if reservation.equipment %}
-                  <a href="{% url 'accounts:profile_view' reservation.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.owner.full_name|default:reservation.equipment.owner.username }}</a>
-                {% elif reservation.kit %}
-                  {% for ki in reservation.kit.items.all %}
-                    {% if ki.equipment.owner %}
-                      <a href="{% url 'accounts:profile_view' ki.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}</a>{% if not forloop.last %}, {% endif %}
-                    {% endif %}
-                  {% endfor %}
-                {% endif %}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-right text-sm">
-                <div class="flex items-center justify-end gap-2">
-                  {% if reservation.status in 'ACTIVE,CONFIRMED' %}
-                  <a href="{% url 'reservations:return' reservation.pk %}"
-                     class="inline-flex items-center px-2.5 py-1 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700 transition">
-                    Return
-                  </a>
-                  {% endif %}
-                  <a href="{% url 'reservations:detail' reservation.pk %}"
-                     class="text-brand-600 hover:text-brand-800 font-medium">View</a>
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-  </div>
-  {% endif %}
-
-  <!-- ===== MY PAST RESERVATIONS ===== -->
-  {% if my_past_reservations %}
-  <div class="mb-6">
-    <div class="mb-2">
-      <h2 class="text-base font-semibold text-slate-900 flex items-center gap-2">
-        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        My Past Reservations
-        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">{{ my_past_reservations|length }}</span>
-      </h2>
-      <p class="text-xs text-slate-500 mt-0.5">
-        Your completed, cancelled, or expired reservations.
-      </p>
-    </div>
-    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200">
-          <thead class="bg-slate-50">
-            <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Item</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Start – End</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-slate-100">
-            {% for reservation in my_past_reservations %}
-            <tr class="hover:bg-slate-50 transition">
-              <td class="px-4 py-3 whitespace-nowrap">
-                <div class="text-sm font-medium text-slate-900">
-                  {% if reservation.equipment %}
-                    <a href="{% url 'equipment:detail' reservation.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.name }}</a>
-                  {% elif reservation.kit %}
-                    <a href="{% url 'kits:detail' reservation.kit.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.kit.name }}</a>
-                  {% endif %}
-                </div>
-                <div class="text-xs text-slate-400">
-                  {% if reservation.equipment %}
-                    Equipment
-                  {% elif reservation.kit %}
-                    Kit
-                    <span class="block text-slate-400 mt-0.5 truncate max-w-[12rem]">
-                      {% for ki in reservation.kit.items.all %}{{ ki.equipment.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                    </span>
-                  {% endif %}
-                </div>
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
-                {{ reservation.start_date|date:"M d" }} – {{ reservation.end_date|date:"M d, Y" }}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm">
-                {% if reservation.status == 'RETURNED' %}
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800">Returned</span>
-                {% elif reservation.status == 'CANCELLED' %}
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Cancelled</span>
-                {% elif reservation.status == 'EXPIRED' %}
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">Expired</span>
-                {% elif reservation.status == 'COMPLETED' %}
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800">Completed</span>
-                {% endif %}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-right text-sm">
-                <a href="{% url 'reservations:detail' reservation.pk %}"
-                   class="text-brand-600 hover:text-brand-800 font-medium">View</a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- ===== RETURNS FOR OTHER OWNERS (admin only) ===== -->
-  {% if other_owner_returns %}
-  <div class="mb-6">
-    <div class="mb-2">
-      <h2 class="text-base font-semibold text-slate-900 flex items-center gap-2">
-        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-        </svg>
-        Returns for Other Owners
-        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">{{ other_owner_returns|length }}</span>
-      </h2>
-      <p class="text-xs text-slate-500 mt-0.5">
-        As an admin, you can confirm these returns on behalf of the owner if needed.
-      </p>
-    </div>
-    <div class="bg-white rounded-xl border border-purple-200 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200">
-          <thead class="bg-purple-50">
-            <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Item</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Returned By</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Owner</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Returned On</th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-slate-100">
-            {% for reservation in other_owner_returns %}
-            <tr class="hover:bg-slate-50 transition">
-              <td class="px-4 py-3 whitespace-nowrap">
-                <div class="text-sm font-medium text-slate-900">
-                  {% if reservation.equipment %}
-                    <a href="{% url 'equipment:detail' reservation.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.name }}</a>
-                  {% elif reservation.kit %}
-                    <a href="{% url 'kits:detail' reservation.kit.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.kit.name }}</a>
-                  {% endif %}
-                </div>
-                <div class="text-xs text-slate-400">
-                  {% if reservation.equipment %}
-                    Equipment
-                  {% elif reservation.kit %}
-                    Kit
-                    <span class="block text-slate-400 mt-0.5 truncate max-w-[12rem]">
-                      {% for ki in reservation.kit.items.all %}{{ ki.equipment.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                    </span>
-                  {% endif %}
-                </div>
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
-                <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
-                {% if reservation.equipment %}
-                  <a href="{% url 'accounts:profile_view' reservation.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.owner.full_name|default:reservation.equipment.owner.username }}</a>
-                {% elif reservation.kit %}
-                  {% for ki in reservation.kit.items.all %}
-                    {% if ki.equipment.owner %}
-                      <a href="{% url 'accounts:profile_view' ki.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}</a>{% if not forloop.last %}, {% endif %}
-                    {% endif %}
-                  {% endfor %}
-                {% endif %}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
-                {{ reservation.returned_date|date:"M d, Y \a\t g:i A" }}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-right text-sm">
-                <div class="flex items-center justify-end gap-2">
-                  <a href="{% url 'reservations:return_confirm' reservation.pk %}"
-                     class="inline-flex items-center px-2.5 py-1 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition">
-                    Confirm as Admin
-                  </a>
-                  <a href="{% url 'reservations:detail' reservation.pk %}"
-                     class="text-brand-600 hover:text-brand-800 font-medium">View</a>
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-  {% endif %}
   </div>
 </div>
+{% endif %}
+
+<!-- ===== MY CURRENT & FUTURE RESERVATIONS ===== -->
+{% if my_current_future_reservations %}
+<div class="mb-5">
+  <div class="flex items-center gap-2 mb-2">
+    <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <h2 class="text-sm font-semibold text-slate-900">Current & Future Reservations</h2>
+    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">{{ my_current_future_reservations|length }}</span>
+  </div>
+  <div class="bg-white rounded-xl border border-emerald-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-100">
+        <thead class="bg-emerald-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Item</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Period</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Return To</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Location</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for reservation in my_current_future_reservations %}
+          <tr class="hover:bg-slate-50 transition align-top">
+            {# Item #}
+            <td class="px-4 py-3">
+              {% if reservation.equipment %}
+                <div class="text-sm font-medium text-slate-900">
+                  <a href="{% url 'equipment:detail' reservation.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.name }}</a>
+                </div>
+              {% elif reservation.kit %}
+                <div class="text-sm font-medium text-slate-900 pb-1.5 mb-1 border-b border-slate-100">
+                  <a href="{% url 'kits:detail' reservation.kit.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.kit.name }}</a>
+                  <span class="ml-1.5 text-xs font-normal text-slate-400">Kit</span>
+                </div>
+                {% for ki in reservation.kit.items.all %}
+                <div class="text-xs text-slate-700 {% if not forloop.last %}pb-1.5 mb-1 border-b border-slate-100{% endif %}">
+                  <a href="{% url 'equipment:detail' ki.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.name }}</a>
+                </div>
+                {% endfor %}
+              {% endif %}
+            </td>
+            {# Period #}
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
+              {{ reservation.start_date|date:"M d" }} – {{ reservation.end_date|date:"M d, Y" }}
+            </td>
+            {# Status #}
+            <td class="px-4 py-3 whitespace-nowrap">
+              {% if reservation.status == 'PENDING' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
+              {% elif reservation.status == 'CONFIRMED' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800">Confirmed</span>
+              {% elif reservation.status == 'ACTIVE' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
+              {% endif %}
+            </td>
+            {# Return To #}
+            <td class="px-4 py-3 text-sm text-slate-700">
+              {% if reservation.equipment %}
+                {% if reservation.equipment.owner %}
+                <a href="{% url 'accounts:profile_view' reservation.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.owner.full_name|default:reservation.equipment.owner.username }}</a>
+                {% endif %}
+              {% elif reservation.kit %}
+                <div class="text-sm pb-1.5 mb-1 border-b border-slate-100 invisible" aria-hidden="true">Kit</div>
+                {% for ki in reservation.kit.items.all %}
+                <div class="text-xs {% if not forloop.last %}pb-1.5 mb-1 border-b border-slate-100{% endif %}">
+                  {% if ki.equipment.owner %}<a href="{% url 'accounts:profile_view' ki.equipment.owner.pk %}" class="text-slate-700 hover:text-brand-600 hover:underline">{{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}</a>{% else %}<span class="text-slate-300">—</span>{% endif %}
+                </div>
+                {% endfor %}
+              {% endif %}
+            </td>
+            {# Location #}
+            <td class="px-4 py-3 text-xs text-slate-500">
+              {% if reservation.equipment %}
+                {% if reservation.equipment.location %}{{ reservation.equipment.location.name }}{% if reservation.equipment.location.building %} · {{ reservation.equipment.location.building }}{% if reservation.equipment.location.room %} {{ reservation.equipment.location.room }}{% endif %}{% endif %}{% else %}<span class="text-slate-300">—</span>{% endif %}
+              {% elif reservation.kit %}
+                <div class="text-sm pb-1.5 mb-1 border-b border-slate-100 invisible" aria-hidden="true">Kit</div>
+                {% for ki in reservation.kit.items.all %}
+                <div class="{% if not forloop.last %}pb-1.5 mb-1 border-b border-slate-100{% endif %}">
+                  {% if ki.equipment.location %}{{ ki.equipment.location.name }}{% if ki.equipment.location.building %} · {{ ki.equipment.location.building }}{% if ki.equipment.location.room %} {{ ki.equipment.location.room }}{% endif %}{% endif %}{% else %}<span class="text-slate-300">—</span>{% endif %}
+                </div>
+                {% endfor %}
+              {% endif %}
+            </td>
+            {# Actions #}
+            <td class="px-4 py-3 whitespace-nowrap text-right align-top">
+              <div class="flex flex-col items-end gap-1.5">
+                <a href="{% url 'reservations:detail' reservation.pk %}" class="text-xs text-brand-600 hover:underline font-medium">View →</a>
+                {% if reservation.status == 'ACTIVE' or reservation.status == 'CONFIRMED' %}
+                <a href="{% url 'reservations:return' reservation.pk %}"
+                   class="inline-flex items-center px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded-lg hover:bg-emerald-700 transition whitespace-nowrap">
+                  Return
+                </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ===== MY PAST RESERVATIONS ===== -->
+{% if my_past_reservations %}
+<div class="mb-5">
+  <div class="flex items-center gap-2 mb-2">
+    <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <h2 class="text-sm font-semibold text-slate-900">Past Reservations</h2>
+    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">{{ my_past_reservations|length }}</span>
+  </div>
+  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-100">
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Item</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Period</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for reservation in my_past_reservations %}
+          <tr class="hover:bg-slate-50 transition align-top">
+            <td class="px-4 py-3">
+              {% if reservation.equipment %}
+                <div class="text-sm font-medium text-slate-900">
+                  <a href="{% url 'equipment:detail' reservation.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.name }}</a>
+                </div>
+              {% elif reservation.kit %}
+                <div class="text-sm font-medium text-slate-900 pb-1.5 mb-1 border-b border-slate-100">
+                  <a href="{% url 'kits:detail' reservation.kit.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.kit.name }}</a>
+                  <span class="ml-1.5 text-xs font-normal text-slate-400">Kit</span>
+                </div>
+                {% for ki in reservation.kit.items.all %}
+                <div class="text-xs text-slate-700 {% if not forloop.last %}pb-1.5 mb-1 border-b border-slate-100{% endif %}">
+                  <a href="{% url 'equipment:detail' ki.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.name }}</a>
+                </div>
+                {% endfor %}
+              {% endif %}
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
+              {{ reservation.start_date|date:"M d" }} – {{ reservation.end_date|date:"M d, Y" }}
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              {% if reservation.status == 'RETURNED' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Returned</span>
+              {% elif reservation.status == 'COMPLETED' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800">Completed</span>
+              {% elif reservation.status == 'CANCELLED' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">Cancelled</span>
+              {% elif reservation.status == 'EXPIRED' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">Expired</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap text-right align-top">
+              <a href="{% url 'reservations:detail' reservation.pk %}" class="text-xs text-brand-600 hover:underline font-medium">View →</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ===== RETURNS FOR OTHER OWNERS (admin only) ===== -->
+{% if other_owner_returns %}
+<div class="mb-5">
+  <div class="flex items-center gap-2 mb-2">
+    <svg class="w-4 h-4 text-purple-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+    </svg>
+    <h2 class="text-sm font-semibold text-slate-900">Returns for Other Owners</h2>
+    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">{{ other_owner_returns|length }}</span>
+    <span class="text-xs text-slate-400 hidden sm:inline">As admin, you can confirm these on behalf of the owner.</span>
+  </div>
+  <div class="bg-white rounded-xl border border-purple-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-100">
+        <thead class="bg-purple-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Item</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Returned By</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Owner</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Location</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Returned On</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for reservation in other_owner_returns %}
+          <tr class="hover:bg-slate-50 transition align-top">
+            {# Item #}
+            <td class="px-4 py-3">
+              {% if reservation.equipment %}
+                <div class="text-sm font-medium text-slate-900">
+                  <a href="{% url 'equipment:detail' reservation.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.name }}</a>
+                </div>
+              {% elif reservation.kit %}
+                <div class="text-sm font-medium text-slate-900 pb-1.5 mb-1 border-b border-slate-100">
+                  <a href="{% url 'kits:detail' reservation.kit.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.kit.name }}</a>
+                  <span class="ml-1.5 text-xs font-normal text-slate-400">Kit</span>
+                </div>
+                {% for ki in reservation.kit.items.all %}
+                <div class="text-xs text-slate-700 {% if not forloop.last %}pb-1.5 mb-1 border-b border-slate-100{% endif %}">
+                  <a href="{% url 'equipment:detail' ki.equipment.pk %}" class="hover:text-brand-600 hover:underline">{{ ki.equipment.name }}</a>
+                </div>
+                {% endfor %}
+              {% endif %}
+            </td>
+            {# Returned By #}
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700">
+              <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>
+            </td>
+            {# Owner #}
+            <td class="px-4 py-3 text-sm text-slate-700">
+              {% if reservation.equipment %}
+                {% if reservation.equipment.owner %}
+                <a href="{% url 'accounts:profile_view' reservation.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.equipment.owner.full_name|default:reservation.equipment.owner.username }}</a>
+                {% endif %}
+              {% elif reservation.kit %}
+                <div class="text-sm pb-1.5 mb-1 border-b border-slate-100 invisible" aria-hidden="true">Kit</div>
+                {% for ki in reservation.kit.items.all %}
+                <div class="text-xs {% if not forloop.last %}pb-1.5 mb-1 border-b border-slate-100{% endif %}">
+                  {% if ki.equipment.owner %}<a href="{% url 'accounts:profile_view' ki.equipment.owner.pk %}" class="text-slate-700 hover:text-brand-600 hover:underline">{{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}</a>{% else %}<span class="text-slate-300">—</span>{% endif %}
+                </div>
+                {% endfor %}
+              {% endif %}
+            </td>
+            {# Location #}
+            <td class="px-4 py-3 text-xs text-slate-500">
+              {% if reservation.equipment %}
+                {% if reservation.equipment.location %}{{ reservation.equipment.location.name }}{% if reservation.equipment.location.building %} · {{ reservation.equipment.location.building }}{% if reservation.equipment.location.room %} {{ reservation.equipment.location.room }}{% endif %}{% endif %}{% else %}<span class="text-slate-300">—</span>{% endif %}
+              {% elif reservation.kit %}
+                <div class="text-sm pb-1.5 mb-1 border-b border-slate-100 invisible" aria-hidden="true">Kit</div>
+                {% for ki in reservation.kit.items.all %}
+                <div class="{% if not forloop.last %}pb-1.5 mb-1 border-b border-slate-100{% endif %}">
+                  {% if ki.equipment.location %}{{ ki.equipment.location.name }}{% if ki.equipment.location.building %} · {{ ki.equipment.location.building }}{% if ki.equipment.location.room %} {{ ki.equipment.location.room }}{% endif %}{% endif %}{% else %}<span class="text-slate-300">—</span>{% endif %}
+                </div>
+                {% endfor %}
+              {% endif %}
+            </td>
+            {# Returned On #}
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">
+              {{ reservation.returned_date|date:"M d, Y" }}
+              <span class="block text-xs text-slate-400">{{ reservation.returned_date|date:"g:i A" }}</span>
+            </td>
+            {# Actions #}
+            <td class="px-4 py-3 whitespace-nowrap text-right align-top">
+              <div class="flex flex-col items-end gap-1.5">
+                <a href="{% url 'reservations:detail' reservation.pk %}" class="text-xs text-brand-600 hover:underline font-medium">View →</a>
+                <a href="{% url 'reservations:return_confirm' reservation.pk %}"
+                   class="inline-flex items-center px-3 py-1.5 bg-purple-600 text-white text-xs font-semibold rounded-lg hover:bg-purple-700 transition whitespace-nowrap">
+                  Confirm as Admin
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 {% endblock %}
