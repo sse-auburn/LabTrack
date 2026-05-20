@@ -85,7 +85,7 @@ def equipment_list_view(request):
     queryset = queryset.order_by('name')
 
     view_mode = request.GET.get('view', 'list')
-    per_page = 12 if view_mode == 'grid' else 20
+    per_page = 30 if view_mode == 'grid' else 25
 
     total_count = queryset.count()
     paginator = Paginator(queryset, per_page)
