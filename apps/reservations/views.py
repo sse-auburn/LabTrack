@@ -257,6 +257,7 @@ def reservation_create_view(request):
                     level='info',
                     link=f'/reservations/{reservation.pk}/',
                     category='reservations',
+                    send_email=False,
                 )
             elif reservation.kit:
                 # Notify all individual equipment owners in the kit
@@ -276,6 +277,7 @@ def reservation_create_view(request):
                         level='info',
                         link=f'/reservations/{reservation.pk}/',
                         category='reservations',
+                        send_email=False,
                     )
 
             messages.success(request, 'Reservation confirmed.')
@@ -351,6 +353,7 @@ def reservation_bulk_create_view(request):
                     level='success',
                     link=reverse('reservations:list'),
                     category='reservations',
+                    send_email=False,
                 )
             skipped = len(locked_items) - len(created)
             if skipped:
@@ -565,6 +568,7 @@ def reservation_confirm_view(request, pk):
             level='success',
             link=f'/reservations/{reservation.pk}/',
             category='reservations',
+            send_email=False,
         )
 
         messages.success(request, 'Reservation confirmed.')
@@ -774,6 +778,7 @@ def reservation_return_confirm_view(request, pk):
             level='success',
             link=f'/reservations/{reservation.pk}/',
             category='reservations',
+            send_email=False,
         )
 
         log_activity(
@@ -952,6 +957,7 @@ def reservation_delete_view(request, pk):
                 level='warning',
                 link=reverse('reservations:list'),
                 category='reservations',
+                send_email=False,
             )
         notify_admins(
             title='Reservation Deleted',

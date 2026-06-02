@@ -211,6 +211,7 @@ def incident_resolve_view(request, pk):
                     level='success' if incident.status == 'RESOLVED' else 'info',
                     link=f'/incidents/{incident.pk}/',
                     category='incidents',
+                    send_email=False,
                 )
 
             messages.success(request, f'Incident updated to "{incident.get_status_display()}".')

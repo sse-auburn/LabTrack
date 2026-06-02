@@ -62,6 +62,7 @@ def register_view(request):
                 level='info',
                 link='/accounts/users/?status=pending',
                 category='system',
+                send_email=True,
             )
 
             messages.success(
@@ -227,6 +228,7 @@ def user_create_view(request):
                 level='success',
                 link='/',
                 category='system',
+                send_email=False,
             )
             notify_admins(
                 title='New User Created',
@@ -279,6 +281,7 @@ def user_edit_view(request, pk):
                 level='info',
                 link=f'/accounts/users/{target_user.pk}/',
                 category='system',
+                send_email=False,
             )
             notify_admins(
                 title='User Updated',
@@ -398,6 +401,7 @@ def assign_role_view(request, pk):
                 level='info',
                 link='/accounts/profile/',
                 category='system',
+                send_email=False,
             )
             notify_admins(
                 title='User Role Changed',
@@ -449,6 +453,7 @@ def toggle_active_view(request, pk):
                 level='success',
                 link='/',
                 category='system',
+                send_email=False,
             )
         else:
             notify(
@@ -458,6 +463,7 @@ def toggle_active_view(request, pk):
                 level='warning',
                 link='/accounts/profile/',
                 category='system',
+                send_email=False,
             )
         notify_admins(
             title='User Status Changed',

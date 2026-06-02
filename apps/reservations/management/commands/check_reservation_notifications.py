@@ -66,6 +66,7 @@ class Command(BaseCommand):
                     level='info',
                     link=f'/reservations/{res.pk}/',
                     category='reservations',
+                    send_email=False,
                 )
             elif res.kit:
                 for ki in res.kit.items.select_related('equipment__owner'):
@@ -80,7 +81,8 @@ class Command(BaseCommand):
                             level='info',
                             link=f'/reservations/{res.pk}/',
                             category='reservations',
-                        )
+                        send_email=False,
+                    )
 
             res.status = 'ACTIVE'
             res.start_notified = True

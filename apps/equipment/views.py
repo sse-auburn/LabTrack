@@ -502,6 +502,7 @@ def equipment_approve_view(request, pk):
             level='success',
             link=f'/equipment/{equipment.pk}/',
             category='equipment',
+            send_email=False,
         )
 
     messages.success(request, f'Equipment "{equipment.name}" has been approved.')
@@ -541,6 +542,7 @@ def equipment_reject_view(request, pk):
             level='error',
             link='/equipment/',
             category='equipment',
+            send_email=False,
         )
 
     messages.success(request, f'Equipment "{equipment.name}" has been rejected.')

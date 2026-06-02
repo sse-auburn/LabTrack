@@ -228,6 +228,7 @@ def transaction_delete_view(request, pk):
                 level='warning',
                 link='/pcard/deletion-requests/',
                 category='system',
+                send_email=True,
             )
 
             messages.success(
@@ -302,6 +303,7 @@ def deletion_request_approve_view(request, pk):
             level='success',
             link='/pcard/',
             category='system',
+            send_email=False,
         )
 
     messages.success(request, 'Deletion request approved and transaction removed.')
@@ -339,6 +341,7 @@ def deletion_request_reject_view(request, pk):
             level='error',
             link=f'/pcard/{transaction.pk}/',
             category='system',
+            send_email=False,
         )
 
     messages.success(request, 'Deletion request rejected.')

@@ -77,7 +77,7 @@ def _send_email(recipient, title, message, link='', category='system'):
         logger.warning('Failed to send notification email to %s: %s', recipient.email, exc)
 
 
-def notify(recipient, title, message, level='info', link='', category='system'):
+def notify(recipient, title, message, level='info', link='', category='system', send_email=True):
     """Create an in-app notification and send an email for a single user.
 
     Parameters
@@ -110,17 +110,18 @@ def notify(recipient, title, message, level='info', link='', category='system'):
         )
 
     # Email notification (handled inside _send_email with its own checks)
-    _send_email(recipient, title, message, link, category)
+    if send_email:
+        _send_email(recipient, title, message, link, category)
 
 
-def notify_admins(title, message, level='info', link='', category='system'):
+def notify_admins(title, message, level='info', link='', category='system', send_email=False):
     """Notify all active admin users (in-app + email), respecting their preferences."""
     admins = User.objects.filter(role='ADMIN', is_active=True)
     for admin in admins:
-        notify(admin, title, message, level, link, category)
+        notify(admin, title, message, level, link, category, send_email)
 
 
-def notify_users(users, title, message, level='info', link='', category='system'):
+def notify_users(users, title, message, level='info', link='', category='system', send_email=True):
     """Notify a specific queryset or list of users."""
     for user in users:
-        notify(user, title, message, level, link, category)
+        notify(user, title, message, level, link, category, send_email)

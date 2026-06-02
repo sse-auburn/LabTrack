@@ -95,6 +95,7 @@ def contact_view(request):
             level='info',
             link='/admin/cms/',
             category='system',
+            send_email=True,
         )
         sent = True
         form = forms.ContactMessageForm()
