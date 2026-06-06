@@ -92,7 +92,7 @@
                     {% elif res.status == 'CANCELLED' %}bg-red-100 text-red-400 line-through
                     {% elif res.status == 'COMPLETED' %}bg-auburn-bluePale text-auburn-blue border-l-2 border-auburn-orange
                     {% else %}bg-slate-100 text-slate-500{% endif %}"
-             title="{% if res.equipment %}{{ res.equipment.name }}{% elif res.kit %}{{ res.kit.name }}{% endif %} — {{ res.requester.get_full_name|default:res.requester.username }}">
+             title="{% if res.equipment %}{{ res.equipment.name }}{% elif res.kit %}{{ res.kit.name }}{% endif %} — {% if res.requester %}{{ res.requester.get_full_name|default:res.requester.username }}{% else %}Deleted User{% endif %}">
             {% if res.equipment %}{{ res.equipment.name|truncatechars:18 }}{% elif res.kit %}{{ res.kit.name|truncatechars:18 }}{% endif %}
           </a>
           {% endfor %}

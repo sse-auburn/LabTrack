@@ -28,7 +28,7 @@
         {% if reservation.equipment %}{{ reservation.equipment.name }}{% elif reservation.kit %}{{ reservation.kit.name }}{% endif %}
       </h1>
       <p class="mt-1 text-sm text-slate-500">
-        Reserved by <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>
+        Reserved by {% if reservation.requester %}<a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>{% else %}<span class="text-slate-400">Deleted User</span>{% endif %}
       </p>
     </div>
     <div class="flex items-center gap-2">
@@ -81,8 +81,8 @@
         <dt class="text-sm font-medium text-slate-500">Return To</dt>
         <dd class="col-span-2 text-sm text-slate-900">
           {% if reservation.equipment %}
-            <a href="{% url 'accounts:profile_view' reservation.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline font-medium">{{ reservation.equipment.owner.full_name|default:reservation.equipment.owner.username }}</a>
-            <span class="text-slate-400 ml-1 text-xs">({{ reservation.equipment.owner.email }})</span>
+            {% if reservation.equipment.owner %}<a href="{% url 'accounts:profile_view' reservation.equipment.owner.pk %}" class="hover:text-brand-600 hover:underline font-medium">{{ reservation.equipment.owner.full_name|default:reservation.equipment.owner.username }}</a>
+            <span class="text-slate-400 ml-1 text-xs">({{ reservation.equipment.owner.email }})</span>{% else %}<span class="text-slate-400">—</span>{% endif %}
             {% if reservation.equipment.location %}
             <div class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
               <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,8 +153,8 @@
       <div class="px-6 py-4 grid grid-cols-3 gap-4">
         <dt class="text-sm font-medium text-slate-500">Requested By</dt>
         <dd class="col-span-2 text-sm text-slate-900">
-          <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>
-          <span class="text-slate-400 ml-1">({{ reservation.requester.email }})</span>
+          {% if reservation.requester %}<a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>
+          <span class="text-slate-400 ml-1">({{ reservation.requester.email }})</span>{% else %}<span class="text-slate-400">Deleted User</span>{% endif %}
         </dd>
       </div>
 
@@ -271,7 +271,7 @@
               <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
               </svg>
-              Remind {{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}
+              Remind {% if ki.equipment.owner %}{{ ki.equipment.owner.full_name|default:ki.equipment.owner.username }}{% else %}Owner{% endif %}
             </button>
           </form>
           {% endif %}

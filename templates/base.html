@@ -373,7 +373,7 @@
                 </div>
                 <div class="min-w-0 flex-1">
                   <p class="text-sm text-slate-800">
-                    <span class="font-medium">{{ a.actor.get_full_name|default:a.actor.username }}</span>
+                    <span class="font-medium">{% if a.actor %}{{ a.actor.get_full_name|default:a.actor.username }}{% else %}Deleted User{% endif %}</span>
                     <span class="text-slate-500">{{ a.get_action_display|lower }}</span>
                   </p>
                   {% if a.object_repr %}

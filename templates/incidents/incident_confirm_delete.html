@@ -52,7 +52,7 @@
           </div>
           <div class="flex justify-between">
             <span class="text-slate-500">Reported By</span>
-            <span class="font-medium text-slate-700">{{ incident.reported_by.full_name|default:incident.reported_by.username }}</span>
+            <span class="font-medium text-slate-700">{% if incident.reported_by %}{{ incident.reported_by.full_name|default:incident.reported_by.username }}{% else %}Deleted User{% endif %}</span>
           </div>
         </div>
 

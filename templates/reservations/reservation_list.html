@@ -92,7 +92,7 @@
             </td>
             {# Returned By #}
             <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700">
-              <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>
+              {% if reservation.requester %}<a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>{% else %}<span class="text-slate-400">Deleted User</span>{% endif %}
             </td>
             {# Location #}
             <td class="px-4 py-3 text-xs text-slate-500">
@@ -463,7 +463,7 @@
             </td>
             {# Returned By #}
             <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700">
-              <a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>
+              {% if reservation.requester %}<a href="{% url 'accounts:profile_view' reservation.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ reservation.requester.full_name|default:reservation.requester.username }}</a>{% else %}<span class="text-slate-400">Deleted User</span>{% endif %}
             </td>
             {# Owner #}
             <td class="px-4 py-3 text-sm text-slate-700">

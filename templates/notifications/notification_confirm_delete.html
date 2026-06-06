@@ -43,7 +43,7 @@
           </div>
           <div class="flex justify-between">
             <span class="text-slate-500">Recipient</span>
-            <span class="font-medium text-slate-700">{{ notification.recipient.full_name|default:notification.recipient.username }}</span>
+            <span class="font-medium text-slate-700">{% if notification.recipient %}{{ notification.recipient.full_name|default:notification.recipient.username }}{% else %}Deleted User{% endif %}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-slate-500">Created</span>

@@ -157,7 +157,7 @@
           <div class="px-4 py-3">
             <div class="flex items-start justify-between">
               <div>
-                <p class="text-xs font-medium text-slate-800"><a href="{% url 'accounts:profile_view' r.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ r.requester.full_name|default:r.requester.username }}</a></p>
+                <p class="text-xs font-medium text-slate-800">{% if r.requester %}<a href="{% url 'accounts:profile_view' r.requester.pk %}" class="hover:text-brand-600 hover:underline">{{ r.requester.full_name|default:r.requester.username }}</a>{% else %}<span class="text-slate-400">Deleted User</span>{% endif %}</p>
                 <p class="text-xs text-slate-400 mt-0.5">{{ r.start_date|date:"M d" }} – {{ r.end_date|date:"M d, Y" }}</p>
               </div>
               {% if r.status == 'ACTIVE' %}

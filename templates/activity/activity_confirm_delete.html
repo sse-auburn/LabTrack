@@ -43,7 +43,7 @@
           </div>
           <div class="flex justify-between">
             <span class="text-slate-500">Actor</span>
-            <span class="font-medium text-slate-700">{{ log.actor.full_name|default:log.actor.username }}</span>
+            <span class="font-medium text-slate-700">{% if log.actor %}{{ log.actor.full_name|default:log.actor.username }}{% else %}Deleted User{% endif %}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-slate-500">Timestamp</span>
