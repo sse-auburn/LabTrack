@@ -1710,6 +1710,8 @@ def contactmessage_detail_view(request, pk):
             ('Email', item.email),
             ('Subject', item.subject),
             ('Message', item.message),
+            ('IP Address', item.ip_address or '—'),
+            ('Device', item.user_agent or '—'),
             ('Received', item.created_at.strftime('%b %d, %Y %I:%M %p') if item.created_at else '—'),
         ],
     })

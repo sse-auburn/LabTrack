@@ -82,16 +82,32 @@ def sponsors_view(request):
     })
 
 
+def _get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        return x_forwarded_for.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR', '')
+
+
 def contact_view(request):
     from apps.notifications.utils import notify_admins
     blocks = models.ContactBlock.objects.filter(is_active=True)
     form = forms.ContactMessageForm(request.POST or None)
     sent = False
     if request.method == 'POST' and form.is_valid():
-        msg = form.save()
+        msg = form.save(commit=False)
+        msg.ip_address = _get_client_ip(request)
+        msg.user_agent = request.META.get('HTTP_USER_AGENT', '')
+        msg.save()
         notify_admins(
             title=f"New Contact Message: {msg.subject}",
-            message=f"From: {msg.name} ({msg.email})\n\n{msg.message}",
+            message=(
+                f"From: {msg.name} ({msg.email})\n\n"
+                f"{msg.message}\n\n"
+                f"---\n"
+                f"IP Address: {msg.ip_address or 'unknown'}\n"
+                f"Device: {msg.user_agent or 'unknown'}"
+            ),
             level='info',
             link='/admin/cms/',
             category='system',

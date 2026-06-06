@@ -22,7 +22,7 @@ done
 echo "    Database is ready."
 
 echo "==> Applying migrations..."
-python manage.py migrate --noinput
+python manage.py migrate --noinput --fake-initial
 
 echo "==> Collecting static files..."
 python manage.py collectstatic --noinput --clear

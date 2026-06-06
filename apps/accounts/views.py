@@ -27,6 +27,13 @@ from apps.reservations.models import Reservation
 # Authentication views
 # ---------------------------------------------------------------------------
 
+def _get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        return x_forwarded_for.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR', '')
+
+
 def register_view(request):
     """Register a new user, create their profile, log them in, and redirect."""
     if request.user.is_authenticated:
@@ -46,6 +53,9 @@ def register_view(request):
             user.is_active = False
             user.save(update_fields=['is_active'])
 
+            ip = _get_client_ip(request)
+            user_agent = request.META.get('HTTP_USER_AGENT', 'unknown')
+
             log_activity(
                 actor=user,
                 action='USER_REGISTERED',
@@ -58,7 +68,12 @@ def register_view(request):
 
             notify_admins(
                 title='New User Pending Approval',
-                message=f'{user.full_name} ({user.email}) registered and is awaiting account approval.',
+                message=(
+                    f'{user.full_name} ({user.email}) registered and is awaiting account approval.\n\n'
+                    f'---\n'
+                    f'IP Address: {ip or "unknown"}\n'
+                    f'Device: {user_agent}'
+                ),
                 level='info',
                 link='/accounts/users/?status=pending',
                 category='system',
