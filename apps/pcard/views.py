@@ -51,22 +51,33 @@ def _get_filtered_queryset(request):
 @login_required
 def transaction_list_view(request):
     """List all P-Card transactions with optional date filtering."""
-    # Default to current month when no date range has been explicitly set
+    today = date.today()
+    # First day of previous month
+    if today.month == 1:
+        default_first_day = today.replace(year=today.year - 1, month=12, day=1)
+    else:
+        default_first_day = today.replace(month=today.month - 1, day=1)
+    default_last_day = today.replace(day=calendar.monthrange(today.year, today.month)[1])
+
+    # Default to last two months when no date range has been explicitly set
     if 'date_from' not in request.GET and 'date_to' not in request.GET:
-        today = date.today()
-        first_day = today.replace(day=1)
-        last_day = today.replace(day=calendar.monthrange(today.year, today.month)[1])
         params = request.GET.copy()
-        params['date_from'] = first_day.isoformat()
-        params['date_to'] = last_day.isoformat()
+        params['date_from'] = default_first_day.isoformat()
+        params['date_to'] = default_last_day.isoformat()
         return redirect(f"{request.path}?{params.urlencode()}")
 
     queryset = _get_filtered_queryset(request)
     total_spent = queryset.aggregate(total=Sum('total_price'))['total']
 
-    paginator = Paginator(queryset, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    # Detect if we're in default tab view mode (no search + default two-month range)
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    search = request.GET.get('q', '')
+    is_default_view = (
+        not search.strip()
+        and date_from == default_first_day.isoformat()
+        and date_to == default_last_day.isoformat()
+    )
 
     # Pending deletion requests made by current user (for UI badges)
     user_pending_requests = PcardDeletionRequest.objects.filter(
@@ -74,15 +85,41 @@ def transaction_list_view(request):
         status='PENDING',
     ).values_list('transaction_id', flat=True)
 
-    return render(request, 'pcard/transaction_list.html', {
-        'page_obj': page_obj,
-        'transaction_list': page_obj,
+    context = {
         'total_count': queryset.count(),
         'total_spent': total_spent,
         'filter_form': PcardFilterForm(request.GET or None),
-        'search': request.GET.get('q', ''),
+        'search': search,
         'user_pending_requests': set(user_pending_requests),
-    })
+        'is_default_view': is_default_view,
+    }
+
+    if is_default_view:
+        first_of_month = today.replace(day=1)
+        current_month_qs = queryset.filter(transaction_date__gte=first_of_month)
+        previous_qs = queryset.filter(transaction_date__lt=first_of_month)
+
+        paginator = Paginator(previous_qs, 10)
+        page_number = request.GET.get('page')
+        previous_page_obj = paginator.get_page(page_number)
+
+        context.update({
+            'current_month_list': current_month_qs,
+            'previous_page_obj': previous_page_obj,
+            'previous_list': previous_page_obj,
+            'current_month_total': current_month_qs.aggregate(total=Sum('total_price'))['total'],
+            'previous_total': previous_qs.aggregate(total=Sum('total_price'))['total'],
+        })
+    else:
+        paginator = Paginator(queryset, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context.update({
+            'page_obj': page_obj,
+            'transaction_list': page_obj,
+        })
+
+    return render(request, 'pcard/transaction_list.html', context)
 
 
 @login_required
