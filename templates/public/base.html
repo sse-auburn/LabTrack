@@ -90,8 +90,9 @@
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
             <div x-show="open" x-cloak x-transition class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1">
-              <a href="{% url 'accounts:login' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-auburn-bluePale hover:text-auburn-orange">LabTrack Login</a>
-              <a href="{% url 'accounts:register' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-auburn-bluePale hover:text-auburn-orange">Request Access</a>
+              <a href="https://auaccess.auburn.edu/" class="block px-4 py-2 text-sm text-slate-700 hover:bg-auburn-bluePale hover:text-auburn-orange">AU Access</a>
+              <a href="{% url 'accounts:login' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-auburn-bluePale hover:text-auburn-orange">LabTrack</a>
+              <a href="https://xylemvision.eng.auburn.edu/" class="block px-4 py-2 text-sm text-slate-700 hover:bg-auburn-bluePale hover:text-auburn-orange">Xylem Vision</a>
             </div>
           </div>
         </nav>
@@ -116,8 +117,9 @@
               <a href="{% url 'public:about' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.url_name == 'about' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">About Lab</a>
               <a href="{% url 'public:contact' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.url_name == 'contact' %}bg-auburn-bluePale text-auburn-orange font-semibold{% else %}text-slate-700 hover:text-auburn-orange hover:bg-auburn-bluePale{% endif %}">Contact</a>
               <div class="pt-2 border-t border-slate-100">
-                <a href="{% url 'accounts:login' %}" class="block px-3 py-2 rounded-md text-base font-semibold text-auburn-orange">LabTrack Login</a>
-                <a href="{% url 'accounts:register' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600">Request Access</a>
+                <a href="https://auaccess.auburn.edu/" class="block px-3 py-2 rounded-md text-base font-semibold text-auburn-orange">AU Access</a>
+                <a href="{% url 'accounts:login' %}" class="block px-3 py-2 rounded-md text-base font-semibold text-auburn-orange">LabTrack</a>
+                <a href="https://xylemvision.eng.auburn.edu/" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600">Xylem Vision</a>
               </div>
             </div>
           </div>
@@ -157,8 +159,9 @@
         <div>
           <h3 class="font-semibold text-white mb-4">Systems</h3>
           <ul class="space-y-2 text-sm text-slate-300">
-            <li><a href="{% url 'accounts:login' %}" class="hover:text-auburn-orange transition">LabTrack Login</a></li>
-            <li><a href="{% url 'accounts:register' %}" class="hover:text-auburn-orange transition">Request Access</a></li>
+            <li><a href="auaccess.auburn.edu" class="hover:text-auburn-orange transition">AU Access</a></li>
+            <li><a href="{% url 'accounts:login' %}" class="hover:text-auburn-orange transition">LabTrack</a></li>
+            <li><a href="https://xylemvision.eng.auburn.edu/" class="hover:text-auburn-orange transition">Xylem Vision</a></li>
           </ul>
         </div>
       </div>
